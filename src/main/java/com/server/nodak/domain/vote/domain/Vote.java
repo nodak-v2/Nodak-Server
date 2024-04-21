@@ -19,6 +19,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(of = {"title"})
 public class Vote extends BaseEntity {
+    
     @Column(nullable = false)
     @NotBlank
     private String title;

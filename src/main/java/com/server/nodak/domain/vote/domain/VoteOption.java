@@ -24,13 +24,14 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(of = {"title", "seq"})
 public class VoteOption extends BaseEntity {
+    
     @Column(nullable = false)
     @NotBlank
     private String content;
 
     @Column(nullable = false)
     @Min(0)
-    private int seq;
+    private Integer seq;
 
     @ManyToOne(cascade = {CascadeType.PERSIST}, optional = false)
     @JoinColumn(nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))

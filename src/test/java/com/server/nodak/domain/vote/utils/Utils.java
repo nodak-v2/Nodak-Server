@@ -8,7 +8,6 @@ public class Utils {
     static Random rnd = new Random();
 
     public static VoteOption createVoteOption(Vote vote, Integer seq, String content) {
-
         return VoteOption.builder()
                 .vote(vote)
                 .content(content)
