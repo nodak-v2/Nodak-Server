@@ -1,0 +1,16 @@
+spring:
+  application:
+    name:
+      hotel
+  datasource:
+    driver-class-name: org.h2.Driver
+    url: jdbc:h2:mem:test;MODE=MARIADB;DATABASE_TO_UPPER=FALSE;NON_KEYWORDS=USER
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    properties:
+      hibernate:
+        format_sql: true
+        show_sql: true
+        dialect: org.hibernate.dialect.MariaDBDialect
+    database-platform: org.hibernate.dialect.MariaDBDialect
