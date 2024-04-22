@@ -1,7 +1,9 @@
 package com.server.nodak.domain.post.domain;
 
 import com.server.nodak.domain.user.domain.User;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,6 +46,26 @@ class PostTest {
 
         em.persist(post);
 
+        // when & then
         assertThat(post).isEqualTo(em.find(Post.class, post.getId()));
+    }
+
+    @Test
+    @DisplayName("title 또는 content 가 공백이면 예외 발생")
+    void title_content_empty() {
+        // given
+        Post post1 = Post.builder()
+                .title("post1")
+                .imageUrl("abc.abc")
+                .user(user)
+                .build();
+
+        // When
+        Throwable throwable = Assertions.catchThrowable(() -> {
+            em.persist(post1);
+        });
+
+        //Then
+        Assertions.assertThat(throwable).isInstanceOf(ConstraintViolationException.class);
     }
 }
