@@ -1,6 +1,5 @@
 package com.server.nodak.security.jwt;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import java.util.Random;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 
 @SpringBootTest
 class TokenProviderTest {
