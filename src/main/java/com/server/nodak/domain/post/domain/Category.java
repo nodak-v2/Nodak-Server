@@ -3,6 +3,7 @@ package com.server.nodak.domain.post.domain;
 import com.server.nodak.domain.model.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
@@ -11,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @NoArgsConstructor
 @Table(name = "category")
 @SQLDelete(sql = "UPDATE category SET is_deleted = true WHERE id = ?")

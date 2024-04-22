@@ -1,10 +1,12 @@
 package com.server.nodak.domain.post.domain;
 
+import com.server.nodak.domain.comment.domain.Comment;
 import com.server.nodak.domain.model.BaseEntity;
 import com.server.nodak.domain.user.domain.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
+@Getter
 @NoArgsConstructor
 @Table(name = "post")
 @SQLDelete(sql = "UPDATE post SET is_deleted = true WHERE id = ?")
@@ -46,6 +49,9 @@ public class Post extends BaseEntity {
 
     @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<StarPost> starPosts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
 
     @Builder
     public Post(String title, String content, String imageUrl, int stars, int views, User user) {

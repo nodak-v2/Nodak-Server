@@ -1,8 +1,10 @@
-package com.server.nodak.domain.post.domain;
+package com.server.nodak.domain.comment.domain;
 
 import com.server.nodak.domain.model.BaseEntity;
+import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
@@ -11,9 +13,12 @@ import org.hibernate.annotations.SQLDelete;
 @Entity
 @Getter
 @NoArgsConstructor
-@Table(name = "star_post")
-@SQLDelete(sql = "UPDATE star_post SET is_deleted = true WHERE id = ?")
-public class StarPost extends BaseEntity {
+@Table(name = "comment")
+@SQLDelete(sql = "UPDATE comment SET is_deleted = true WHERE id = ?")
+public class Comment extends BaseEntity {
+
+    @NotNull
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -25,5 +30,5 @@ public class StarPost extends BaseEntity {
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
     @ColumnDefault("false")
-    private boolean isDeleted;
+    private Boolean isDeleted;
 }
