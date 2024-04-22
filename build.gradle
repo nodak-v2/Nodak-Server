@@ -28,6 +28,9 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
+    // Validator
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
     // H2
     testImplementation 'com.h2database:h2'
 

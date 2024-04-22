@@ -6,10 +6,11 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 @EnableJpaAuditing
 @SpringBootApplication
+@EnableJpaAuditing
 public class NodakApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NodakApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(NodakApplication.class, args);
+    }
 
 }
