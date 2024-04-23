@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @SpringBootApplication
 public class NodakApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(NodakApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(NodakApplication.class, args);
+    }
 
 }
