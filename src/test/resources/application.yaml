@@ -19,3 +19,6 @@ spring:
     access-token-expiration: 3600000 # 1 Hours
     refresh-token-expiration: 86400000 # 1 Days
     key: sgjasg3123adadg3123123hdfh21ad53422dadasf5123adadg3123123hdfh21ad53425 # 추후 수정 필요
+
+swagger:
+  url: http://localhost:8080
