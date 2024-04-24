@@ -31,12 +31,4 @@ public class Category extends BaseEntity {
     public Category(String title) {
         this.title = title;
     }
-
-    public void addPost(Post post) {
-        this.posts.add(post);
-    }
-
-    public void deletePost(Post post) {
-        this.posts.remove(post);
-    }
 }

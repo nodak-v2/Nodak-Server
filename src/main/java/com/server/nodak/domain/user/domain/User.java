@@ -1,12 +1,16 @@
 package com.server.nodak.domain.user.domain;
 
 import com.server.nodak.domain.model.BaseEntity;
+import com.server.nodak.domain.post.domain.Post;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
 
-import static com.server.nodak.domain.user.domain.UserRole.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import static com.server.nodak.domain.user.domain.UserRole.GENERAL;
 
 @Getter
 @Entity
@@ -37,6 +41,10 @@ public class User extends BaseEntity {
     private String profileImageUrl;
 
     private Boolean isDeleted;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<Post> posts = new ArrayList<>();
+
 
     private User(String email, String password, String nickname, UserProvider provider) {
         this.email = email;
