@@ -42,6 +42,7 @@ class PostTest {
                 .content("게시글 내용 AA. 투표 부탁드립니다.")
                 .imageUrl("abc.abc")
                 .user(user)
+                .category(new Category())
                 .build();
 
         em.persist(post);
@@ -58,6 +59,7 @@ class PostTest {
                 .title("post1")
                 .imageUrl("abc.abc")
                 .user(user)
+                .category(new Category())
                 .build();
 
         // When
