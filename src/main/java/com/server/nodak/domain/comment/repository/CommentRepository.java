@@ -1,7 +1,12 @@
 package com.server.nodak.domain.comment.repository;
 
-import com.server.nodak.domain.comment.domain.Comment;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.querydsl.jpa.JPQLQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+@Repository
+@RequiredArgsConstructor
+public class CommentRepository {
+
+    private final JPQLQueryFactory queryFactory;
 }

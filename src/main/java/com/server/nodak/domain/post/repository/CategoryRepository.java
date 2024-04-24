@@ -1,7 +1,12 @@
 package com.server.nodak.domain.post.repository;
 
-import com.server.nodak.domain.post.domain.Category;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.querydsl.jpa.JPQLQueryFactory;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
-public interface CategoryRepository extends JpaRepository<Category, Long> {
+@Repository
+@RequiredArgsConstructor
+public class CategoryRepository {
+
+    private final JPQLQueryFactory queryFactory;
 }
