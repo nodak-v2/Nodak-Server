@@ -3,14 +3,14 @@ package com.server.nodak.domain.vote.domain;
 import static com.server.nodak.domain.vote.utils.Utils.createPost;
 import static com.server.nodak.domain.vote.utils.Utils.createUser;
 import static com.server.nodak.domain.vote.utils.Utils.createVote;
+import static com.server.nodak.domain.vote.utils.Utils.createVoteHistory;
 import static com.server.nodak.domain.vote.utils.Utils.createVoteOption;
 
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
-import jakarta.validation.ConstraintViolationException;
-import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
+import org.hibernate.exception.ConstraintViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,42 +23,51 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @DisplayName("VoteOption 엔티티 테스트")
 @Slf4j
-class VoteOptionTest {
-    Random rnd = new Random();
+class VoteHistoryTest {
+
     @Autowired
     TestEntityManager em;
-    Vote vote;
+
+    User user;
+
+    VoteOption voteOption;
+    VoteHistory voteHistory;
 
     @BeforeEach
     public void setUp() {
-        User user = createUser();
+        user = createUser();
         Post post = createPost(user);
-        vote = createVote("test_title", post);
+        Vote vote = createVote("test_title", post);
+        voteOption = createVoteOption(vote, 1, "test_content");
+        voteHistory = createVoteHistory(user, voteOption);
+        em.persist(user);
+        em.persist(post);
         em.persist(vote);
+        em.persist(voteOption);
     }
 
     @Test
-    @DisplayName("VoteOption 저장 테스트")
+    @DisplayName("VoteHistory 저장 테스트")
     public void testSave() {
         // Given
-        VoteOption voteOption = createVoteOption(vote, null, "test_content");
+        voteHistory = createVoteHistory(user, voteOption);
 
         // When
-        em.persist(voteOption);
+        em.persist(voteHistory);
 
         //Then
-        Assertions.assertThat(em.find(VoteOption.class, voteOption.getId())).isEqualTo(voteOption);
+        Assertions.assertThat(em.find(VoteHistory.class, voteHistory.getId())).isEqualTo(voteHistory);
     }
 
     @Test
-    @DisplayName("VoteOption 저장 테스트 - content가 공백이면 예외를 발생시킨다.")
-    public void testSaveByTitleIsEmpty() {
+    @DisplayName("VoteHistory 저장 테스트 - User가 null이면 예외를 발생시킨다.")
+    public void testSaveByUserIsNull() {
         // Given
-        VoteOption voteOption = createVoteOption(vote, null, "");
+        voteHistory = createVoteHistory(null, voteOption);
 
         // When
         Throwable throwable = Assertions.catchThrowable(() -> {
-            em.persist(voteOption);
+            em.persist(voteHistory);
         });
 
         //Then
@@ -66,14 +75,14 @@ class VoteOptionTest {
     }
 
     @Test
-    @DisplayName("VoteOption 저장 테스트 - seq가 0 이하 경우 예외를 발생시킨다.")
-    public void testSaveByMinSeq() {
+    @DisplayName("VoteHistory 저장 테스트 - VoteOption이 null이면 예외를 발생시킨다.")
+    public void testSaveByVoteOptionIsNull() {
         // Given
-        VoteOption voteOption = createVoteOption(vote, -1, "test_content");
+        voteHistory = createVoteHistory(user, null);
 
         // When
         Throwable throwable = Assertions.catchThrowable(() -> {
-            em.persist(voteOption);
+            em.persist(voteHistory);
         });
 
         //Then
