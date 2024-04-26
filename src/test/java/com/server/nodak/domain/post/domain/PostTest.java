@@ -62,12 +62,25 @@ class PostTest {
                 .category(new Category())
                 .build();
 
+        Post post2 = Post.builder()
+                .content("게시글 내용 AA")
+                .imageUrl("abc.abc")
+                .user(user)
+                .category(new Category())
+                .build();
+
         // When
-        Throwable throwable = Assertions.catchThrowable(() -> {
+        Throwable result1 = Assertions.catchThrowable(() -> {
             em.persist(post1);
         });
 
+        Throwable result2 = Assertions.catchThrowable(() -> {
+            em.persist(post2);
+        });
+
         //Then
-        Assertions.assertThat(throwable).isInstanceOf(ConstraintViolationException.class);
+        Assertions.assertThat(result1).isInstanceOf(ConstraintViolationException.class);
+        Assertions.assertThat(result2).isInstanceOf(ConstraintViolationException.class);
+
     }
 }

@@ -45,7 +45,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
     private List<Post> posts = new ArrayList<>();
 
-
     private User(String email, String password, String nickname, UserProvider provider) {
         this.email = email;
         this.password = password;
