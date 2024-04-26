@@ -6,7 +6,6 @@ import com.server.nodak.domain.comment.repository.CommentJpaRepository;
 import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.repository.PostJpaRepository;
-import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.exception.common.DataNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,10 +23,10 @@ public class CommentService {
                 () -> new DataNotFoundException());
 
 
-        // TODO : 로그인한 유저 넣기
+        // TODO : 로그인 한 유저 넣기
         Comment comment = Comment.builder()
                 .content(commentRequest.getContent())
-                .user(new User())
+                .user(null)
                 .post(post)
                 .build();
 
