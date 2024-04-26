@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "category")
 @SQLDelete(sql = "UPDATE category SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 public class Category extends BaseEntity {
 
     @NotNull

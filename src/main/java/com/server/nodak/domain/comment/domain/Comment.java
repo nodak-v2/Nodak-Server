@@ -10,12 +10,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "comment")
 @SQLDelete(sql = "UPDATE comment SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 public class Comment extends BaseEntity {
 
     @NotBlank
@@ -31,7 +33,7 @@ public class Comment extends BaseEntity {
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
     @ColumnDefault("false")
-    private Boolean isDeleted;
+    private boolean isDeleted;
 
     @Builder
     public Comment(String content, User user, Post post) {
