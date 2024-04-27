@@ -28,13 +28,13 @@ public class Utils {
                 .build();
     }
 
-    public static Post createPost(User user) {
+    public static Post createPost(User user, String title, String content, Category category) {
         return Post.builder()
-                .title("post1")
-                .content("게시글 내용 AA. 투표 부탁드립니다.")
+                .title(title)
+                .content(content)
                 .imageUrl("abc.abc")
                 .user(user)
-                .category(new Category())
+                .category(category)
                 .build();
     }
 
@@ -44,5 +44,9 @@ public class Utils {
 
     public static VoteHistory createVoteHistory(User user, VoteOption voteOption) {
         return VoteHistory.builder().user(user).voteOption(voteOption).build();
+    }
+
+    public static Category createCategory() {
+        return new Category("축구");
     }
 }

@@ -1,12 +1,15 @@
 package com.server.nodak.domain.vote.domain;
 
+import static com.server.nodak.domain.vote.utils.Utils.createCategory;
 import static com.server.nodak.domain.vote.utils.Utils.createPost;
 import static com.server.nodak.domain.vote.utils.Utils.createUser;
 import static com.server.nodak.domain.vote.utils.Utils.createVote;
 import static com.server.nodak.domain.vote.utils.Utils.createVoteOption;
 
+import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.global.config.QueryDslConfig;
 import jakarta.validation.ConstraintViolationException;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.springframework.context.annotation.Import;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({QueryDslConfig.class})
 @DisplayName("VoteOption 엔티티 테스트")
 @Slf4j
 class VoteOptionTest {
@@ -32,9 +37,12 @@ class VoteOptionTest {
     @BeforeEach
     public void setUp() {
         User user = createUser();
-        Post post = createPost(user);
+        Category category = createCategory();
+        Post post = createPost(user, "title", "content", category);
         vote = createVote("test_title", post);
+        em.persist(category);
         em.persist(vote);
+
     }
 
     @Test
