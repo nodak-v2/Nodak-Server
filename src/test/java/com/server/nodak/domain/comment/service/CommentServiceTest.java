@@ -8,6 +8,7 @@ import com.server.nodak.domain.comment.repository.CommentJpaRepository;
 import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.repository.PostJpaRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,27 @@ class CommentServiceTest {
     @MockBean
     private PostJpaRepository postJpaRepository;
 
+    private Long postId;
+    private Long commentId;
+    private Post post;
+    private Comment comment;
+
+    @BeforeEach
+    void setUp() {
+        postId = 1L;
+        commentId = 1L;
+
+        post = new Post();  // Post 생성자나 빌더로 필요한 초기화 진행
+        comment = Comment.builder()
+                .post(post)
+                .content("Original content")
+                .build();
+
+        // ID가 필요한 테스트에서는 ReflectionTestUtils 사용
+        ReflectionTestUtils.setField(comment, "id", commentId);
+        ReflectionTestUtils.setField(post, "id", postId);
+    }
+
     @Test
     @DisplayName("댓글 생성 테스트")
     void createComment_테스트() {
@@ -64,7 +86,6 @@ class CommentServiceTest {
     @DisplayName("게시글 댓글 조회")
     void fetchCommentsForPost_테스트() {
         // given
-        Long postId = 1L;
         when(postJpaRepository.findById(postId)).thenReturn(Optional.of(new Post()));
         when(commentRepository.getCommentsByPost(postId)).thenReturn(Collections.emptyList());
 
@@ -80,18 +101,6 @@ class CommentServiceTest {
     @DisplayName("댓글 수정 테스트")
     void updateComment_테스트() {
         // given
-        Long postId = 1L;
-        Post post = new Post();
-
-        Long commentId = 1L;
-        Comment comment = Comment.builder()
-                .post(post)
-                .content("원래 댓굴")
-                .build();
-
-        ReflectionTestUtils.setField(post, "id", postId);
-        ReflectionTestUtils.setField(comment, "id", commentId);
-
         UpdateCommentRequest commentRequest = new UpdateCommentRequest("수정된 댓글");
 
         when(commentJpaRepository.findById(commentId)).thenReturn(Optional.of(comment));
@@ -107,18 +116,6 @@ class CommentServiceTest {
     @DisplayName("댓글 삭제 테스트")
     void deleteComment() {
         // given
-        Long postId = 1L;
-        Post post = new Post();
-
-        Long commentId = 1L;
-        Comment comment = Comment.builder()
-                .post(post)
-                .content("원래 댓굴")
-                .build();
-
-        ReflectionTestUtils.setField(post, "id", postId);
-        ReflectionTestUtils.setField(comment, "id", commentId);
-
         when(commentJpaRepository.findById(commentId)).thenReturn(Optional.of(comment));
 
         // when
