@@ -1,6 +1,7 @@
 package com.server.nodak.domain.comment.controller;
 
 import com.server.nodak.domain.comment.dto.request.CreateCommentRequest;
+import com.server.nodak.domain.comment.dto.request.UpdateCommentRequest;
 import com.server.nodak.domain.comment.dto.response.CommentResponse;
 import com.server.nodak.domain.comment.service.CommentService;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,24 @@ public class CommentController {
     public ResponseEntity<List<CommentResponse>> getComments(@PathVariable("postId") long postId) {
         List<CommentResponse> result = commentService.fetchCommentsForPost(postId);
         return ResponseEntity.ok(result);
+    }
+
+    @PatchMapping("/{commentId}")
+    public ResponseEntity<Void> updateComment(
+            @PathVariable("postId") long postId,
+            @PathVariable("commentId") long commentId,
+            @RequestBody UpdateCommentRequest commentRequest
+    ) {
+        commentService.updateComment(postId, commentId, commentRequest);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{commentId}")
+    public ResponseEntity<Void> deleteComment(
+        @PathVariable("postId") long postId,
+        @PathVariable("commentId") long commentId
+    ) {
+        commentService.deleteComment(postId, commentId);
+        return ResponseEntity.ok().build();
     }
 }

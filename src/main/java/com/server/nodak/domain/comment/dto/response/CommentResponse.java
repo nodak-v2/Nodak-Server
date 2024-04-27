@@ -6,10 +6,9 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Getter
+@Builder
+@AllArgsConstructor
 public class CommentResponse {
 
     private Long commentId;
