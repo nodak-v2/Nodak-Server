@@ -1,20 +1,21 @@
 spring:
-  application:
-    name:
-      hotel
   datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/nodak?useUnicode=yes&characterEncoding=UTF-8
     username: root
-    password: 1234
+    password: 1235
+    url: jdbc:mysql://localhost:3306/nodak?useUnicode=yes&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
-      ddl-auto: create-drop
-    properties:
-      hibernate:
-        format_sql: true
-        show_sql: true
-        dialect: org.hibernate.dialect.MySQLDialect
-    database-platform: org.hibernate.dialect.MariaDBDialect
+      ddl-auto: update
+      format_sql: true
+      show_sql: true
+      dialect: org.hibernate.dialect.MySQLDialect
+
+  jwt:
+    access-token-expiration: 3600000 # 1 Hours
+    refresh-token-expiration: 86400000 # 1 Days
+    key: sgjasg3123adadg3123123hdfh21ad53422dadasf5123adadg3123123hdfh21ad53425 # 추후 수정 필요
+
 swagger:
   url: http://localhost:8080
