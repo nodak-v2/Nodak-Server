@@ -10,4 +10,8 @@ public class UpdateCommentRequest {
 
     @NotBlank(message = "댓글 내용을 입력해주세요.")
     private String content;
+
+    public UpdateCommentRequest(String content) {
+        this.content = content;
+    }
 }
