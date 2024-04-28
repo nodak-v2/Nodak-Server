@@ -1,7 +1,6 @@
 spring:
   application:
-    name:
-      hotel
+    name: test
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test;MODE=MARIADB;DATABASE_TO_UPPER=FALSE;NON_KEYWORDS=USER

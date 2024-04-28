@@ -1,7 +1,6 @@
 spring:
   application:
-    name:
-      hotel
+    name: prod
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/nodak?useUnicode=yes&characterEncoding=UTF-8
