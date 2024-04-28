@@ -42,7 +42,6 @@ class VoteOptionTest {
         vote = createVote("test_title", post);
         em.persist(category);
         em.persist(vote);
-
     }
 
     @Test
