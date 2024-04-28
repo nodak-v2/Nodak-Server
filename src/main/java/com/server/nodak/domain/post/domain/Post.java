@@ -2,8 +2,17 @@ package com.server.nodak.domain.post.domain;
 
 import com.server.nodak.domain.model.BaseEntity;
 import com.server.nodak.domain.user.domain.User;
-import jakarta.persistence.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,15 +20,12 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "post")
 @SQLDelete(sql = "UPDATE post SET is_deleted = true WHERE id = ?")
-@SQLRestriction("is_deleted is false")
+@SQLRestriction("is_deleted = false")
 public class Post extends BaseEntity {
 
     @NotBlank
@@ -34,7 +40,7 @@ public class Post extends BaseEntity {
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
     @ColumnDefault("false")
-    private Boolean isDeleted;
+    private boolean isDeleted;
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")

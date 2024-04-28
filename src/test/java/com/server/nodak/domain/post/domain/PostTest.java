@@ -1,6 +1,10 @@
 package com.server.nodak.domain.post.domain;
 
+import static com.server.nodak.domain.user.domain.UserProvider.KAKAO;
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.global.config.QueryDslConfig;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
@@ -11,12 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
-import static com.server.nodak.domain.user.domain.UserProvider.KAKAO;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.context.annotation.Import;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({QueryDslConfig.class})
 @DisplayName("Post 엔티티 생성 테스트")
 @Slf4j
 class PostTest {
