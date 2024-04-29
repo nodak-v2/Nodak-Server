@@ -11,11 +11,11 @@ import com.server.nodak.domain.post.repository.PostJpaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -26,20 +26,19 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest
-@Transactional
+@ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
 
-    @Autowired
+    @InjectMocks
     private CommentService commentService;
 
-    @MockBean
+    @Mock
     private CommentRepository commentRepository;
 
-    @MockBean
+    @Mock
     private CommentJpaRepository commentJpaRepository;
 
-    @MockBean
+    @Mock
     private PostJpaRepository postJpaRepository;
 
     private Long postId;
