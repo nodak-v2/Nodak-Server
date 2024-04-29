@@ -22,9 +22,9 @@ import lombok.ToString;
 @Getter
 @Entity
 @NoArgsConstructor
-@ToString(of = {"title", "seq"})
+@ToString(of = {"content", "seq"})
 public class VoteOption extends BaseEntity {
-    
+
     @Column(nullable = false)
     @NotBlank
     private String content;

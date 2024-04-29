@@ -1,5 +1,10 @@
 package com.server.nodak.domain.user.domain;
 
+import static com.server.nodak.domain.user.domain.User.createUser;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import com.server.nodak.global.config.QueryDslConfig;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,14 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
-
-import java.util.UUID;
-
-import static com.server.nodak.domain.user.domain.User.createUser;
-import static org.assertj.core.api.Assertions.assertThat;
+import org.springframework.context.annotation.Import;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@Import({QueryDslConfig.class})
 @DisplayName("User 엔티티 테스트")
 @Slf4j
 class UserTest {
