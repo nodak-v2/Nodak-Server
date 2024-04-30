@@ -8,30 +8,34 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "comment")
 @SQLDelete(sql = "UPDATE comment SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 public class Comment extends BaseEntity {
 
     @NotBlank
+    @Setter
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "post_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Post post;
 
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
     @ColumnDefault("false")
-    private Boolean isDeleted;
+    private boolean isDeleted;
 
     @Builder
     public Comment(String content, User user, Post post) {

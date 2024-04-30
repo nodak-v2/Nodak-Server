@@ -7,12 +7,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "star_post")
 @SQLDelete(sql = "UPDATE star_post SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 public class StarPost extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
