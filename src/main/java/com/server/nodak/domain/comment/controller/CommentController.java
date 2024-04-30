@@ -4,6 +4,7 @@ import com.server.nodak.domain.comment.dto.request.CreateCommentRequest;
 import com.server.nodak.domain.comment.dto.request.UpdateCommentRequest;
 import com.server.nodak.domain.comment.dto.response.CommentResponse;
 import com.server.nodak.domain.comment.service.CommentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class CommentController {
     @PostMapping
     public ResponseEntity<Void> createComment(
             @PathVariable("postId") long postId,
-            @RequestBody CreateCommentRequest commentRequest
+            @Valid @RequestBody CreateCommentRequest commentRequest
     ) {
         commentService.createComment(postId, commentRequest);
         return ResponseEntity.ok().build();
@@ -36,7 +37,7 @@ public class CommentController {
     public ResponseEntity<Void> updateComment(
             @PathVariable("postId") long postId,
             @PathVariable("commentId") long commentId,
-            @RequestBody UpdateCommentRequest commentRequest
+            @Valid @RequestBody UpdateCommentRequest commentRequest
     ) {
         commentService.updateComment(postId, commentId, commentRequest);
         return ResponseEntity.ok().build();

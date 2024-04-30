@@ -4,8 +4,8 @@ import com.server.nodak.domain.comment.domain.Comment;
 import com.server.nodak.domain.comment.dto.request.CreateCommentRequest;
 import com.server.nodak.domain.comment.dto.request.UpdateCommentRequest;
 import com.server.nodak.domain.comment.dto.response.CommentResponse;
-import com.server.nodak.domain.comment.repository.CommentJpaRepository;
 import com.server.nodak.domain.comment.repository.CommentRepository;
+import com.server.nodak.domain.comment.repository.CommentRepositoryImpl;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.repository.PostJpaRepository;
 import com.server.nodak.exception.common.BadRequestException;
@@ -14,15 +14,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class CommentService {
 
-    private final CommentRepository commentRepository;
-    private final CommentJpaRepository commentJpaRepository;
+    private final CommentRepositoryImpl commentRepositoryImpl;
+    private final CommentRepository commentJpaRepository;
     private final PostJpaRepository postJpaRepository;
 
     @Transactional
@@ -45,19 +45,15 @@ public class CommentService {
         postJpaRepository.findById(postId).orElseThrow(
                 () -> new DataNotFoundException());
 
-        List<Comment> comments = commentRepository.getCommentsByPost(postId);
+        List<Comment> comments = commentRepositoryImpl.getCommentsByPostId(postId);
 
         return convertToCommentResponseList(comments);
     }
 
     private List<CommentResponse> convertToCommentResponseList(List<Comment> comments) {
-        List<CommentResponse> result = new ArrayList<>();
-
-        for (Comment comment : comments) {
-            CommentResponse commentResponse = CommentResponse.of(comment);
-            result.add(commentResponse);
-        }
-        return result;
+        return comments.stream()
+                .map(CommentResponse::of)
+                .collect(Collectors.toList());
     }
 
     @Transactional
