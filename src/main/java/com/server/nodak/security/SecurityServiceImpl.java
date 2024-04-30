@@ -26,11 +26,7 @@ public class SecurityServiceImpl implements SecurityService {
     }
 
     private UsernamePasswordAuthenticationToken createAuthentication(User user) {
-        return new UsernamePasswordAuthenticationToken(
-                user,
-                null,
-                of(userRoleToAuthorities(user.getRole()))
-        );
+        return new NodakAuthentication(user);
     }
 
     private User getUser(String userId) {
