@@ -40,6 +40,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @Slf4j
 class VoteServiceTest {
     Random rnd = new Random();
+    
     @InjectMocks
     VoteService voteService;
     @Mock
@@ -50,6 +51,7 @@ class VoteServiceTest {
     VoteOptionRepository voteOptionRepository;
     @Mock
     VoteHistoryRepository voteHistoryRepository;
+    
     User user;
     Category category;
     Post post;
