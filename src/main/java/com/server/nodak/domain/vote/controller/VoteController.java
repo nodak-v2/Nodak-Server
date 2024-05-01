@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 @RequestMapping("/votes")
 public class VoteController {
+
     private final VoteService voteService;
 
     @GetMapping("/{voteId}")
