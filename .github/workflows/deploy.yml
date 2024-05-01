@@ -1,8 +1,9 @@
 name: Docker Build and Deploy
 
 on:
-  pull_request:
-    branches: develop
+  push:
+    branches:
+      - develop # Action 트리거 브랜치
 
 permissions:
   contents: read
