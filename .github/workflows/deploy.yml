@@ -43,7 +43,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
+            matt1235/${{ secrets.DOCKER_REPOSITORY }}:latest
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
