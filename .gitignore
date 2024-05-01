@@ -23,6 +23,7 @@ bin/
 *.iml
 *.ipr
 src/main/generated
+src/main/resources/*.yaml
 out/
 !**/src/main/**/out/
 !**/src/test/**/out/
