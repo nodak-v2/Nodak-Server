@@ -43,9 +43,9 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ github.ref_name }}
+            ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${{ github.head_ref }}
             ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest
-          labels: version=${{ github.ref_name }}
+          labels: version=${{ github.head_ref }}
 
       - name: Deploy to Server
         uses: appleboy/ssh-action@master
