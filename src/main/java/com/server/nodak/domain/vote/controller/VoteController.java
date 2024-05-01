@@ -1,8 +1,10 @@
 package com.server.nodak.domain.vote.controller;
 
+import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.domain.vote.dto.VoteResultResponse;
 import com.server.nodak.domain.vote.service.VoteService;
 import com.server.nodak.global.common.response.ApiResponse;
+import com.server.nodak.security.aop.AuthorizationRequired;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +28,7 @@ public class VoteController {
     }
 
     @PostMapping("/{voteId}")
+    @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> registerVote(@PathVariable Long voteId, @RequestParam Long option,
                                                           Principal principal) {
         voteService.registerVoteOption(principal.getName(), voteId, option);
