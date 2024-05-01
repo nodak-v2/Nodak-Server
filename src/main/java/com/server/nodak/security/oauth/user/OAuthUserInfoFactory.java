@@ -1,13 +1,10 @@
 package com.server.nodak.security.oauth.user;
 
-import com.server.nodak.domain.user.domain.UserProvider;
 import com.server.nodak.exception.common.InternalServerErrorException;
-import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.util.Map;
 
-import static com.server.nodak.domain.user.domain.UserProvider.*;
 import static lombok.AccessLevel.*;
 
 @NoArgsConstructor(access = PRIVATE)

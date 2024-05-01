@@ -47,10 +47,9 @@ public class OAuthServiceHandler extends DefaultOAuth2UserService {
     private User getUserByEmail(OAuthUserInfo oAuthUserInfo) {
         User user = userRepository.findByEmail(oAuthUserInfo.getEmail()).orElse(null);
 
-        if(user == null) {
+        if (user == null) {
             user = registerUser(oAuthUserInfo);
-        }
-        else if (user.getProvider() != oAuthUserInfo.getProvider()) {
+        } else if (user.getProvider() != oAuthUserInfo.getProvider()) {
             throw new DataNotFoundException("이미 해당 이메일로 가입된 아이디가 있습니다.");
         }
 
