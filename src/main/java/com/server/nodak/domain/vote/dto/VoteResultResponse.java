@@ -13,5 +13,6 @@ import lombok.NoArgsConstructor;
 public class VoteResultResponse {
     private Long voteId;
     private String voteTitle;
+    private int totalNumber;
     private List<VoteOptionResult> voteOptions;
 }

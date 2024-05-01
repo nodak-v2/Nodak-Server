@@ -57,6 +57,7 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
         return VoteResultResponse.builder()
                 .voteId(voteResults.get(0).getVoteId())
                 .voteTitle(voteResults.get(0).getVoteTitle())
+                .totalNumber(voteOptionResults.stream().map(e -> e.getCount()).reduce((x, y) -> x + y).get())
                 .voteOptions(voteOptionResults)
                 .build();
     }

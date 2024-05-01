@@ -74,6 +74,7 @@ class VoteRepositoryImplTest {
         // Then
         Assertions.assertThat(voteResult.getVoteOptions().size()).isEqualTo(voteOptionCount);
         Assertions.assertThat(voteResult.getVoteOptions().get(0).getCount()).isEqualTo(voteHistoryCount);
+        Assertions.assertThat(voteResult.getTotalNumber()).isEqualTo(voteOptionCount * voteHistoryCount);
     }
 
     private void saveVoteAndVoteOptions(int voteOptionCount, int voteHistoryCount) {
