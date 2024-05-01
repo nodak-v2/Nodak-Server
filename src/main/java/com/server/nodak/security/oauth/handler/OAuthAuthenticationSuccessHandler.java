@@ -27,19 +27,12 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        String targetUrl = determineTargetUrl(request, response, authentication);
+        String targetUrl = this.determineTargetUrl(request, response, authentication);
 
         if (response.isCommitted()) {
             return;
         }
 
-        this.clearAuthenticationAttributes(request, response);
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
-    }
-
-    @Override
-    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
-        String redirectUri = getRedirectUri(request);
         NodakAuthentication nodakAuthentication = (NodakAuthentication) authentication;
 
         String userId = String.valueOf(nodakAuthentication.getUser().getId());
@@ -50,7 +43,13 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         servletUtils.putHeader(response, AUTHORIZATION, accessToken);
         servletUtils.addCookie(response, "RefreshToken", refreshToken, (int) jwtProperties.getRefreshTokenExpiration());
 
-        return redirectUri;
+        this.clearAuthenticationAttributes(request, response);
+        this.getRedirectStrategy().sendRedirect(request, response, targetUrl);
+    }
+
+    @Override
+    protected String determineTargetUrl(HttpServletRequest request, HttpServletResponse response, Authentication authentication) {
+        return getRedirectUri(request);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
