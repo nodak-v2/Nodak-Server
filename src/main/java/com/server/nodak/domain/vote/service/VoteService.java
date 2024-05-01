@@ -10,7 +10,6 @@ import com.server.nodak.domain.vote.repository.VoteHistoryRepository;
 import com.server.nodak.domain.vote.repository.VoteOptionRepository;
 import com.server.nodak.domain.vote.repository.VoteRepository;
 import com.server.nodak.exception.common.BadRequestException;
-import com.server.nodak.exception.common.UserNotAllowedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,7 +51,7 @@ public class VoteService {
     }
 
     private User findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new UserNotAllowedException());
+        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException());
     }
 
 }
