@@ -1,5 +1,12 @@
 package com.server.nodak.domain.comment.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.server.nodak.domain.comment.domain.Comment;
 import com.server.nodak.domain.comment.dto.request.CreateCommentRequest;
 import com.server.nodak.domain.comment.dto.request.UpdateCommentRequest;
@@ -7,7 +14,10 @@ import com.server.nodak.domain.comment.dto.response.CommentResponse;
 import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.comment.repository.CommentRepositoryImpl;
 import com.server.nodak.domain.post.domain.Post;
-import com.server.nodak.domain.post.repository.PostJpaRepository;
+import com.server.nodak.domain.post.repository.PostRepository;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -16,15 +26,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
@@ -39,7 +40,7 @@ class CommentServiceTest {
     private CommentRepository commentRepository;
 
     @Mock
-    private PostJpaRepository postJpaRepository;
+    private PostRepository postRepository;
 
     private Long postId;
     private Long commentId;
@@ -71,7 +72,7 @@ class CommentServiceTest {
 
         Post post = new Post();
 
-        when(postJpaRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
         when(commentRepository.save(any(Comment.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // when
@@ -85,7 +86,7 @@ class CommentServiceTest {
     @DisplayName("게시글 댓글 조회")
     void fetchCommentsForPost_테스트() {
         // given
-        when(postJpaRepository.findById(postId)).thenReturn(Optional.of(new Post()));
+        when(postRepository.findById(postId)).thenReturn(Optional.of(new Post()));
         when(commentRepositoryImpl.getCommentsByPostId(postId)).thenReturn(Collections.emptyList());
 
         // when
