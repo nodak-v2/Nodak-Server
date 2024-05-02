@@ -49,4 +49,8 @@ public class Utils {
     public static Category createCategory() {
         return new Category("축구");
     }
+
+    public static Category createCategory(String title) {
+        return new Category(title);
+    }
 }

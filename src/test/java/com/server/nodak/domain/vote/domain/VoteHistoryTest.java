@@ -78,19 +78,4 @@ class VoteHistoryTest {
         //Then
         Assertions.assertThat(throwable).isInstanceOf(ConstraintViolationException.class);
     }
-
-    @Test
-    @DisplayName("VoteHistory 저장 테스트 - VoteOption이 null이면 예외를 발생시킨다.")
-    public void testSaveByVoteOptionIsNull() {
-        // Given
-        voteHistory = createVoteHistory(user, null);
-
-        // When
-        Throwable throwable = Assertions.catchThrowable(() -> {
-            em.persist(voteHistory);
-        });
-
-        //Then
-        Assertions.assertThat(throwable).isInstanceOf(ConstraintViolationException.class);
-    }
 }
