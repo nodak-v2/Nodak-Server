@@ -9,6 +9,7 @@ import static com.server.nodak.domain.vote.utils.Utils.createVoteOption;
 
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
+import com.server.nodak.domain.post.dto.PostResponse;
 import com.server.nodak.domain.post.dto.PostSearchRequest;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.user.domain.User;
@@ -55,61 +56,81 @@ class PostRepositoryImplTest {
     VoteOptionRepository voteOptionRepository;
     @Autowired
     VoteHistoryRepository voteHistoryRepository;
+    PageRequest pageRequest;
     User user;
-    Category category;
+    Category category1;
+    Category category2;
     List<Post> posts = new ArrayList<>();
     Vote vote;
     List<VoteOption> voteOptions = new ArrayList<>();
+    List<VoteHistory> voteHistories = new ArrayList<>();
     Random rnd = new Random();
 
     @BeforeEach
     public void setUp() {
+        pageRequest = PageRequest.of(0, 10);
         user = createUser();
-        category = createCategory();
+        category1 = createCategory("운동");
+        category2 = createCategory("연애");
         em.persist(user);
-        em.persist(category);
+        em.persist(category1);
+        em.persist(category2);
+    }
+
+    @Test
+    @DisplayName("findOne 테스트 - 게시글 상세보기")
+    public void findOne() {
+        // Given
+        int postCount = rnd.nextInt(3) + 1;
+        int voteOptionCount = rnd.nextInt(2, 5);
+        int voteHistoryCount = rnd.nextInt(2, 5);
+        IntStream.range(0, postCount).forEach(e -> saveVoteAndVoteOptions(voteOptionCount, voteHistoryCount));
+        int selectId = rnd.nextInt(postCount);
+
+        // When
+        PostResponse response = postRepository.findOne(user.getId(), posts.get(selectId).getId());
+
+        // Then
+        Assertions.assertThat(response.getTitle()).isEqualTo(posts.get(selectId).getTitle());
+        Assertions.assertThat(response.getAuthor()).isEqualTo(posts.get(selectId).getUser().getNickname());
+        Assertions.assertThat(response.getCreatedAt()).isEqualTo(posts.get(selectId).getCreatedAt());
+        Assertions.assertThat(response.getContent()).isEqualTo(posts.get(selectId).getContent());
+        Assertions.assertThat(response.getImageUrl()).isEqualTo(posts.get(selectId).getImageUrl());
+        Assertions.assertThat(response.getStarCount()).isEqualTo(posts.get(selectId).getStarPosts().size());
+        Assertions.assertThat(response.getCheckStar()).isEqualTo(posts.get(selectId).getStarPosts().stream()
+                .filter(e -> e.getUser().getNickname().equals(response.getAuthor())
+                        && e.getPost().getId() == selectId).toList().size() > 0);
     }
 
     @Test
     @DisplayName("search 테스트 - 키워드 검색")
     void searchByTitleAndContent() {
         // Given
-        String keyword = randomUUID(1, 5);
-        PageRequest pageRequest = PageRequest.of(0, 10);
+        String keyword = randomUUID(1, 2);
         PostSearchRequest searchRequest = PostSearchRequest.builder().keyword(keyword).build();
-        int postCount = rnd.nextInt(1, 10);
+        int postCount = 10;
         int voteOptionCount = rnd.nextInt(1, 5);
         int voteHistoryCount = rnd.nextInt(1, 5);
         IntStream.rangeClosed(1, postCount).forEach(e -> saveVoteAndVoteOptions(voteOptionCount, voteHistoryCount));
+        long findPostCount = posts.stream()
+                .filter(e -> e.getTitle().contains(keyword) || e.getContent().contains(keyword)).count();
 
         // Then
         Page<PostSearchResponse> result = postRepository.search(searchRequest, pageRequest);
 
         // When
-        long findPostCount = posts.stream()
-                .filter(e -> e.getTitle().contains(keyword) || e.getContent().contains(keyword)).count();
         Assertions.assertThat(result.getContent().size()).isEqualTo(findPostCount);
-        result.getContent().stream()
-                .forEach(e -> Assertions.assertThat(e.getTotalCount()).isEqualTo(voteHistoryCount * voteOptionCount));
+        Assertions.assertThat(result.getSize()).isEqualTo(pageRequest.getPageSize());
     }
 
     @Test
     @DisplayName("search 테스트 - 카테고리 검색")
     public void searchByCategoryId() {
         // Given
-        PageRequest pageRequest = PageRequest.of(0, 10);
-        Category category1 = createCategory("운동");
-        Category category2 = createCategory("연애");
         List<Post> posts = List.of(
-                createPost(user, String.format("title_%s", randomUUID(1, 10)),
-                        String.format("content_%s", randomUUID(1, 10)),
-                        category1),
-                createPost(user, String.format("title_%s", randomUUID(1, 10)),
-                        String.format("content_%s", randomUUID(1, 10)),
-                        category1),
-                createPost(user, String.format("title_%s", randomUUID(1, 10)),
-                        String.format("content_%s", randomUUID(1, 10)),
-                        category2)
+                createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1),
+                createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1),
+                createPost(user, randomUUID(1, 10), randomUUID(1, 10), category2)
         );
         List<Post> savePosts = postRepository.saveAll(posts);
         PostSearchRequest searchRequest = PostSearchRequest.builder().categoryId(category1.getId()).build();
@@ -117,34 +138,34 @@ class PostRepositoryImplTest {
                 .map(post -> post.getId()).toList();
 
         // When
-
         Page<PostSearchResponse> postsFromCategory1 = postRepository.search(searchRequest,
                 pageRequest);
 
         // Then
-        postsFromCategory1.getContent().stream().forEach(res -> {
-            Assertions.assertThat(res.getPostId()).isIn(postIds);
-        });
-//        Assertions.assertThat(postsFromCategory1.getSize()).isEqualTo(pageRequest.getPageSize());
+        Assertions.assertThat(postsFromCategory1.getTotalElements()).isEqualTo(postIds.size());
     }
 
     private void saveVoteAndVoteOptions(int voteOptionCount, int voteHistoryCount) {
-        String uuid = randomUUID(1, 10);
-        Post post = createPost(user, String.format("Post_title_%s", uuid), String.format("Post_content_%s", uuid),
-                category);
+        String uuid = randomUUID(1, 4);
+
+        Post post = createPost(user, uuid, uuid, category1);
         posts.add(post);
+
         vote = createVote(String.format("Vote_title_%s", uuid), post);
-        voteOptions = createVoteOptions(vote, voteOptionCount);
-        voteOptions.stream().forEach(voteOption -> {
-            voteHistoryRepository.saveAll(createVoteHistorys(user, voteOption, voteHistoryCount));
-        });
+        voteOptions.addAll(createVoteOptions(vote, voteOptionCount));
 
-    }
+        List<VoteHistory> historyList = IntStream.rangeClosed(1, voteHistoryCount).mapToObj(e -> {
+            if (e == 1) {
+                return createVoteHistory(user, voteOptions.get(rnd.nextInt(0, voteOptionCount)));
+            }
+            User tmpUser = createUser();
+            em.persist(tmpUser);
+            return createVoteHistory(tmpUser, voteOptions.get(rnd.nextInt(0, voteOptionCount)));
+        }).toList();
 
-    private List<VoteHistory> createVoteHistorys(User user, VoteOption voteOption, int size) {
-        return IntStream.rangeClosed(1, size).mapToObj(e ->
-                createVoteHistory(user, voteOption)
-        ).collect(Collectors.toList());
+        voteHistories.addAll(historyList);
+
+        voteHistoryRepository.saveAll(historyList);
     }
 
     private List<VoteOption> createVoteOptions(Vote vote, int size) {

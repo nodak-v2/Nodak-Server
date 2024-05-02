@@ -1,6 +1,7 @@
 package com.server.nodak.domain.post.domain;
 
 import com.server.nodak.domain.model.BaseEntity;
+import com.server.nodak.domain.post.dto.PostRequest;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.vote.domain.Vote;
 import jakarta.persistence.CascadeType;
@@ -76,7 +77,7 @@ public class Post extends BaseEntity {
             this.category.getPosts().remove(this);
         }
         this.category = category;
-        category.getPosts().add(this);
+        this.category.getPosts().add(this);
     }
 
     private void setUser(User user) {
@@ -86,5 +87,17 @@ public class Post extends BaseEntity {
 
     public void setVote(Vote vote) {
         this.vote = vote;
+    }
+
+    public void update(PostRequest request) {
+        if (!request.getTitle().equals(title)) {
+            this.title = request.getTitle();
+        }
+        if (!request.getContent().equals(content)) {
+            this.content = request.getContent();
+        }
+        if (!request.getImageUrl().equals(imageUrl)) {
+            this.imageUrl = request.getImageUrl();
+        }
     }
 }
