@@ -2,6 +2,7 @@ package com.server.nodak.domain.post.domain;
 
 import com.server.nodak.domain.model.BaseEntity;
 import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.domain.vote.domain.Vote;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -11,6 +12,7 @@ import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
@@ -55,18 +57,23 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<StarPost> starPosts = new ArrayList<>();
 
+    @OneToOne(mappedBy = "post", cascade = {CascadeType.PERSIST,
+            CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
+    private Vote vote;
+
     @Builder
-    public Post(String title, String content, String imageUrl, User user, Category category) {
+    public Post(String title, String content, String imageUrl, User user, Category category, Vote vote) {
         this.title = title;
         this.content = content;
         this.imageUrl = imageUrl;
         this.setUser(user);
         this.setCategory(category);
+        this.setVote(vote);
     }
 
     private void setCategory(Category category) {
         if (this.category != null) {
-            category.getPosts().remove(this);
+            this.category.getPosts().remove(this);
         }
         this.category = category;
         category.getPosts().add(this);
@@ -75,5 +82,9 @@ public class Post extends BaseEntity {
     private void setUser(User user) {
         this.user = user;
         user.getPosts().add(this);
+    }
+
+    public void setVote(Vote vote) {
+        this.vote = vote;
     }
 }

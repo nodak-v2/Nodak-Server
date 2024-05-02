@@ -1,6 +1,7 @@
 package com.server.nodak.domain.post.domain;
 
 import static com.server.nodak.domain.user.domain.UserProvider.KAKAO;
+import static com.server.nodak.domain.vote.utils.Utils.createVote;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.server.nodak.domain.user.domain.User;
@@ -45,8 +46,9 @@ class PostTest {
                 .content("게시글 내용 AA. 투표 부탁드립니다.")
                 .imageUrl("abc.abc")
                 .user(user)
-                .category(new Category())
+                .category(new Category("축구"))
                 .build();
+        createVote("title", post);
 
         em.persist(post);
 

@@ -9,8 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +29,7 @@ public class Vote extends BaseEntity {
     @NotBlank
     private String title;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Post post;
 
@@ -45,7 +45,11 @@ public class Vote extends BaseEntity {
     }
 
     public void setPost(Post post) {
+        if (this.post != null) {
+            this.post.setVote(null);
+        }
         this.post = post;
+        this.post.setVote(this);
     }
 
     public void removeVoteOption(VoteOption voteOption) {
