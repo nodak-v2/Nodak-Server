@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PostSearchResponse {
     private Long postId;
+    private Long voteId;
     private String title;
     private Long totalCount;
     private String author;
@@ -17,9 +18,11 @@ public class PostSearchResponse {
     private String postImageUrl;
 
     @QueryProjection
-    public PostSearchResponse(Long postId, String title, Long totalCount, String author, String profileImageUrl,
+    public PostSearchResponse(Long postId, Long voteId, String title, Long totalCount, String author,
+                              String profileImageUrl,
                               String postImageUrl) {
         this.postId = postId;
+        this.voteId = voteId;
         this.title = title;
         this.totalCount = totalCount;
         this.author = author;

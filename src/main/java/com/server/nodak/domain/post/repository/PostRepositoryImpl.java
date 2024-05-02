@@ -5,10 +5,14 @@ import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.server.nodak.domain.post.domain.QStarPost;
+import com.server.nodak.domain.post.dto.PostResponse;
 import com.server.nodak.domain.post.dto.PostSearchRequest;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
+import com.server.nodak.domain.post.dto.QPostResponse;
 import com.server.nodak.domain.post.dto.QPostSearchResponse;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +28,36 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
+    public PostResponse findOne(Long userId, Long postId) {
+        QStarPost starPost = QStarPost.starPost;
+        return queryFactory.select(
+                        new QPostResponse(
+                                post.title,
+                                post.user.nickname,
+                                post.user.profileImageUrl,
+                                post.createdAt,
+                                post.content,
+                                post.imageUrl,
+                                post.starPosts.size(),
+                                userId != null ?
+                                        post.starPosts.contains(
+                                                JPAExpressions.selectFrom(starPost)
+                                                        .where(starPost.user.id.eq(userId),
+                                                                starPost.post.id.eq(postId))
+                                        ) : Expressions.FALSE
+                        )
+                )
+                .from(post)
+                .where(post.id.eq(postId))
+                .fetchOne();
+    }
+
+    @Override
     public Page<PostSearchResponse> search(PostSearchRequest request, Pageable pageable) {
         List<PostSearchResponse> fetch = queryFactory.select(
                         new QPostSearchResponse(
                                 post.id,
+                                post.vote.id,
                                 post.title,
                                 JPAExpressions
                                         .select(voteHistory.count())
@@ -42,7 +72,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .where(
                         searchCondition(request),
                         searchCategory(request)
-
                 )
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -50,6 +79,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .fetch();
 
         long count = searchForCount(request);
+        
         return new PageImpl<>(fetch, pageable, count);
     }
 
@@ -57,7 +87,10 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         Long count = queryFactory
                 .select(post.count())
                 .from(post)
-                .where(searchCondition(request))
+                .where(
+                        searchCondition(request),
+                        searchCategory(request)
+                )
                 .fetchOne();
 
         if (count == null) {

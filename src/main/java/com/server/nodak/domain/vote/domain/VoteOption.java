@@ -51,7 +51,7 @@ public class VoteOption extends BaseEntity {
 
     public void setVote(Vote vote) {
         if (this.vote != null) {
-            vote.removeVoteOption(this);
+            this.vote.removeVoteOption(this);
         }
         this.vote = vote;
         this.vote.addVoteOption(this);
