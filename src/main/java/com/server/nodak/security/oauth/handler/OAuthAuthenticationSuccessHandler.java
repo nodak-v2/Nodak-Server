@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
@@ -33,7 +34,7 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
             return;
         }
 
-        NodakAuthentication nodakAuthentication = (NodakAuthentication) authentication;
+        NodakAuthentication nodakAuthentication = parseToNodakAuthentication(authentication);
 
         String userId = String.valueOf(nodakAuthentication.getUser().getId());
 
@@ -61,5 +62,10 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         return servletUtils.getCookie(request, REDIRECT_URI_NAME)
                 .map(Cookie::getValue)
                 .orElse("/");
+    }
+
+    private NodakAuthentication parseToNodakAuthentication(Authentication authentication) {
+        OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken) authentication;
+        return (NodakAuthentication) oAuth2AuthenticationToken.getPrincipal();
     }
 }
