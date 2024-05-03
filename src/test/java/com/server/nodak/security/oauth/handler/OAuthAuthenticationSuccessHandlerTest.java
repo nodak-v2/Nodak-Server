@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 
 import java.util.UUID;
 
@@ -54,13 +55,15 @@ class OAuthAuthenticationSuccessHandlerTest {
         HttpServletRequest request = new MockHttpServletRequest();
         HttpServletResponse response = new MockHttpServletResponse();
         NodakAuthentication authentication = mock(NodakAuthentication.class);
+        OAuth2AuthenticationToken oAuth2AuthenticationToken = mock(OAuth2AuthenticationToken.class);
         User user = mock(User.class);
 
         // when
         when(user.getId()).thenReturn(1L);
         when(authentication.getUser()).thenReturn(user);
+        when(oAuth2AuthenticationToken.getPrincipal()).thenReturn(authentication);
 
-        oAuthSuccessHandler.onAuthenticationSuccess(request, response, authentication);
+        oAuthSuccessHandler.onAuthenticationSuccess(request, response, oAuth2AuthenticationToken);
 
         // then
         assertNotNull(response.getHeader(AUTHORIZATION));
