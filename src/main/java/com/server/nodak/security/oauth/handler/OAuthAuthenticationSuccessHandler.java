@@ -56,6 +56,7 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         servletUtils.removeCookie(request, response, REDIRECT_URI_NAME);
+        servletUtils.removeCookie(request, response, "oauth2_auth_request");
     }
 
     private String getRedirectUri(HttpServletRequest request) {
