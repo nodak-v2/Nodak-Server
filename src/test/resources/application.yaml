@@ -20,5 +20,24 @@ spring:
     refresh-token-expiration: 86400000 # 1 Days
     key: sgjasg3123adadg3123123hdfh21ad53422dadasf5123adadg3123123hdfh21ad53425 # 추후 수정 필요
 
+  security: # 추후 수정 예정
+    oauth2:
+      client:
+        registration:
+          kakao:
+            client-id: bceb38bab36ecc887b0cb796e5862edb
+            client-secret: FmIu9HoiUp4tRg1x2yYDVyO78s0glfMk
+            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            client-authentication-method: client_secret_post
+            authorization-grant-type: authorization_code
+            scope: account_email
+            client-name: Kakao
+        provider:
+          kakao:
+            authorization-uri: https://kauth:kakao:com/oauth/authorize
+            token-uri: https://kauth:kakao:com/oauth/token
+            user-info-uri: https://kapi.kakao.com/v2/user/me
+            user-name-attribute: id
+
 swagger:
   url: https://api.nodak.link

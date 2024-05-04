@@ -40,7 +40,7 @@ public class HttpServletUtils {
         });
     }
 
-    private Optional<Cookie> getCookie(HttpServletRequest request, String name) {
+    public Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
 
         if(cookies != null && cookies.length > 0) {
