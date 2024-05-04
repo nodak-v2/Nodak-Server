@@ -1,7 +1,4 @@
 spring:
-  application:
-    name:
-      hotel
   datasource:
     driver-class-name: org.h2.Driver
     url: jdbc:h2:mem:test;MODE=MARIADB;DATABASE_TO_UPPER=FALSE;NON_KEYWORDS=USER
@@ -10,8 +7,8 @@ spring:
       ddl-auto: create-drop
     properties:
       hibernate:
-        format_sql: true
-        show_sql: true
+        format_sql: false
+        show_sql: false
         dialect: org.hibernate.dialect.MariaDBDialect
     database-platform: org.hibernate.dialect.MariaDBDialect
 
@@ -22,3 +19,14 @@ spring:
 
 swagger:
   url: http://localhost:8080
+
+#  springdoc.api-docs.path=/core/v3/api-docs
+#  springdoc.swagger-ui.config-url=/core/v3/api-docs/swagger-config
+#  server.forward-headers-strategy=framework
+springdoc:
+  api-docs:
+    path: /core/v3/api-docs
+  swagger-ui:
+    config-url: /core/v3/api-docs/swagger-config
+server:
+  forward-headers-strategy: framework
