@@ -4,7 +4,7 @@ spring:
       hotel
   datasource:
     driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:test;MODE=MARIADB;DATABASE_TO_UPPER=FALSE;NON_KEYWORDS=USER
+    url: jdbc:h2:mem:test;MODE=MYSQL;DATABASE_TO_UPPER=FALSE;NON_KEYWORDS=USER
   jpa:
     hibernate:
       ddl-auto: create-drop
@@ -12,8 +12,7 @@ spring:
       hibernate:
         format_sql: false
         show_sql: false
-        dialect: org.hibernate.dialect.MariaDBDialect
-    database-platform: org.hibernate.dialect.MariaDBDialect
+        dialect: org.hibernate.dialect.MySQLDialect
 
   jwt:
     access-token-expiration: 3600000 # 1 Hours
