@@ -9,8 +9,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public final class SecurityUtils {
 
     public static boolean isAuthenticated() {
-
-
         return SecurityContextHolder.getContext().getAuthentication() != null
                 && SecurityContextHolder.getContext().getAuthentication().isAuthenticated();
     }
