@@ -7,15 +7,14 @@ import com.server.nodak.domain.comment.dto.response.CommentResponse;
 import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.comment.repository.CommentRepositoryImpl;
 import com.server.nodak.domain.post.domain.Post;
-import com.server.nodak.domain.post.repository.PostJpaRepository;
+import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.exception.common.BadRequestException;
 import com.server.nodak.exception.common.DataNotFoundException;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -23,11 +22,11 @@ public class CommentService {
 
     private final CommentRepositoryImpl commentRepositoryImpl;
     private final CommentRepository commentJpaRepository;
-    private final PostJpaRepository postJpaRepository;
+    private final PostRepository postRepository;
 
     @Transactional
     public void createComment(long postId, CreateCommentRequest commentRequest) {
-        Post post = postJpaRepository.findById(postId).orElseThrow(
+        Post post = postRepository.findById(postId).orElseThrow(
                 () -> new DataNotFoundException());
 
         // TODO : 로그인 한 유저 넣기
@@ -42,7 +41,7 @@ public class CommentService {
 
     @Transactional(readOnly = true)
     public List<CommentResponse> fetchCommentsForPost(long postId) {
-        postJpaRepository.findById(postId).orElseThrow(
+        postRepository.findById(postId).orElseThrow(
                 () -> new DataNotFoundException());
 
         List<Comment> comments = commentRepositoryImpl.getCommentsByPostId(postId);

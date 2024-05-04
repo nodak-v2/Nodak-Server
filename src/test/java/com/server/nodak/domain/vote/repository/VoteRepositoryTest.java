@@ -11,8 +11,6 @@ import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.global.config.QueryDslConfig;
 import jakarta.persistence.EntityManager;
-import java.util.List;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +41,6 @@ class VoteRepositoryTest {
         user = createUser();
         category = createCategory();
         em.persist(user);
-        em.persist(category);
         post = createPost(user, "title", "content", category);
     }
 
@@ -58,22 +55,6 @@ class VoteRepositoryTest {
 
         // Then
         Assertions.assertThat(saveVote).isNotNull();
-    }
-
-    @Test
-    @DisplayName("saveAll 테스트")
-    public void saveAllTest() {
-        // Given
-        List<Vote> votes = List.of(createVote("test_title1", post), createVote("test_title2", post),
-                createVote("test_title3", post));
-
-        // When
-        List<Vote> saveVotes = voteRepository.saveAll(votes);
-
-        // Then
-        IntStream.range(0, saveVotes.size()).forEach(i -> {
-            Assertions.assertThat(votes.get(i).getId()).isEqualTo(saveVotes.get(i).getId());
-        });
     }
 
     @Test

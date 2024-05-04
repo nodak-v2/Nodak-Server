@@ -39,7 +39,7 @@ public class VoteOption extends BaseEntity {
 
     @OneToMany(mappedBy = "voteOption", cascade = {CascadeType.PERSIST,
             CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<VoteHistory> voteHistories;
+    private List<VoteHistory> voteHistories = new ArrayList<>();
 
 
     @Builder
@@ -47,12 +47,11 @@ public class VoteOption extends BaseEntity {
         this.content = content;
         this.seq = seq;
         setVote(vote);
-        this.voteHistories = new ArrayList<>();
     }
 
     public void setVote(Vote vote) {
         if (this.vote != null) {
-            vote.removeVoteOption(this);
+            this.vote.removeVoteOption(this);
         }
         this.vote = vote;
         this.vote.addVoteOption(this);
