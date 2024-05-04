@@ -1,12 +1,5 @@
 package com.server.nodak.global.config;
 
-import io.swagger.v3.oas.models.Components;
-import io.swagger.v3.oas.models.OpenAPI;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.security.SecurityScheme.Type;
-import org.springframework.context.annotation.Bean;
-
 //@OpenAPIDefinition(info = @Info(title = "Nodak API 명세서", description = "Nodak API 명세서", version = "v1"))
 //@Configuration
 //@EnableWebMvc
@@ -17,24 +10,24 @@ import org.springframework.context.annotation.Bean;
 //        SwaggerUiOAuthProperties.class,
 //        JacksonAutoConfiguration.class,
 //        SpringDocConfigProperties.class})
-public class SwaggerConfig {
-
-    private final static String BEARER_TOKEN_PREFIX = "Bearer";
-
-    @Bean
-    OpenAPI openAPI() {
-        String schemeName = "Authorization";
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(schemeName);
-        Components components = new Components();
-        components.addSecuritySchemes(
-                schemeName, new SecurityScheme()
-                        .name(schemeName)
-                        .type(Type.HTTP)
-                        .scheme(BEARER_TOKEN_PREFIX)
-                        .bearerFormat("JWT")
-        );
-        return new OpenAPI()
-                .addSecurityItem(securityRequirement)
-                .components(components);
-    }
-}
+//public class SwaggerConfig {
+//
+//    private final static String BEARER_TOKEN_PREFIX = "Bearer";
+//
+//    @Bean
+//    OpenAPI openAPI() {
+//        String schemeName = "Authorization";
+//        SecurityRequirement securityRequirement = new SecurityRequirement().addList(schemeName);
+//        Components components = new Components();
+//        components.addSecuritySchemes(
+//                schemeName, new SecurityScheme()
+//                        .name(schemeName)
+//                        .type(Type.HTTP)
+//                        .scheme(BEARER_TOKEN_PREFIX)
+//                        .bearerFormat("JWT")
+//        );
+//        return new OpenAPI()
+//                .addSecurityItem(securityRequirement)
+//                .components(components);
+//    }
+//}
