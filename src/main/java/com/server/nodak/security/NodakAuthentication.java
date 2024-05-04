@@ -6,12 +6,14 @@ import lombok.Getter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Collection;
+import java.util.Map;
 import java.util.Set;
 
 @Getter
-public class NodakAuthentication extends UsernamePasswordAuthenticationToken {
+public class NodakAuthentication extends UsernamePasswordAuthenticationToken implements OAuth2User {
     private User user;
 
     public NodakAuthentication(User user) {
@@ -21,5 +23,10 @@ public class NodakAuthentication extends UsernamePasswordAuthenticationToken {
 
     private static Collection<? extends GrantedAuthority> authorities(UserRole role) {
         return Set.of(new SimpleGrantedAuthority(role.name()));
+    }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return null;
     }
 }
