@@ -14,7 +14,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 
 @OpenAPIDefinition(info = @Info(title = "Nodak API 명세서", description = "Nodak API 명세서", version = "v1"))
-//@Configuration
+@Configuration
 public class SwaggerConfig {
     @Value("${swagger.url}")
     private String url;

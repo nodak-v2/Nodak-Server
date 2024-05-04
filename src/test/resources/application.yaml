@@ -21,4 +21,4 @@ spring:
     key: sgjasg3123adadg3123123hdfh21ad53422dadasf5123adadg3123123hdfh21ad53425 # 추후 수정 필요
 
 swagger:
-  url: http://localhost:8080
+  url: https://api.nodak.link
