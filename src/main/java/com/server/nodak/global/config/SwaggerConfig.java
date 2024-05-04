@@ -6,17 +6,15 @@ import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
-import io.swagger.v3.oas.models.servers.Server;
-import java.util.List;
-
+import io.swagger.v3.oas.models.security.SecurityScheme.Type;
 import org.springdoc.core.configuration.SpringDocConfiguration;
 import org.springdoc.core.properties.SpringDocConfigProperties;
 import org.springdoc.core.properties.SwaggerUiConfigProperties;
 import org.springdoc.core.properties.SwaggerUiOAuthProperties;
 import org.springdoc.webmvc.core.configuration.SpringDocWebMvcConfiguration;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
@@ -25,7 +23,6 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @OpenAPIDefinition(info = @Info(title = "Nodak API 명세서", description = "Nodak API 명세서", version = "v1"))
 @Configuration
 @EnableWebMvc
-//@ComponentScan(basePackages = {"com.server.nodak"})
 @Import({SpringDocConfiguration.class,
         SpringDocWebMvcConfiguration.class,
         org.springdoc.webmvc.ui.SwaggerConfig.class,
@@ -45,7 +42,7 @@ public class SwaggerConfig {
         components.addSecuritySchemes(
                 schemeName, new SecurityScheme()
                         .name(schemeName)
-                        .type(SecurityScheme.Type.HTTP)
+                        .type(Type.HTTP)
                         .scheme(BEARER_TOKEN_PREFIX)
                         .bearerFormat("JWT")
         );
