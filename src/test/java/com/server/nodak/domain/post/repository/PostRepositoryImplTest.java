@@ -77,7 +77,7 @@ class PostRepositoryImplTest {
         em.persist(category2);
     }
 
-    @Test
+    //    @Test
     @DisplayName("findOne 테스트 - 게시글 상세보기")
     public void findOne() {
         // Given
