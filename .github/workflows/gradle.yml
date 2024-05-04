@@ -40,6 +40,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
+
+      - name: Use Gradle 8.7
+        run: |
+          wget https://services.gradle.org/distributions/gradle-8.7-bin.zip
+          mkdir -p /opt/gradle
+          unzip -d /opt/gradle gradle-8.7-bin.zip
+          export PATH=$PATH:/opt/gradle/gradle-8.7/bin
+          gradle --version
           
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
