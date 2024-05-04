@@ -61,7 +61,6 @@ class PostRepositoryImplTest {
     Category category1;
     Category category2;
     List<Post> posts = new ArrayList<>();
-    Vote vote;
     List<VoteOption> voteOptions = new ArrayList<>();
     List<VoteHistory> voteHistories = new ArrayList<>();
     Random rnd = new Random();
@@ -84,7 +83,7 @@ class PostRepositoryImplTest {
         int postCount = rnd.nextInt(3) + 1;
         int voteOptionCount = rnd.nextInt(2, 5);
         int voteHistoryCount = rnd.nextInt(2, 5);
-        IntStream.range(0, postCount).forEach(e -> saveVoteAndVoteOptions(voteOptionCount, voteHistoryCount));
+        saveVoteAndVoteOptions(postCount, voteOptionCount, voteHistoryCount);
         int selectId = rnd.nextInt(postCount);
 
         // When
@@ -93,9 +92,6 @@ class PostRepositoryImplTest {
         // Then
         Assertions.assertThat(response.getTitle()).isEqualTo(posts.get(selectId).getTitle());
         Assertions.assertThat(response.getAuthor()).isEqualTo(posts.get(selectId).getUser().getNickname());
-//        Assertions.assertThat(response.getCreatedAt()).isEqualTo(posts.get(selectId).getCreatedAt());
-        log.info("expect : {}", response.getCreatedAt());
-        log.info("act : {}", posts.get(selectId).getCreatedAt());
         Assertions.assertThat(response.getContent()).isEqualTo(posts.get(selectId).getContent());
         Assertions.assertThat(response.getImageUrl()).isEqualTo(posts.get(selectId).getImageUrl());
         Assertions.assertThat(response.getStarCount()).isEqualTo(posts.get(selectId).getStarPosts().size());
@@ -113,7 +109,7 @@ class PostRepositoryImplTest {
         int postCount = 10;
         int voteOptionCount = rnd.nextInt(1, 5);
         int voteHistoryCount = rnd.nextInt(1, 5);
-        IntStream.rangeClosed(1, postCount).forEach(e -> saveVoteAndVoteOptions(voteOptionCount, voteHistoryCount));
+        saveVoteAndVoteOptions(postCount, voteOptionCount, voteHistoryCount);
         long findPostCount = posts.stream()
                 .filter(e -> e.getTitle().contains(keyword) || e.getContent().contains(keyword)).count();
 
@@ -147,27 +143,29 @@ class PostRepositoryImplTest {
         Assertions.assertThat(postsFromCategory1.getTotalElements()).isEqualTo(postIds.size());
     }
 
-    private void saveVoteAndVoteOptions(int voteOptionCount, int voteHistoryCount) {
+    private void saveVoteAndVoteOptions(int postCount, int voteOptionCount, int voteHistoryCount) {
         String uuid = randomUUID(1, 4);
 
-        Post post = createPost(user, uuid, uuid, category1);
-        posts.add(post);
+        IntStream.range(0, postCount).forEach(cnt -> {
+            Post post = createPost(user, uuid, uuid, category1);
+            posts.add(post);
+            Vote vote = createVote(String.format("Vote_title_%s", uuid), post);
+            voteOptions.addAll(createVoteOptions(vote, voteOptionCount));
+        });
 
-        vote = createVote(String.format("Vote_title_%s", uuid), post);
-        voteOptions.addAll(createVoteOptions(vote, voteOptionCount));
+        voteOptions.stream().forEach(voteOption -> {
+            List<VoteHistory> historyList = IntStream.rangeClosed(1, voteHistoryCount).mapToObj(e -> {
+                if (e == 1) {
+                    return createVoteHistory(user, voteOption);
+                }
+                User tmpUser = createUser();
+                em.persist(tmpUser);
+                return createVoteHistory(tmpUser, voteOption);
+            }).toList();
+            voteHistories.addAll(historyList);
+        });
 
-        List<VoteHistory> historyList = IntStream.rangeClosed(1, voteHistoryCount).mapToObj(e -> {
-            if (e == 1) {
-                return createVoteHistory(user, voteOptions.get(rnd.nextInt(0, voteOptionCount)));
-            }
-            User tmpUser = createUser();
-            em.persist(tmpUser);
-            return createVoteHistory(tmpUser, voteOptions.get(rnd.nextInt(0, voteOptionCount)));
-        }).toList();
-
-        voteHistories.addAll(historyList);
-
-        voteHistoryRepository.saveAll(historyList);
+        voteHistoryRepository.saveAll(voteHistories);
     }
 
     private List<VoteOption> createVoteOptions(Vote vote, int size) {

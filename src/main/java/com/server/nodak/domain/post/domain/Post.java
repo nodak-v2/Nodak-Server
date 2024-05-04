@@ -22,14 +22,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @Table(name = "post")
-@SQLDelete(sql = "UPDATE post SET is_deleted = true WHERE id = ?")
 @SQLRestriction("is_deleted = false")
 public class Post extends BaseEntity {
 
@@ -87,6 +85,10 @@ public class Post extends BaseEntity {
 
     public void setVote(Vote vote) {
         this.vote = vote;
+    }
+
+    public void delete(boolean isDeleted) {
+        this.isDeleted = isDeleted ? true : false;
     }
 
     public void update(PostRequest request) {

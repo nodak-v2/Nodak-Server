@@ -94,7 +94,25 @@ class PostRepositoryTest {
         // Then
         Assertions.assertThat(findPost.getId()).isEqualTo(savePost.getId());
     }
-    
+
+    @Test
+    @DisplayName("deleteById 테스트")
+    public void deleteByIdTest() {
+        // Given
+        Post post = createPost(user, String.format("title_%s", randomUUID()), String.format("content_%s", randomUUID()),
+                category);
+        postRepository.save(post);
+
+        // When
+        Post findPost = postRepository.findById(post.getId()).get();
+        findPost.delete(true);
+        postRepository.save(findPost);
+
+        // Then
+        Assertions.assertThat(findPost.isDeleted()).isEqualTo(true);
+        Assertions.assertThat(postRepository.existsById(findPost.getId())).isFalse();
+    }
+
 
     public String randomUUID() {
         return UUID.randomUUID().toString().substring(1, 10);
