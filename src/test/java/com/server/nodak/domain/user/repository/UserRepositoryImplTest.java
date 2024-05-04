@@ -1,5 +1,6 @@
 package com.server.nodak.domain.user.repository;
 
+import com.server.nodak.NodakApplication;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.domain.UserProvider;
 import jakarta.persistence.EntityManager;
@@ -18,7 +19,7 @@ import static com.server.nodak.domain.user.domain.UserProvider.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(classes = NodakApplication.class)
 @Transactional
 class UserRepositoryImplTest {
     @Autowired

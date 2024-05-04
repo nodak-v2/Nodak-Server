@@ -1,5 +1,6 @@
 package com.server.nodak.security.aop;
 
+import com.server.nodak.NodakApplication;
 import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.exception.common.AuthorizationException;
 import org.aspectj.lang.JoinPoint;
@@ -30,7 +31,7 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@SpringBootTest
+@SpringBootTest(classes = NodakApplication.class)
 @Import(AuthorizationAopTest.AnnotationAopTester.class)
 class AuthorizationAopTest {
     @Autowired

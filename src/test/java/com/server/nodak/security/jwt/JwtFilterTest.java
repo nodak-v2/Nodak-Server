@@ -1,5 +1,6 @@
 package com.server.nodak.security.jwt;
 
+import com.server.nodak.NodakApplication;
 import com.server.nodak.security.SecurityService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.*;
 
-@SpringBootTest
+@SpringBootTest(classes = NodakApplication.class)
 class JwtFilterTest {
     @Autowired
     TokenProvider tokenProvider;

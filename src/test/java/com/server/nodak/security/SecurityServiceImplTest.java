@@ -1,5 +1,6 @@
 package com.server.nodak.security;
 
+import com.server.nodak.NodakApplication;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.domain.UserProvider;
 import com.server.nodak.domain.user.domain.UserRole;
@@ -27,7 +28,7 @@ import static com.server.nodak.domain.user.domain.UserProvider.*;
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-@SpringBootTest
+@SpringBootTest(classes = NodakApplication.class)
 @Transactional
 class SecurityServiceImplTest {
     @Autowired

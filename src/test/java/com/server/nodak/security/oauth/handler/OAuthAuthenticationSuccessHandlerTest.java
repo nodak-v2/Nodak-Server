@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.*;
 
-@SpringBootTest
+@SpringBootTest(classes = NodakApplication.class)
 class OAuthAuthenticationSuccessHandlerTest {
     @Autowired
     OAuthAuthenticationSuccessHandler oAuthSuccessHandler;
