@@ -14,14 +14,11 @@ import org.springdoc.core.properties.SwaggerUiOAuthProperties;
 import org.springdoc.webmvc.core.configuration.SpringDocWebMvcConfiguration;
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.HttpHeaders;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 @OpenAPIDefinition(info = @Info(title = "Nodak API 명세서", description = "Nodak API 명세서", version = "v1"))
-@Configuration
+//@Configuration
 @EnableWebMvc
 @Import({SpringDocConfiguration.class,
         SpringDocWebMvcConfiguration.class,
