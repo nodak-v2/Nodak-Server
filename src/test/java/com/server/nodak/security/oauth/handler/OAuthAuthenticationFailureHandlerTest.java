@@ -1,5 +1,6 @@
 package com.server.nodak.security.oauth.handler;
 
+import com.server.nodak.NodakApplication;
 import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -10,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.util.UUID;
 
@@ -18,6 +20,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.*;
 
 @SpringBootTest
+@ContextConfiguration(classes = NodakApplication.class)
 class OAuthAuthenticationFailureHandlerTest {
     @Autowired
     OAuthAuthenticationFailureHandler oAuthFailureHandler;

@@ -18,6 +18,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.util.UUID;
 
@@ -26,6 +27,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.*;
 
 @SpringBootTest
+@ContextConfiguration(classes = NodakApplication.class)
 class OAuthAuthenticationSuccessHandlerTest {
     @Autowired
     OAuthAuthenticationSuccessHandler oAuthSuccessHandler;

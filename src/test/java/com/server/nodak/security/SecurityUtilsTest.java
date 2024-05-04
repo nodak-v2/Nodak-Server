@@ -1,5 +1,6 @@
 package com.server.nodak.security;
 
+import com.server.nodak.NodakApplication;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.util.UUID;
 
@@ -17,6 +19,7 @@ import static com.server.nodak.domain.user.domain.UserProvider.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ContextConfiguration(classes = NodakApplication.class)
 class SecurityUtilsTest {
 
     User user;

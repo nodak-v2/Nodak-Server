@@ -1,5 +1,6 @@
 package com.server.nodak.security.aop;
 
+import com.server.nodak.NodakApplication;
 import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.exception.common.AuthorizationException;
 import org.aspectj.lang.JoinPoint;
@@ -18,6 +19,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Import(AuthorizationAopTest.AnnotationAopTester.class)
+@ContextConfiguration(classes = NodakApplication.class)
 class AuthorizationAopTest {
     @Autowired
     AuthorizationAop authorizationAop;
@@ -40,7 +43,7 @@ class AuthorizationAopTest {
 
     @ParameterizedTest
     @EnumSource(UserRole.class)
-    @DisplayName("접근 권한이 없는 컨트롤러에 접근 시 예외가 반한된다.")
+    @DisplayName("TDASDASDASDASDADADAD ==========")
     void notHaveAccessRight(UserRole currentRole) {
         // given
         setAuthority(currentRole);

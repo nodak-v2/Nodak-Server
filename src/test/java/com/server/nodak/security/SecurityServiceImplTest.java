@@ -1,5 +1,6 @@
 package com.server.nodak.security;
 
+import com.server.nodak.NodakApplication;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.domain.UserProvider;
 import com.server.nodak.domain.user.domain.UserRole;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.test.context.ContextConfiguration;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
@@ -29,6 +31,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Transactional
+@ContextConfiguration(classes = NodakApplication.class)
 class SecurityServiceImplTest {
     @Autowired
     SecurityService securityService;
