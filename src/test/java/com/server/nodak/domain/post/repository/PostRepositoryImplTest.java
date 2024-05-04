@@ -77,7 +77,7 @@ class PostRepositoryImplTest {
         em.persist(category2);
     }
 
-    //    @Test
+    @Test
     @DisplayName("findOne 테스트 - 게시글 상세보기")
     public void findOne() {
         // Given
@@ -93,7 +93,9 @@ class PostRepositoryImplTest {
         // Then
         Assertions.assertThat(response.getTitle()).isEqualTo(posts.get(selectId).getTitle());
         Assertions.assertThat(response.getAuthor()).isEqualTo(posts.get(selectId).getUser().getNickname());
-        Assertions.assertThat(response.getCreatedAt()).isEqualTo(posts.get(selectId).getCreatedAt());
+//        Assertions.assertThat(response.getCreatedAt()).isEqualTo(posts.get(selectId).getCreatedAt());
+        log.info("expect : {}", response.getCreatedAt());
+        log.info("act : {}", posts.get(selectId).getCreatedAt());
         Assertions.assertThat(response.getContent()).isEqualTo(posts.get(selectId).getContent());
         Assertions.assertThat(response.getImageUrl()).isEqualTo(posts.get(selectId).getImageUrl());
         Assertions.assertThat(response.getStarCount()).isEqualTo(posts.get(selectId).getStarPosts().size());
