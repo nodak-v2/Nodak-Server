@@ -119,7 +119,7 @@ class PostServiceTest {
         given(postRepository.findOne(user.getId(), postId)).willReturn(postResponse);
 
         // When
-        PostResponse response = postService.findPostOne(user.getId(), postId);
+        PostResponse response = postService.findPost(user.getId(), postId);
 
         // Then
         Assertions.assertThat(response.getTitle()).isEqualTo(postResponse.getTitle());

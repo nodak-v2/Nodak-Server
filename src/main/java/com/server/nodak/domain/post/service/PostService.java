@@ -54,7 +54,7 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public PostResponse findPostOne(Long userId, Long postId) {
+    public PostResponse findPost(Long userId, Long postId) {
         return postRepository.findOne(userId, postId);
     }
 
