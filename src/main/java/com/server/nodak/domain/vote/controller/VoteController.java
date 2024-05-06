@@ -1,7 +1,7 @@
 package com.server.nodak.domain.vote.controller;
 
 import com.server.nodak.domain.user.domain.UserRole;
-import com.server.nodak.domain.vote.dto.VoteResultResponse;
+import com.server.nodak.domain.vote.dto.VoteResponse;
 import com.server.nodak.domain.vote.service.VoteService;
 import com.server.nodak.global.common.response.ApiResponse;
 import com.server.nodak.security.aop.AuthorizationRequired;
@@ -22,9 +22,12 @@ public class VoteController {
 
     private final VoteService voteService;
 
+    // TODO : 로그인 회원 식별 어노테이션 추가 예정
     @GetMapping("/{voteId}")
-    public ResponseEntity<ApiResponse<VoteResultResponse>> voteResult(@PathVariable Long voteId) {
-        VoteResultResponse result = voteService.findVoteResult(voteId);
+    public ResponseEntity<ApiResponse<VoteResponse>> voteResult(@PathVariable Long voteId,
+                                                                Principal principal) {
+
+        VoteResponse result = voteService.findVoteResult(Long.parseLong(principal.getName()), voteId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
