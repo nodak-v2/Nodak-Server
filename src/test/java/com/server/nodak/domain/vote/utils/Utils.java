@@ -60,11 +60,11 @@ public class Utils {
     public static PostRequest createPostRequest(String title, String channel, String postContent, String voteTitle,
                                                 String imageUrl, Map<Integer, String> voteOption) {
         return PostRequest.builder()
-                .title("Post_title")
-                .channel("카테고리")
-                .content("Post_content")
-                .voteTitle("Vote_title")
-                .imageUrl("http://image.com")
+                .title(title)
+                .channel(channel)
+                .content(postContent)
+                .voteTitle(voteTitle)
+                .imageUrl(imageUrl)
                 .voteOptionContent(voteOption)
                 .build();
     }
