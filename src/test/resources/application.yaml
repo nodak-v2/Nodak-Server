@@ -38,5 +38,18 @@ spring:
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
 
+cloud:
+  aws:
+    credentials:
+      access-key:  # IAM에서 생성한 access-key
+      secret-key:  # IAM에서 생성한 secret-key
+    region:
+      static:
+    s3:
+      bucket:  # 버킷 이름
+      host-url:
+    stack:
+      auto: false
+
 swagger:
   url: https://api.nodak.link
