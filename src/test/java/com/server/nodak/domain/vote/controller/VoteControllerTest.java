@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.vote.service.VoteService;
 import java.security.Principal;
+import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,6 +36,7 @@ class VoteControllerTest {
     VoteService voteService;
     MockMvc mockMvc;
     User user;
+    Random rnd = new Random();
 
     @BeforeEach
     public void setUp() {
@@ -49,9 +51,12 @@ class VoteControllerTest {
     void voteResult() throws Exception {
         // Given
         Long voteId = 1L;
+        String userId = String.valueOf(rnd.nextLong(10));
+        given(principal.getName()).willReturn(userId);
 
         // When
-        ResultActions resultActions = mockMvc.perform(get(String.format("/votes/%d", voteId)));
+        ResultActions resultActions = mockMvc.perform(get(String.format("/votes/%d", voteId))
+                .principal(principal));
 
         // Then
         resultActions.andExpect(status().isOk());

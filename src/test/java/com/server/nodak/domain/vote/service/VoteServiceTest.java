@@ -16,8 +16,10 @@ import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteHistory;
 import com.server.nodak.domain.vote.domain.VoteOption;
+import com.server.nodak.domain.vote.dto.VoteAfterResultResponse;
+import com.server.nodak.domain.vote.dto.VoteBeforeResultResponse;
 import com.server.nodak.domain.vote.dto.VoteOptionResult;
-import com.server.nodak.domain.vote.dto.VoteResultResponse;
+import com.server.nodak.domain.vote.dto.VoteResponse;
 import com.server.nodak.domain.vote.repository.VoteHistoryRepository;
 import com.server.nodak.domain.vote.repository.VoteOptionRepository;
 import com.server.nodak.domain.vote.repository.VoteRepository;
@@ -40,7 +42,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @Slf4j
 class VoteServiceTest {
     Random rnd = new Random();
-    
+
     @InjectMocks
     VoteService voteService;
     @Mock
@@ -51,7 +53,7 @@ class VoteServiceTest {
     VoteOptionRepository voteOptionRepository;
     @Mock
     VoteHistoryRepository voteHistoryRepository;
-    
+
     User user;
     Category category;
     Post post;
@@ -96,16 +98,29 @@ class VoteServiceTest {
         Long voteId = 1L;
         String voteTitle = "Vote_title";
         List<VoteOptionResult> voteOptionResults = List.of();
+        boolean isExists = rnd.nextBoolean();
 
-        VoteResultResponse response = VoteResultResponse.builder().voteId(voteId).voteTitle(voteTitle)
+        VoteResponse beforeResponse = VoteBeforeResultResponse.builder().voteId(voteId).voteTitle(voteTitle)
+                .voteOptions(voteOptionResults).build();
+        VoteResponse afterResponse = VoteAfterResultResponse.builder().voteId(voteId).voteTitle(voteTitle)
                 .voteOptions(voteOptionResults).build();
 
-        given(voteRepository.findVoteResult(voteId)).willReturn(response);
+        given(voteRepository.existsHistoryByVoteId(user.getId(), voteId)).willReturn(isExists);
+        if (isExists) {
+            given(voteRepository.findVoteAfter(user.getId(), voteId)).willReturn(afterResponse);
+        } else {
+            given(voteRepository.findVoteBefore(voteId)).willReturn(beforeResponse);
+        }
 
         // When
-        VoteResultResponse result = voteService.findVoteResult(voteId);
+        VoteResponse result = voteService.findVoteResult(user.getId(), voteId);
 
         // Then
+        if (isExists) {
+            then(voteRepository).should().findVoteAfter(user.getId(), voteId);
+        } else {
+            then(voteRepository).should().findVoteBefore(voteId);
+        }
         Assertions.assertThat(result.getVoteId()).isEqualTo(voteId);
         Assertions.assertThat(result.getVoteTitle()).isEqualTo(voteTitle);
         Assertions.assertThat(result.getVoteOptions().size()).isEqualTo(voteOptionResults.size());

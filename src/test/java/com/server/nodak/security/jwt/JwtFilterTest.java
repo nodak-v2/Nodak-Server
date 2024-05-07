@@ -3,6 +3,8 @@ package com.server.nodak.security.jwt;
 import com.server.nodak.security.SecurityService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +35,7 @@ class JwtFilterTest {
     SecurityService securityService;
 
     String accessToken;
+    String refreshToken;
     String subject;
     Authentication authentication;
 
@@ -40,6 +43,7 @@ class JwtFilterTest {
     void beforeEach() {
         subject = randomString();
         accessToken = tokenProvider.createAccessToken(subject);
+        refreshToken = tokenProvider.createRefreshToken(subject);
         authentication = mock(Authentication.class);
     }
 
@@ -80,6 +84,26 @@ class JwtFilterTest {
         // then
         verify(securityService, never())
                 .getAuthentication(anyString());
+    }
+
+    @Test
+    @DisplayName("올바른 RefreshToken으로만 요청시 토큰이 재발급 되고, SecurityContext가 설정 되어야한다.")
+    void validRefreshTokenReissue() throws Exception{
+        // given
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        FilterChain filterChain = mock(FilterChain.class);
+        request.setCookies(new Cookie("RefreshToken", refreshToken));
+
+        // when
+        jwtFilter.doFilterInternal(request, response, filterChain);
+
+        // then
+        assertNotNull(response.getHeader(AUTHORIZATION));
+        assertNotNull(response.getCookie("RefreshToken"));
+
+        verify(securityService, times(1))
+                .getAuthentication(any());
     }
 
     private String randomString() {

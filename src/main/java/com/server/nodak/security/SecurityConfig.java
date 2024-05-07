@@ -27,6 +27,8 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .formLogin(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable)
+                .cors(AbstractHttpConfigurer::disable)
                 .oauth2Login(configurer ->
                         configurer.authorizationEndpoint(endpoint ->
                                         endpoint.baseUri("/oauth2/authorization")

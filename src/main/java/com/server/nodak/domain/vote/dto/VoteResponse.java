@@ -10,9 +10,16 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class VoteResultResponse {
+public class VoteResponse {
     private Long voteId;
+
     private String voteTitle;
+
+    private Boolean hasVoted;
+
+    private Long choiceVoteOptionId;
+
     private int totalNumber;
+
     private List<VoteOptionResult> voteOptions;
 }

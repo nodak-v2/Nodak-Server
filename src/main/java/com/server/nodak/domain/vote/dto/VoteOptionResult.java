@@ -19,6 +19,6 @@ public class VoteOptionResult {
         this.voteOptionId = voteOptionId;
         this.seq = seq;
         this.voteOptionContent = voteOptionContent;
-        this.count = count;
+        this.count = count != null ? count : 0;
     }
 }
