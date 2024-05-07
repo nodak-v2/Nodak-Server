@@ -27,7 +27,7 @@ public class S3Service {
 
         amazonS3Client.putObject(s3Properties.getBucket(), fileName, file.getInputStream(), objectMetadata);
 
-        return new UploadImageResponse(s3Properties.getHostUrl() + fileName);
+        return new UploadImageResponse(fileName);
     }
 
     private String getFileName(MultipartFile image, String imagePath) {
