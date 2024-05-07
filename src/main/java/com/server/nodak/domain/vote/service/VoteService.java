@@ -5,7 +5,7 @@ import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteHistory;
 import com.server.nodak.domain.vote.domain.VoteOption;
-import com.server.nodak.domain.vote.dto.VoteResultResponse;
+import com.server.nodak.domain.vote.dto.VoteResponse;
 import com.server.nodak.domain.vote.repository.VoteHistoryRepository;
 import com.server.nodak.domain.vote.repository.VoteOptionRepository;
 import com.server.nodak.domain.vote.repository.VoteRepository;
@@ -33,8 +33,11 @@ public class VoteService {
     }
 
     @Transactional(readOnly = true)
-    public VoteResultResponse findVoteResult(Long voteId) {
-        return voteRepository.findVoteResult(voteId);
+    public VoteResponse findVoteResult(Long userId, Long voteId) {
+        if (voteRepository.existsHistoryByVoteId(userId, voteId)) {
+            return voteRepository.findVoteAfter(userId, voteId);
+        }
+        return voteRepository.findVoteBefore(voteId);
     }
 
     private VoteHistory createVoteHistory(User user, VoteOption voteOption) {
@@ -53,5 +56,4 @@ public class VoteService {
     private User findUserByEmail(String email) {
         return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException());
     }
-
 }

@@ -1,7 +1,11 @@
 package com.server.nodak.domain.vote.repository;
 
-import com.server.nodak.domain.vote.dto.VoteResultResponse;
+import com.server.nodak.domain.vote.dto.VoteResponse;
 
 public interface VoteRepositoryCustom {
-    VoteResultResponse findVoteResult(Long voteId);
+    VoteResponse findVoteBefore(Long voteId);
+
+    Boolean existsHistoryByVoteId(Long userId, Long voteId);
+
+    VoteResponse findVoteAfter(Long userId, Long voteId);
 }
