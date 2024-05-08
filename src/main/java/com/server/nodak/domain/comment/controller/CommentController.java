@@ -34,7 +34,7 @@ public class CommentController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getComments(@PathVariable("postId") long postId) {
+    public ResponseEntity<ApiResponse<List<CommentResponse>>> getComments(@PathVariable("postId") long postId) {
         List<CommentResponse> result = commentService.fetchCommentsForPost(postId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
