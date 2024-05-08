@@ -29,4 +29,9 @@ public class NodakAuthentication extends UsernamePasswordAuthenticationToken imp
     public Map<String, Object> getAttributes() {
         return null;
     }
+
+    @Override
+    public String getName() {
+        return String.valueOf(user.getId());
+    }
 }
