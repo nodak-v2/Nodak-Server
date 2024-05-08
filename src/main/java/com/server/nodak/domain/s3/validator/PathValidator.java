@@ -9,7 +9,7 @@ public class PathValidator implements ConstraintValidator<ValidateImagePath, Str
 
     @Override
     public void initialize(ValidateImagePath constraintAnnotation) {
-ㅇ        this.validateImagePath = constraintAnnotation;
+        this.validateImagePath = constraintAnnotation;
     }
 
     @Override
