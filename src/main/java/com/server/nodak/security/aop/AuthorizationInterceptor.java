@@ -35,11 +35,9 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
 
     private boolean hasAuthority(Collection<? extends GrantedAuthority> possibleAuthority) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null) return false;
-        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        boolean b = authorities
+
+        return authentication != null && authentication.getAuthorities()
                 .stream().anyMatch(possibleAuthority::contains);
-        return b;
     }
 
     private AuthorizationRequired getAnnotation(Object handler) {
