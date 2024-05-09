@@ -29,6 +29,7 @@ public class SecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
+                .anonymous(AbstractHttpConfigurer::disable)
                 .oauth2Login(configurer ->
                         configurer.authorizationEndpoint(endpoint ->
                                         endpoint.baseUri("/oauth2/authorization")
