@@ -5,7 +5,10 @@ import com.server.nodak.domain.post.dto.PostResponse;
 import com.server.nodak.domain.post.dto.PostSearchRequest;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.post.service.PostService;
+import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.global.common.response.ApiResponse;
+import com.server.nodak.security.SecurityUtils;
+import com.server.nodak.security.aop.AuthorizationRequired;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -36,24 +39,27 @@ public class PostController {
     }
 
     @GetMapping("/{postId}")
-    public ResponseEntity<ApiResponse<PostResponse>> postDetails(@PathVariable Long postId, Principal principal) {
-        PostResponse response = postService.findPost(Long.parseLong(principal.getName()), postId);
+    public ResponseEntity<ApiResponse<PostResponse>> postDetails(@PathVariable Long postId) {
+        PostResponse response = postService.findPost(SecurityUtils.getUserId(), postId);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
     @PostMapping
+    @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> registerPost(@RequestBody PostRequest request, Principal principal) {
         postService.savePost(Long.parseLong(principal.getName()), request);
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/{postId}/stars")
+    @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> registerLike(@PathVariable Long postId, Principal principal) {
         postService.registerLike(Long.parseLong(principal.getName()), postId);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/{postId}")
+    @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> updatePost(@PathVariable Long postId,
                                                         @RequestBody PostRequest request, Principal principal) {
         postService.updatePost(Long.parseLong(principal.getName()), postId, request);
@@ -61,12 +67,14 @@ public class PostController {
     }
 
     @DeleteMapping("/{postId}/stars")
+    @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> cancleLike(@PathVariable Long postId, Principal principal) {
         postService.cancleLike(Long.parseLong(principal.getName()), postId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/{postId}")
+    @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId, Principal principal) {
         postService.removePost(Long.parseLong(principal.getName()), postId);
         return ResponseEntity.ok().build();
