@@ -87,7 +87,7 @@ class PostRepositoryImplTest {
         int selectId = rnd.nextInt(postCount);
 
         // When
-        PostResponse response = postRepository.findOne(user.getId(), posts.get(selectId).getId());
+        PostResponse response = postRepository.findOne(user.getId(), posts.get(selectId).getId()).get();
 
         // Then
         Assertions.assertThat(response.getTitle()).isEqualTo(posts.get(selectId).getTitle());

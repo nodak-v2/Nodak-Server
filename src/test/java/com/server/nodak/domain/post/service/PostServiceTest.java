@@ -116,7 +116,7 @@ class PostServiceTest {
                 .starCount(3)
                 .checkStar(true)
                 .build());
-        given(postRepository.findOne(user.getId(), postId)).willReturn(postResponse);
+        given(postRepository.findOne(user.getId(), postId)).willReturn(Optional.ofNullable(postResponse));
 
         // When
         PostResponse response = postService.findPost(user.getId(), postId);
