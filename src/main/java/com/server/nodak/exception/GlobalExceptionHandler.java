@@ -2,6 +2,10 @@ package com.server.nodak.exception;
 
 import com.server.nodak.exception.common.BaseException;
 import com.server.nodak.global.common.response.ApiResponse;
+import jakarta.validation.ConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,10 +14,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -25,7 +25,7 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.error(exception.getMessage()));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ExceptionHandler({MethodArgumentNotValidException.class})
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseEntity<ApiResponse<?>> handleValidationExceptions(MethodArgumentNotValidException ex) {
@@ -43,5 +43,13 @@ public class GlobalExceptionHandler {
                 .collect(Collectors.joining(", "));
 
         return ResponseEntity.badRequest().body(ApiResponse.error(errorMessage));
+    }
+
+    @ExceptionHandler({ConstraintViolationException.class})
+    public ResponseEntity<ApiResponse<?>> handleConstraintValidation(ConstraintViolationException ex) {
+        String property = ex.getConstraintViolations().stream().map(e -> String.valueOf(e.getPropertyPath()))
+                .collect(Collectors.joining(", "));
+        String message = String.format("%s 은(는) %s", property, "다시 확인해주세요");
+        return ResponseEntity.badRequest().body(ApiResponse.error(message));
     }
 }
