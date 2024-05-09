@@ -6,9 +6,9 @@ import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteHistory;
 import com.server.nodak.domain.vote.domain.VoteOption;
 import com.server.nodak.domain.vote.dto.VoteResponse;
-import com.server.nodak.domain.vote.repository.VoteHistoryRepository;
-import com.server.nodak.domain.vote.repository.VoteOptionRepository;
-import com.server.nodak.domain.vote.repository.VoteRepository;
+import com.server.nodak.domain.vote.repository.vote.VoteRepository;
+import com.server.nodak.domain.vote.repository.votehistory.VoteHistoryRepository;
+import com.server.nodak.domain.vote.repository.voteoption.VoteOptionRepository;
 import com.server.nodak.exception.common.BadRequestException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,12 +24,23 @@ public class VoteService {
     private final VoteHistoryRepository voteHistoryRepository;
 
     @Transactional
-    public void registerVoteOption(String email, Long voteId, Long optionSeq) {
-        User user = findUserByEmail(email);
+    public void registerVoteOption(Long userId, Long voteId, Long optionSeq) {
+        User user = findUserById(userId);
         Vote vote = findVoteById(voteId);
+
+        checkIfUserAlreadyVoted(vote.getId(), userId);
+
         VoteOption voteOption = findVoteOptionByVoteIdAndSeq(vote.getId(), optionSeq);
         VoteHistory voteHistory = createVoteHistory(user, voteOption);
+
         voteHistoryRepository.save(voteHistory);
+    }
+
+    private void checkIfUserAlreadyVoted(Long voteId, Long userId) {
+        voteHistoryRepository.findByVoteIdAndUserId(voteId, userId)
+                .ifPresent(voteHistory -> {
+                    throw new BadRequestException("이미 투표에 참여하였습니다.");
+                });
     }
 
     @Transactional(readOnly = true)
@@ -53,7 +64,8 @@ public class VoteService {
                 .orElseThrow(() -> new BadRequestException("존재하지 않는 투표 후보지입니다."));
     }
 
-    private User findUserByEmail(String email) {
-        return userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException());
+    private User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException("use not found"));
     }
 }
