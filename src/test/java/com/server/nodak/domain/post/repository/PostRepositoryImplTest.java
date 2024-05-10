@@ -94,6 +94,7 @@ class PostRepositoryImplTest {
         Assertions.assertThat(response.getAuthor()).isEqualTo(posts.get(selectId).getUser().getNickname());
         Assertions.assertThat(response.getIsAuthor())
                 .isEqualTo(posts.get(selectId).getUser().getId().equals(user.getId()));
+        Assertions.assertThat(response.getCommentSize()).isEqualTo(posts.get(selectId).getComments().size());
         Assertions.assertThat(response.getContent()).isEqualTo(posts.get(selectId).getContent());
         Assertions.assertThat(response.getImageUrl()).isEqualTo(posts.get(selectId).getImageUrl());
         Assertions.assertThat(response.getStarCount()).isEqualTo(posts.get(selectId).getStarPosts().size());
