@@ -1,6 +1,7 @@
 package com.server.nodak.domain.vote.controller;
 
 import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.domain.vote.service.VoteService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import java.util.Random;
 
 import static com.server.nodak.domain.vote.utils.Utils.createUser;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -31,6 +33,8 @@ class VoteControllerTest {
 
     @InjectMocks
     VoteController voteController;
+    @Mock
+    VoteService voteService;
     @Mock
     Principal principal;
     MockMvc mockMvc;
@@ -46,6 +50,7 @@ class VoteControllerTest {
                 .build();
 
         ReflectionTestUtils.setField(user, "id", 1L);
+        lenient().when(principal.getName()).thenReturn(String.valueOf(user.getId()));
     }
 
     @Test
@@ -53,8 +58,6 @@ class VoteControllerTest {
     void voteResult() throws Exception {
         // Given
         Long voteId = 1L;
-        String userId = String.valueOf(rnd.nextLong(10));
-        given(principal.getName()).willReturn(userId);
 
         // When
         ResultActions resultActions = mockMvc.perform(get(String.format("/votes/%d", voteId))
