@@ -35,6 +35,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         new QPostResponse(
                                 post.title,
                                 post.user.nickname,
+                                userId != null ?
+                                        post.user.id.eq(userId) : Expressions.FALSE,
                                 post.user.profileImageUrl,
                                 post.createdAt,
                                 post.content,
