@@ -45,6 +45,9 @@ public class VoteService {
 
     @Transactional(readOnly = true)
     public VoteResponse findVoteResult(Long userId, Long voteId) {
+        findUserById(userId);
+        findVoteById(voteId);
+
         if (voteRepository.existsHistoryByVoteId(userId, voteId)) {
             return voteRepository.findVoteAfter(userId, voteId);
         }
