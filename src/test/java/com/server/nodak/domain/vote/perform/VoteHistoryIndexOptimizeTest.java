@@ -52,7 +52,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("perform")
 @Import({QueryDslConfig.class})
-@DisplayName("Post 검색 성능 테스트")
+@DisplayName("VoteHistory 인덱스 최적화 테스트")
 @Slf4j
 @Rollback(value = false)
 @Transactional
