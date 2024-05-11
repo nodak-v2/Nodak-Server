@@ -1,20 +1,13 @@
 package com.server.nodak.domain.vote.repository;
 
-import static com.server.nodak.domain.vote.utils.Utils.createCategory;
-import static com.server.nodak.domain.vote.utils.Utils.createPost;
-import static com.server.nodak.domain.vote.utils.Utils.createUser;
-import static com.server.nodak.domain.vote.utils.Utils.createVote;
-import static com.server.nodak.domain.vote.utils.Utils.createVoteOption;
-
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteOption;
+import com.server.nodak.domain.vote.repository.voteoption.VoteOptionRepository;
 import com.server.nodak.global.config.QueryDslConfig;
 import jakarta.persistence.EntityManager;
-import java.util.List;
-import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+
+import java.util.List;
+import java.util.stream.IntStream;
+
+import static com.server.nodak.domain.vote.utils.Utils.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)

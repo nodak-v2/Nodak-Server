@@ -1,14 +1,5 @@
 package com.server.nodak.domain.vote.service;
 
-import static com.server.nodak.domain.vote.utils.Utils.createCategory;
-import static com.server.nodak.domain.vote.utils.Utils.createPost;
-import static com.server.nodak.domain.vote.utils.Utils.createUser;
-import static com.server.nodak.domain.vote.utils.Utils.createVote;
-import static com.server.nodak.domain.vote.utils.Utils.createVoteHistory;
-import static com.server.nodak.domain.vote.utils.Utils.createVoteOption;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.then;
-
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
@@ -20,12 +11,9 @@ import com.server.nodak.domain.vote.dto.VoteAfterResultResponse;
 import com.server.nodak.domain.vote.dto.VoteBeforeResultResponse;
 import com.server.nodak.domain.vote.dto.VoteOptionResult;
 import com.server.nodak.domain.vote.dto.VoteResponse;
-import com.server.nodak.domain.vote.repository.VoteHistoryRepository;
-import com.server.nodak.domain.vote.repository.VoteOptionRepository;
-import com.server.nodak.domain.vote.repository.VoteRepository;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import com.server.nodak.domain.vote.repository.vote.VoteRepository;
+import com.server.nodak.domain.vote.repository.votehistory.VoteHistoryRepository;
+import com.server.nodak.domain.vote.repository.voteoption.VoteOptionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,6 +24,16 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
+
+import static com.server.nodak.domain.vote.utils.Utils.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("VoteService 테스트")
@@ -67,6 +65,13 @@ class VoteServiceTest {
         category = Mockito.spy(createCategory());
         post = Mockito.spy(createPost(user, "Post_title", "Post_content", category));
         vote = Mockito.spy(createVote("Vote_title", post));
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        ReflectionTestUtils.setField(vote, "id", 1L);
+        ReflectionTestUtils.setField(post, "id", 1L);
+
+        given(userRepository.findById(any(Long.class))).willReturn(Optional.of(user));
+        given(voteRepository.findById(any(Long.class))).willReturn(Optional.of(vote));
     }
 
 
@@ -79,14 +84,13 @@ class VoteServiceTest {
         voteOption = createVoteOption(vote, optionSeq, "VoteOption_content");
         voteHistory = createVoteHistory(user, voteOption);
 
-        given(userRepository.findByEmail(user.getEmail())).willReturn(Optional.ofNullable(user));
         given(vote.getId()).willReturn(voteId);
         given(voteRepository.findById(voteId)).willReturn(Optional.ofNullable(vote));
         given(voteOptionRepository.findByVoteIdAndSeq(voteId, (long) optionSeq)).willReturn(
                 Optional.ofNullable(voteOption));
 
         // When
-        voteService.registerVoteOption(user.getEmail(), voteId, (long) optionSeq);
+        voteService.registerVoteOption(user.getId(), voteId, (long) optionSeq);
 
         // Then
         then(voteHistoryRepository).should().save(voteHistory);
