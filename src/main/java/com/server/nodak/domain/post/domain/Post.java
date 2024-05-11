@@ -1,5 +1,6 @@
 package com.server.nodak.domain.post.domain;
 
+import com.server.nodak.domain.comment.domain.Comment;
 import com.server.nodak.domain.model.BaseEntity;
 import com.server.nodak.domain.post.dto.PostRequest;
 import com.server.nodak.domain.user.domain.User;
@@ -56,6 +57,9 @@ public class Post extends BaseEntity {
     @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
     private List<StarPost> starPosts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
     @OneToOne(mappedBy = "post", cascade = {CascadeType.PERSIST,
             CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private Vote vote;
@@ -101,5 +105,13 @@ public class Post extends BaseEntity {
         if (!request.getImageUrl().equals(imageUrl)) {
             this.imageUrl = request.getImageUrl();
         }
+    }
+
+    public void addVoteComment(Comment comment) {
+        this.comments.add(comment);
+    }
+
+    public void removeComment(Comment comment) {
+        this.comments.remove(comment);
     }
 }

@@ -14,7 +14,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     Page<PostSearchResponse> search(PostSearchRequest request, Pageable pageable);
 
     @Override
-    PostResponse findOne(Long userId, Long postId);
+    Optional<PostResponse> findOne(Long userId, Long postId);
 
     Optional<Post> findByIdAndUserId(Long postId, Long userId);
 }

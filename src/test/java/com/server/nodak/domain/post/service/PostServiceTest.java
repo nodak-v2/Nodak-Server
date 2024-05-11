@@ -116,7 +116,7 @@ class PostServiceTest {
                 .starCount(3)
                 .checkStar(true)
                 .build());
-        given(postRepository.findOne(user.getId(), postId)).willReturn(postResponse);
+        given(postRepository.findOne(user.getId(), postId)).willReturn(Optional.ofNullable(postResponse));
 
         // When
         PostResponse response = postService.findPost(user.getId(), postId);
@@ -188,7 +188,7 @@ class PostServiceTest {
         Post post = createPost(user, randomUUID(), randomUUID(), category);
         StarPost starPost = Mockito.spy(StarPost.builder().user(user).post(post).build());
 
-        given(starPostRepository.findByDeletedIsTrue(user.getId(), post.getId())).willReturn(
+        given(starPostRepository.findByUserIdAndPostId(user.getId(), post.getId())).willReturn(
                 Optional.ofNullable(starPost));
 
         // When

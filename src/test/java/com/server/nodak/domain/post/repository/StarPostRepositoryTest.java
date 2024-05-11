@@ -83,7 +83,7 @@ class StarPostRepositoryTest {
         starPostRepository.save(starPost);
 
         // When
-        StarPost findStarPost = starPostRepository.findById(starPost.getId()).get();
+        StarPost findStarPost = starPostRepository.findByUserIdAndPostId(user.getId(), post.getId()).get();
         findStarPost.delete(true);
         starPostRepository.save(findStarPost);
 

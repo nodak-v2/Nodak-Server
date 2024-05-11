@@ -15,6 +15,7 @@ import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.post.dto.QPostResponse;
 import com.server.nodak.domain.post.dto.QPostSearchResponse;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -28,12 +29,15 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public PostResponse findOne(Long userId, Long postId) {
+    public Optional<PostResponse> findOne(Long userId, Long postId) {
         QStarPost starPost = QStarPost.starPost;
-        return queryFactory.select(
+        PostResponse postResponse = queryFactory.select(
                         new QPostResponse(
                                 post.title,
                                 post.user.nickname,
+                                userId != null ?
+                                        post.user.id.eq(userId) : Expressions.FALSE,
+                                post.comments.size(),
                                 post.user.profileImageUrl,
                                 post.createdAt,
                                 post.content,
@@ -50,6 +54,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .from(post)
                 .where(post.id.eq(postId))
                 .fetchOne();
+        return Optional.ofNullable(postResponse);
     }
 
     @Override
@@ -79,7 +84,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .fetch();
 
         long count = searchForCount(request);
-        
+
         return new PageImpl<>(fetch, pageable, count);
     }
 

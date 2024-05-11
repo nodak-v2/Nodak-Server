@@ -16,6 +16,8 @@ import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteOption;
 import com.server.nodak.exception.common.AuthorizationException;
 import com.server.nodak.exception.common.BadRequestException;
+import com.server.nodak.exception.common.ConflictException;
+import com.server.nodak.exception.common.DataNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -55,7 +57,7 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostResponse findPost(Long userId, Long postId) {
-        return postRepository.findOne(userId, postId);
+        return postRepository.findOne(userId, postId).orElseThrow(() -> new DataNotFoundException());
     }
 
     @Transactional
@@ -74,13 +76,17 @@ public class PostService {
 
     @Transactional
     public void registerLike(Long userId, Long postId) {
-        StarPost starPost = createStarPost(findUserById(userId), findPostById(postId));
-        starPostRepository.save(starPost);
+        if (starPostRepository.findByUserIdAndPostId(userId, postId).isEmpty()) {
+            StarPost starPost = createStarPost(findUserById(userId), findPostById(postId));
+            starPostRepository.save(starPost);
+            return;
+        }
+        throw new ConflictException();
     }
 
     @Transactional
     public void cancleLike(Long userId, Long postId) {
-        StarPost starPost = starPostRepository.findByDeletedIsTrue(userId, postId)
+        StarPost starPost = starPostRepository.findByUserIdAndPostId(userId, postId)
                 .orElseThrow(() -> new BadRequestException());
         starPost.delete(true);
         starPostRepository.save(starPost);
