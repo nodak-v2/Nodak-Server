@@ -76,7 +76,7 @@ public class PostService {
 
     @Transactional
     public void registerLike(Long userId, Long postId) {
-        if (starPostRepository.findByUserIdAndPostId(userId, postId).size() == 0) {
+        if (starPostRepository.findByUserIdAndPostId(userId, postId).isEmpty()) {
             StarPost starPost = createStarPost(findUserById(userId), findPostById(postId));
             starPostRepository.save(starPost);
             return;
@@ -86,7 +86,7 @@ public class PostService {
 
     @Transactional
     public void cancleLike(Long userId, Long postId) {
-        StarPost starPost = starPostRepository.findByDeletedIsTrue(userId, postId)
+        StarPost starPost = starPostRepository.findByUserIdAndPostId(userId, postId)
                 .orElseThrow(() -> new BadRequestException());
         starPost.delete(true);
         starPostRepository.save(starPost);
