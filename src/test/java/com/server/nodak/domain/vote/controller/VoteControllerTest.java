@@ -1,15 +1,7 @@
 package com.server.nodak.domain.vote.controller;
 
-import static com.server.nodak.domain.vote.utils.Utils.createUser;
-import static org.mockito.BDDMockito.given;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.vote.service.VoteService;
-import java.security.Principal;
-import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -19,9 +11,20 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.security.Principal;
+import java.util.Random;
+
+import static com.server.nodak.domain.vote.utils.Utils.createUser;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.lenient;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("VoteController 테스트")
@@ -31,9 +34,9 @@ class VoteControllerTest {
     @InjectMocks
     VoteController voteController;
     @Mock
-    Principal principal;
-    @Mock
     VoteService voteService;
+    @Mock
+    Principal principal;
     MockMvc mockMvc;
     User user;
     Random rnd = new Random();
@@ -41,9 +44,13 @@ class VoteControllerTest {
     @BeforeEach
     public void setUp() {
         user = createUser();
+
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(voteController)
                 .build();
+
+        ReflectionTestUtils.setField(user, "id", 1L);
+        lenient().when(principal.getName()).thenReturn(String.valueOf(user.getId()));
     }
 
     @Test
@@ -51,8 +58,6 @@ class VoteControllerTest {
     void voteResult() throws Exception {
         // Given
         Long voteId = 1L;
-        String userId = String.valueOf(rnd.nextLong(10));
-        given(principal.getName()).willReturn(userId);
 
         // When
         ResultActions resultActions = mockMvc.perform(get(String.format("/votes/%d", voteId))
@@ -81,8 +86,7 @@ class VoteControllerTest {
         // Given
         Long voteId = 1L;
         Long optionId = 1L;
-        String username = "username";
-        given(principal.getName()).willReturn(username);
+        given(principal.getName()).willReturn(String.valueOf(user.getId()));
 
         // When
         ResultActions resultActions = mockMvc.perform(post(String.format("/votes/%d", voteId))
@@ -100,7 +104,7 @@ class VoteControllerTest {
         String voteId = "voteId";
         Long optionId = 1L;
         String username = "username";
-        given(principal.getName()).willReturn(username);
+        given(principal.getName()).willReturn(String.valueOf(user.getId()));
 
         // When
         ResultActions resultActions = mockMvc.perform(post(String.format("/votes/%s", voteId))

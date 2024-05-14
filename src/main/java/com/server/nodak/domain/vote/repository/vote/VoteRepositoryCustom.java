@@ -1,4 +1,4 @@
-package com.server.nodak.domain.vote.repository;
+package com.server.nodak.domain.vote.repository.vote;
 
 import com.server.nodak.domain.vote.dto.VoteResponse;
 

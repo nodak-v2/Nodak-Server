@@ -1,22 +1,17 @@
-package com.server.nodak.domain.vote.repository;
-
-import static com.server.nodak.domain.vote.domain.QVote.vote;
-import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
-import static com.server.nodak.domain.vote.domain.QVoteOption.voteOption;
+package com.server.nodak.domain.vote.repository.vote;
 
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.nodak.domain.vote.domain.QVoteOption;
-import com.server.nodak.domain.vote.dto.QVoteOptionResult;
-import com.server.nodak.domain.vote.dto.QVoteResult;
-import com.server.nodak.domain.vote.dto.VoteAfterResultResponse;
-import com.server.nodak.domain.vote.dto.VoteBeforeResultResponse;
-import com.server.nodak.domain.vote.dto.VoteOptionResult;
-import com.server.nodak.domain.vote.dto.VoteResponse;
-import com.server.nodak.domain.vote.dto.VoteResult;
-import java.util.List;
+import com.server.nodak.domain.vote.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.List;
+
+import static com.server.nodak.domain.vote.domain.QVote.vote;
+import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
+import static com.server.nodak.domain.vote.domain.QVoteOption.voteOption;
 
 @RequiredArgsConstructor
 @Slf4j
