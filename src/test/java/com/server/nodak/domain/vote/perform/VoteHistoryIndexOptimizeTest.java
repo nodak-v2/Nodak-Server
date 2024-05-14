@@ -18,7 +18,7 @@ import com.server.nodak.domain.user.repository.UserJpaRepository;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteHistory;
 import com.server.nodak.domain.vote.domain.VoteOption;
-import com.server.nodak.domain.vote.repository.VoteHistoryRepository;
+import com.server.nodak.domain.vote.repository.votehistory.VoteHistoryRepository;
 import com.server.nodak.global.config.QueryDslConfig;
 import java.util.ArrayList;
 import java.util.List;
