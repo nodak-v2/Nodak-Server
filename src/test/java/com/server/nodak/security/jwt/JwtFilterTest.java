@@ -19,6 +19,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -92,7 +94,7 @@ class JwtFilterTest {
     void validRefreshTokenReissue() throws Exception{
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
-        MockHttpServletResponse response = new MockHttpServletResponse();
+        NodakServletResponse response = new NodakServletResponse();
         FilterChain filterChain = mock(FilterChain.class);
         request.setCookies(new Cookie("RefreshToken", refreshToken));
 
@@ -100,7 +102,7 @@ class JwtFilterTest {
         jwtFilter.doFilterInternal(request, response, filterChain);
 
         // then
-        assertNotNull(response.getHeader(AUTHORIZATION));
+        assertNotNull(response.getCookie("AccessToken"));
         assertNotNull(response.getCookie("RefreshToken"));
 
         verify(securityService, times(1))
@@ -111,4 +113,13 @@ class JwtFilterTest {
         return UUID.randomUUID().toString();
     }
 
+    static class NodakServletResponse extends MockHttpServletResponse {
+        private List<Cookie> cookies = new ArrayList<>();
+
+        @Override
+        public void addCookie(Cookie cookie) {
+            super.addCookie(cookie);
+            cookies.add(cookie);
+        }
+    }
 }
