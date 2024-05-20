@@ -54,7 +54,7 @@ class JwtFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain filterChain = mock(FilterChain.class);
-        request.addHeader(AUTHORIZATION, accessToken);
+        request.setCookies(new Cookie("AccessToken", accessToken));
 
         // when
         when(securityService.getAuthentication(tokenProvider.getSubject(accessToken)))
@@ -73,7 +73,8 @@ class JwtFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
         FilterChain filterChain = mock(FilterChain.class);
-        request.addHeader(AUTHORIZATION, accessToken + "1");
+        request.setCookies(new Cookie("AccessToken", accessToken + "1"));
+
 
         // when
         when(securityService.getAuthentication(tokenProvider.getSubject(accessToken)))
