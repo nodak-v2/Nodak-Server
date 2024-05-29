@@ -1,7 +1,9 @@
 package com.server.nodak.domain.user.controller;
 
+import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.domain.user.service.UserService;
 import com.server.nodak.global.common.response.ApiResponse;
+import com.server.nodak.security.aop.AuthorizationRequired;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +17,7 @@ public class UserController {
     private UserService userService;
 
     @GetMapping("/status")
+    @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
     public ResponseEntity<ApiResponse<?>> getStatus() {
         return ResponseEntity.ok(ApiResponse.success(userService.getUserInfo()));
     }
