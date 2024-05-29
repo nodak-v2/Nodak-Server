@@ -16,7 +16,7 @@ public class StatusCheckController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/temp")
     // TODO : 삭제 예정
     public ResponseEntity<?> test(@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}") String redirectUri) {
         return ResponseEntity.ok(redirectUri);
