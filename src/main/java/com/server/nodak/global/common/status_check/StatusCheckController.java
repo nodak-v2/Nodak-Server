@@ -18,7 +18,13 @@ public class StatusCheckController {
 
     @GetMapping("/temp")
     // TODO : 삭제 예정
-    public ResponseEntity<?> test(@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}") String redirectUri) {
+    public ResponseEntity<?> temp(@Value("${spring.security.oauth2.client.registration.kakao.redirect-uri}") String redirectUri) {
+        return ResponseEntity.ok(redirectUri);
+    }
+
+    @GetMapping("/name")
+    // TODO : 삭제 예정
+    public ResponseEntity<?> name(@Value("${spring.name}") String redirectUri) {
         return ResponseEntity.ok(redirectUri);
     }
 }
