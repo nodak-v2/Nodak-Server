@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/user")
 @RequiredArgsConstructor
 public class UserController {
-    private UserService userService;
+    private final UserService userService;
 
     @GetMapping("/status")
     @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
