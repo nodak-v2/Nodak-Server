@@ -79,6 +79,29 @@ class SecurityUtilsTest {
         assertNull(SecurityUtils.getUserId());
     }
 
+    @Test
+    @DisplayName("로그인 한 유저는 유저를 반환해야한다.")
+    void authenticatedUserGetUser() {
+        // given
+
+        // when
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // then
+        assertEquals(user, SecurityUtils.getUser());
+    }
+
+    @Test
+    @DisplayName("로그인 하지 않은 유저는 null 값을 반환해야한다.")
+    void notAuthenticatedUserGetUser() {
+        // given
+
+        // when
+
+        // then
+        assertNull(SecurityUtils.getUser());
+    }
+
     private String randomString() {
         return UUID.randomUUID().toString();
     }

@@ -14,8 +14,13 @@ public final class SecurityUtils {
     }
 
     public static Long getUserId() {
+        User user = getUser();
+        return user == null ? null : user.getId();
+    }
+
+    public static User getUser() {
         return SecurityContextHolder.getContext().getAuthentication() != null ?
-                ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getId() :
+                ((User) SecurityContextHolder.getContext().getAuthentication().getPrincipal()) :
                 null;
     }
 }
