@@ -39,7 +39,7 @@ public class JwtFilter extends OncePerRequestFilter {
             accessToken = tokenProvider.createAccessToken(subject);
             refreshToken = tokenProvider.createRefreshToken(subject);
 
-            servletUtils.putHeader(response, AUTHORIZATION, accessToken);
+            servletUtils.addCookie(response, "AccessToken", accessToken, (int) jwtProperties.getAccessTokenExpiration());
             servletUtils.addCookie(response, "RefreshToken", refreshToken, (int) jwtProperties.getRefreshTokenExpiration());
 
             setAuthentication(accessToken);
@@ -54,7 +54,9 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private String getAccessToken(HttpServletRequest request) {
-        return servletUtils.getHeader(request, AUTHORIZATION).orElse(null);
+        return servletUtils.getCookie(request, "AccessToken")
+                .map(Cookie::getValue)
+                .orElse(null);
     }
 
     private String getRefreshToken(HttpServletRequest request) {
