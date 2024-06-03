@@ -64,6 +64,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.id,
                                 post.vote.id,
                                 post.title,
+                                post.comments.size(),
+                                post.starPosts.size(),
                                 JPAExpressions
                                         .select(voteHistory.count())
                                         .from(voteHistory)
