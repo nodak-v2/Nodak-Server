@@ -1,23 +1,37 @@
 package com.server.nodak.domain.user.dto;
 
 import com.server.nodak.domain.user.domain.User;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Setter
+@NoArgsConstructor
 public class UserInfoResponse {
-    private boolean isLogin;
-    private Long userId;
+    private String email;
     private String nickname;
-    private String profileImage;
+    private String profileImageUrl;
+    private String introduction;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+    private int followerCount;
+    private int followeeCount;
 
-    public static UserInfoResponse of(User user) {
-        return new UserInfoResponse(
-                user != null,
-                user != null ? user.getId() : null,
-                user != null ? user.getNickname() : null,
-                user != null ? user.getProfileImageUrl() : null
-        );
+    protected UserInfoResponse(User user, int followerCount, int followeeCount) {
+        this.email = user.getEmail();
+        this.nickname = user.getNickname();
+        this.profileImageUrl = user.getProfileImageUrl();
+        this.introduction = user.getDescription();
+        this.createdAt = user.getCreatedAt();
+        this.updatedAt = user.getUpdatedAt();
+        this.followerCount = followerCount;
+        this.followeeCount = followeeCount;
+    }
+
+    public static UserInfoResponse of(User user, int followerCount, int followeeCount) {
+        return new UserInfoResponse(user, followerCount, followeeCount);
     }
 }

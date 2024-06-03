@@ -1,10 +1,9 @@
 package com.server.nodak.domain.user.service;
 
 import com.server.nodak.domain.user.domain.User;
-import com.server.nodak.domain.user.dto.UserInfoResponse;
+import com.server.nodak.domain.user.dto.CurrentUserInfoResponse;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.security.NodakAuthentication;
-import com.server.nodak.security.SecurityUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -44,12 +43,12 @@ class UserServiceTest {
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         // then
-        UserInfoResponse userInfoResponse = userService.getUserInfo();
+        CurrentUserInfoResponse currentUserInfoResponse = userService.getCurrentUserInfo();
 
-        assertEquals(user.getNickname(), userInfoResponse.getNickname());
-        assertEquals(user.getId(), userInfoResponse.getUserId());
-        assertTrue(userInfoResponse.isLogin());
-        assertEquals(user.getProfileImageUrl(), userInfoResponse.getProfileImage());
+        assertEquals(user.getNickname(), currentUserInfoResponse.getNickname());
+        assertEquals(user.getId(), currentUserInfoResponse.getUserId());
+        assertTrue(currentUserInfoResponse.isLogin());
+        assertEquals(user.getProfileImageUrl(), currentUserInfoResponse.getProfileImage());
     }
 
     @Test
@@ -61,12 +60,12 @@ class UserServiceTest {
         SecurityContextHolder.getContext().setAuthentication(null);
 
         // then
-        UserInfoResponse userInfoResponse = userService.getUserInfo();
+        CurrentUserInfoResponse currentUserInfoResponse = userService.getCurrentUserInfo();
 
-        assertFalse(userInfoResponse.isLogin());
-        assertNull(userInfoResponse.getNickname());
-        assertNull(userInfoResponse.getUserId());
-        assertNull(userInfoResponse.getProfileImage());
+        assertFalse(currentUserInfoResponse.isLogin());
+        assertNull(currentUserInfoResponse.getNickname());
+        assertNull(currentUserInfoResponse.getUserId());
+        assertNull(currentUserInfoResponse.getProfileImage());
     }
 
     private String randomString() {
