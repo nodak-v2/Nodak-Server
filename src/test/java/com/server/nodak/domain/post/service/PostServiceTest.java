@@ -205,7 +205,7 @@ class PostServiceTest {
                 .mapToObj(e -> PostSearchResponse.builder().postId(e)
                         .postImageUrl(String.format("http://postImage%d.com", e))
                         .author(String.format("작성자%d", e))
-                        .profileImageUrl(String.format("http://profileImage%d.com", e)).totalCount(10L).build())
+                        .profileImageUrl(String.format("http://profileImage%d.com", e)).voterCount(10L).build())
                 .toList();
     }
 

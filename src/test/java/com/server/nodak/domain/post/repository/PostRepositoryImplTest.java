@@ -1,11 +1,23 @@
 package com.server.nodak.domain.post.repository;
 
+import static com.server.nodak.domain.vote.utils.Utils.createCategory;
+import static com.server.nodak.domain.vote.utils.Utils.createPost;
+import static com.server.nodak.domain.vote.utils.Utils.createUser;
+import static com.server.nodak.domain.vote.utils.Utils.createVote;
+import static com.server.nodak.domain.vote.utils.Utils.createVoteHistory;
+import static com.server.nodak.domain.vote.utils.Utils.createVoteOption;
+
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.server.nodak.domain.comment.domain.Comment;
+import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
+import com.server.nodak.domain.post.domain.StarPost;
 import com.server.nodak.domain.post.dto.PostResponse;
 import com.server.nodak.domain.post.dto.PostSearchRequest;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.domain.user.repository.UserJpaRepository;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteHistory;
 import com.server.nodak.domain.vote.domain.VoteOption;
@@ -14,6 +26,12 @@ import com.server.nodak.domain.vote.repository.votehistory.VoteHistoryRepository
 import com.server.nodak.domain.vote.repository.voteoption.VoteOptionRepository;
 import com.server.nodak.global.config.QueryDslConfig;
 import jakarta.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,15 +43,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static com.server.nodak.domain.vote.utils.Utils.*;
+import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -43,9 +53,17 @@ import static com.server.nodak.domain.vote.utils.Utils.*;
 class PostRepositoryImplTest {
 
     @Autowired
+    JPAQueryFactory queryFactory;
+    @Autowired
     EntityManager em;
     @Autowired
+    UserJpaRepository userRepository;
+    @Autowired
     PostRepository postRepository;
+    @Autowired
+    CommentRepository commentRepository;
+    @Autowired
+    StarPostRepository starPostRepository;
     @Autowired
     VoteRepository voteRepository;
     @Autowired
@@ -56,13 +74,21 @@ class PostRepositoryImplTest {
     User user;
     Category category1;
     Category category2;
+    List<User> users = new ArrayList<>();
     List<Post> posts = new ArrayList<>();
+    List<Comment> comments = new ArrayList<>();
+    List<StarPost> starPosts = new ArrayList<>();
+    List<Vote> votes = new ArrayList<>();
     List<VoteOption> voteOptions = new ArrayList<>();
     List<VoteHistory> voteHistories = new ArrayList<>();
     Random rnd = new Random();
 
     @BeforeEach
     public void setUp() {
+        // @Transactional 어노테이션은 데이터 정합성을 위해 AUTO_INCREMENT를 롤백해주지 않아서 nativeQuery를 작성했습니다.
+        this.em.createNativeQuery("ALTER TABLE users AUTO_INCREMENT = 1").executeUpdate();
+        this.em.createNativeQuery("ALTER TABLE post AUTO_INCREMENT = 1").executeUpdate();
+
         pageRequest = PageRequest.of(0, 10);
         user = createUser();
         category1 = createCategory("운동");
@@ -167,10 +193,102 @@ class PostRepositoryImplTest {
         voteHistoryRepository.saveAll(voteHistories);
     }
 
+    @Test
+    @Transactional
+    @DisplayName("search 테스트 - 댓글 수, 좋아요 수를 검증합니다.")
+    public void assertionsPostSearchResponse() {
+        // given
+        String keyword = randomUUID(1, 2);
+        int postCount = 100;
+        int commentCount = 100;
+        int likeCount = 100;
+
+        createPostAndVoteData(postCount);
+        createCommentData(commentCount);
+        createLikeData(likeCount);
+
+        PostSearchRequest request = PostSearchRequest.builder()
+                .keyword(keyword)
+                .build();
+
+        // when
+        List<PostSearchResponse> searchResponses = postRepository.search(request, pageRequest).getContent();
+
+        // then
+        searchResponses.stream().forEach(res -> {
+            System.out.println("start");
+            Post expectPost = posts.stream().filter(post -> post.getId() == res.getPostId()).findFirst().get();
+            // 게시글 ID 검증
+            Assertions.assertThat(res.getPostId()).isEqualTo(expectPost.getId());
+            // 댓글 수 검증
+            Assertions.assertThat(res.getCommentCount()).isEqualTo(expectPost.getComments().size());
+            // 좋아요 수 검증
+            Assertions.assertThat(res.getLikeCount()).isEqualTo(expectPost.getStarPosts().size());
+        });
+
+    }
+
     private List<VoteOption> createVoteOptions(Vote vote, int size) {
         return IntStream.rangeClosed(1, size).mapToObj(e ->
                 createVoteOption(vote, e, String.format("VoteOption_content_%d", e))
         ).collect(Collectors.toList());
+    }
+
+    public void createLikeData(int count) {
+        List<StarPost> saveStarPosts = IntStream.rangeClosed(1, count).mapToObj(index -> {
+            Long userIdx = rnd.nextLong(1, users.size() - 1);
+            Long postIdx = rnd.nextLong(1, posts.size() - 1);
+            User user = userRepository.findById(userIdx).get();
+            Post post = postRepository.findById(postIdx).get();
+
+            StarPost starPost = createLike(user, post);
+            starPosts.add(starPost);
+            return starPost;
+        }).toList();
+
+        starPostRepository.saveAll(saveStarPosts);
+    }
+
+    public void createCommentData(int count) {
+        List<Comment> saveComments = IntStream.rangeClosed(1, count).mapToObj(index -> {
+            Long userIdx = rnd.nextLong(1, users.size() - 1);
+            Long postIdx = rnd.nextLong(1, posts.size() - 1);
+            User user = userRepository.findById(userIdx).get();
+            Post post = postRepository.findById(postIdx).get();
+            Comment comment = createComment(user, post, randomUUID(1, 10));
+            comments.add(comment);
+            return comment;
+        }).toList();
+
+        commentRepository.saveAll(saveComments);
+    }
+
+    public void createPostAndVoteData(int count) {
+        IntStream.rangeClosed(1, count)
+                .forEach(index -> {
+                    User user = createUser();
+                    users.add(user);
+                    Post post = createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1);
+                    Vote vote = createVote(randomUUID(1, 10), post);
+                    posts.add(post);
+                    votes.add(vote);
+                    postRepository.save(post);
+                });
+    }
+
+    private StarPost createLike(User user, Post post) {
+        return StarPost.builder()
+                .user(user)
+                .post(post)
+                .build();
+    }
+
+    private Comment createComment(User user, Post post, String content) {
+        return Comment.builder()
+                .user(user)
+                .post(post)
+                .content(content)
+                .build();
     }
 
     public String randomUUID(int start, int end) {
