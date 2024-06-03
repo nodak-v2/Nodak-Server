@@ -32,6 +32,7 @@ public class UserController {
     }
 
     @PatchMapping
+    @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
     public ResponseEntity<ApiResponse<Void>> getUserInfo(@RequestBody UserUpdateDTO userUpdateDTO) {
         userService.updateUserInfo(userUpdateDTO);
         return ok(success());
