@@ -53,3 +53,9 @@ cloud:
 
 swagger:
   url: https://api.nodak.link
+
+server:
+  servlet:
+    session:
+      cookie:
+        same-site: none
