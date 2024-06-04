@@ -82,7 +82,7 @@ class HttpServletUtilsTest {
 
         // then
         verify(mockResponse, times(1))
-                .addCookie(any(Cookie.class));
+                .addHeader(name, anyString());
     }
 
     @Test
