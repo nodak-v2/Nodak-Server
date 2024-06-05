@@ -1,14 +1,18 @@
 package com.server.nodak.domain.user.controller;
 
 import com.server.nodak.domain.user.domain.UserRole;
+import com.server.nodak.domain.user.dto.CurrentUserInfoResponse;
+import com.server.nodak.domain.user.dto.UserInfoResponse;
+import com.server.nodak.domain.user.dto.UserUpdateDTO;
 import com.server.nodak.domain.user.service.UserService;
 import com.server.nodak.global.common.response.ApiResponse;
 import com.server.nodak.security.aop.AuthorizationRequired;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.server.nodak.global.common.response.ApiResponse.*;
+import static org.springframework.http.ResponseEntity.*;
 
 @RestController
 @RequestMapping("/user")
@@ -18,8 +22,19 @@ public class UserController {
 
     @GetMapping("/status")
     @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
-    public ResponseEntity<ApiResponse<?>> getStatus() {
-        return ResponseEntity.ok(ApiResponse.success(userService.getUserInfo()));
+    public ResponseEntity<ApiResponse<CurrentUserInfoResponse>> getStatus() {
+        return ok(success(userService.getCurrentUserInfo()));
     }
 
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@PathVariable("userId") Long userId) {
+        return ok(success(userService.getUserInfo(userId)));
+    }
+
+    @PatchMapping
+    @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
+    public ResponseEntity<ApiResponse<Void>> getUserInfo(@RequestBody UserUpdateDTO userUpdateDTO) {
+        userService.updateUserInfo(userUpdateDTO);
+        return ok(success());
+    }
 }
