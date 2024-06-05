@@ -26,8 +26,9 @@ public class HttpServletUtils {
     public void addCookie(HttpServletResponse response, String name, String value, int seconds) {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
-        cookie.setHttpOnly(false);
+        cookie.setHttpOnly(true);
         cookie.setMaxAge(seconds);
+        cookie.setSecure(true);
         response.addCookie(cookie);
     }
 
