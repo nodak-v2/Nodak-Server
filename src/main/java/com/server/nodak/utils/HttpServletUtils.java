@@ -29,7 +29,7 @@ public class HttpServletUtils {
                 .path("/")
                 .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
+                .sameSite("Lax")
                 .maxAge(seconds)
                 .build();
         response.addHeader("Set-Cookie", cookie.toString());
