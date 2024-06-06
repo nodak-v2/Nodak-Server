@@ -25,14 +25,13 @@ public class HttpServletUtils {
     }
 
     public void addCookie(HttpServletResponse response, String name, String value, int seconds) {
-        ResponseCookie cookie = ResponseCookie.from(name, value)
-                .path("/")
-                .httpOnly(true)
-                .secure(true)
-                .sameSite("Lax")
-                .maxAge(seconds)
-                .build();
-        response.addHeader("Set-Cookie", cookie.toString());
+        Cookie cookie = new Cookie(name, value);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(seconds);
+        cookie.setSecure(true);
+        cookie.setAttribute("SameSite", "None");
+        response.addCookie(cookie);
     }
 
     public void removeCookie(HttpServletRequest request, HttpServletResponse response, String name) {
