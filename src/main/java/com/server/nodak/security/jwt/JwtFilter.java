@@ -31,7 +31,7 @@ public class JwtFilter extends OncePerRequestFilter {
         String accessToken = getAccessToken(request);
         String refreshToken = getRefreshToken(request);
 
-        if (tokenProvider.validateToken(accessToken)) {
+        if (accessToken != null && tokenProvider.validateToken(accessToken)) {
             setAuthentication(accessToken);
         } else if (refreshToken != null && tokenProvider.validateToken(refreshToken)) {
             String subject = tokenProvider.getSubject(refreshToken);
