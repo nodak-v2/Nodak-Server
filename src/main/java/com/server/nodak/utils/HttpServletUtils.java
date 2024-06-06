@@ -5,6 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
+import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -24,12 +25,14 @@ public class HttpServletUtils {
     }
 
     public void addCookie(HttpServletResponse response, String name, String value, int seconds) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(seconds);
-        cookie.setSecure(true);
-        response.addCookie(cookie);
+        ResponseCookie cookie = ResponseCookie.from(name, value)
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None")
+                .maxAge(seconds)
+                .build();
+        response.addHeader("Set-Cookie", cookie.toString());
     }
 
     public void removeCookie(HttpServletRequest request, HttpServletResponse response, String name) {
