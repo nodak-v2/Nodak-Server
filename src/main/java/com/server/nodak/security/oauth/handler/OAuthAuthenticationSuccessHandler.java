@@ -41,7 +41,7 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         servletUtils.addCookie(response, "RefreshToken", refreshToken, (int) jwtProperties.getRefreshTokenExpiration());
 
         this.clearAuthenticationAttributes(request, response);
-        response.setHeader(HttpHeaders.LOCATION, REDIRECT_URI);
+        response.sendRedirect(REDIRECT_URI);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
