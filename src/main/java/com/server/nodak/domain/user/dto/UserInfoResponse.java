@@ -1,5 +1,6 @@
 package com.server.nodak.domain.user.dto;
 
+import com.querydsl.core.annotations.QueryProjection;
 import com.server.nodak.domain.user.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class UserInfoResponse {
+    private Long userId;
     private String email;
     private String nickname;
     private String profileImageUrl;
@@ -21,12 +23,26 @@ public class UserInfoResponse {
     private int followeeCount;
 
     protected UserInfoResponse(User user, int followerCount, int followeeCount) {
+        this.userId = user.getId();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
         this.profileImageUrl = user.getProfileImageUrl();
         this.introduction = user.getDescription();
         this.createdAt = user.getCreatedAt();
         this.updatedAt = user.getUpdatedAt();
+        this.followerCount = followerCount;
+        this.followeeCount = followeeCount;
+    }
+
+    @QueryProjection
+    public UserInfoResponse(Long userId, String email, String nickname, String profileImageUrl, String introduction, LocalDateTime createdAt, LocalDateTime updatedAt, int followerCount, int followeeCount) {
+        this.userId = userId;
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.introduction = introduction;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
         this.followerCount = followerCount;
         this.followeeCount = followeeCount;
     }
