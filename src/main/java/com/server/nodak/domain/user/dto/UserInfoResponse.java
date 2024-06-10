@@ -1,5 +1,6 @@
 package com.server.nodak.domain.user.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.server.nodak.domain.user.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,7 +16,9 @@ public class UserInfoResponse {
     private String nickname;
     private String profileImageUrl;
     private String introduction;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime updatedAt;
     private int followerCount;
     private int followeeCount;
