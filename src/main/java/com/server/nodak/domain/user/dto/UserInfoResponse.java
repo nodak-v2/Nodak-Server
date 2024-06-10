@@ -1,6 +1,7 @@
 package com.server.nodak.domain.user.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.server.nodak.domain.user.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
