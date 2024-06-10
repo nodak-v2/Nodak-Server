@@ -14,8 +14,9 @@ import lombok.Getter;
 public class CommentResponse {
 
     private Long commentId;
+    private Long userId;
     private String profileImageUrl;
-    private String writerName;
+    private String nickname;
     private String content;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createdAt;
@@ -26,8 +27,9 @@ public class CommentResponse {
         // TODO : profileImageUrl, writerName 수정
         return CommentResponse.builder()
                 .commentId(comment.getId())
+                .userId(user.getId())
                 .profileImageUrl(null)
-                .writerName("닉네임 1")
+                .nickname("닉네임 1")
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();
