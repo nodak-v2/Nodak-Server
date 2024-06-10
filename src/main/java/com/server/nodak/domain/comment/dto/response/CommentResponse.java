@@ -29,7 +29,7 @@ public class CommentResponse {
                 .commentId(comment.getId())
                 .userId(user.getId())
                 .profileImageUrl(null)
-                .nickname("닉네임 1")
+                .nickname(user.getNickname())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt())
                 .build();
