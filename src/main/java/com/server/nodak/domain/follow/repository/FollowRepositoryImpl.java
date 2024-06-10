@@ -35,10 +35,15 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     }
 
     @Override
+    public Optional<Follow> checkIfDeletedFollowExists(Long followerId, Long followeeId) {
+        return followJpaRepository.checkIfDeletedFollowExists(followerId, followeeId);
+    }
+
+    @Override
     public Follow save(Follow follow) {
         return followJpaRepository.save(follow);
     }
-
+    
     @Override
     public List<User> getFollowersByUserId(Long userId) {
         return followJpaRepository.findFollowersByUserId(userId);

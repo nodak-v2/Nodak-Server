@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -32,10 +33,17 @@ public class FollowService {
 
     @Transactional
     public void followUser(Long userId, Long followeeId) {
-        User follower = userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException("Invalid follower Id:" + userId));
-        User followee = userRepository.findById(followeeId)
-                .orElseThrow(() -> new BadRequestException("Invalid followee Id:" + followeeId));
+        if (userId == followeeId) {
+            throw new BadRequestException();
+        }
+        User follower = checkIfUserExists(userId);
+        User followee = checkIfUserExists(followeeId);
+
+        Optional<Follow> followOptional = followRepository.checkIfDeletedFollowExists(userId, followeeId);
+        if (followOptional.isPresent()) {
+            followOptional.get().updateDelete(false);
+            return;
+        }
 
         if (followRepository.getFollowByRelation(userId, followeeId).isPresent()) {
             throw new BadRequestException("Already following this user.");
@@ -45,10 +53,21 @@ public class FollowService {
         followRepository.save(follow);
     }
 
+    private User checkIfUserExists(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new BadRequestException());
+    }
+
     @Transactional
     public void unfollowUser(Long userId, Long followeeId) {
+        if (userId == followeeId) {
+            throw new BadRequestException();
+        }
         Follow follow = followRepository.getFollowByRelation(userId, followeeId)
-                .orElseThrow(() -> new BadRequestException("Follow relation not found"));
+                .orElseThrow(() -> new BadRequestException("follow not found"));
+
+        checkIfUserExists(userId);
+        checkIfUserExists(followeeId);
 
         follow.updateDelete(true);
         followRepository.save(follow);
@@ -57,8 +76,10 @@ public class FollowService {
     @Transactional(readOnly = true)
     public List<UserInfoResponse> getFollowers(Long userId) {
         List<User> followers = followRepository.getFollowersByUserId(userId);
+
         int followerCount = followRepository.getUserFollowerCount(userId);
         int followeeCount = followRepository.getUserFolloweeCount(userId);
+
         return followers.stream()
                 .map(user -> UserInfoResponse.of(user, followerCount, followeeCount))
                 .collect(Collectors.toList());
@@ -67,8 +88,10 @@ public class FollowService {
     @Transactional(readOnly = true)
     public List<UserInfoResponse> getFollowees(Long userId) {
         List<User> followees = followRepository.getFolloweesByUserId(userId);
+
         int followerCount = followRepository.getUserFollowerCount(userId);
         int followeeCount = followRepository.getUserFolloweeCount(userId);
+
         return followees.stream()
                 .map(user -> UserInfoResponse.of(user, followerCount, followeeCount))
                 .collect(Collectors.toList());

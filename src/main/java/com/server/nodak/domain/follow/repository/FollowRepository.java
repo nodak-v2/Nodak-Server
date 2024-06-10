@@ -14,6 +14,8 @@ public interface FollowRepository {
 
     Optional<Follow> getFollowByRelation(Long followerId, Long followeeId);
 
+    Optional<Follow> checkIfDeletedFollowExists(Long followerId, Long followeeId);
+
     Follow save(Follow follow);
 
     List<User> getFollowersByUserId(Long userId);

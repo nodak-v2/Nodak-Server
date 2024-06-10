@@ -8,10 +8,12 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 @Getter
 @Entity
 @NoArgsConstructor
+@SQLRestriction("is_deleted = false")
 public class Follow extends BaseEntity {
     @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, optional = false)
     private User follower;
@@ -23,7 +25,7 @@ public class Follow extends BaseEntity {
         Follow follow = new Follow();
         follow.follower = follower;
         follow.followee = followee;
-        follow.isDeleted = true;
+        follow.isDeleted = false;
 
         return follow;
     }
