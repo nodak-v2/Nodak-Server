@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
+import com.server.nodak.domain.notification.controller.NotificationController;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.domain.StarPost;
@@ -57,6 +58,10 @@ class PostServiceTest {
     PostRepository postRepository;
     @Mock
     StarPostRepository starPostRepository;
+
+    @Mock
+    NotificationController notificationController;
+
     User user;
     Category category;
 

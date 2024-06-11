@@ -1,5 +1,6 @@
 package com.server.nodak.domain.post.service;
 
+import com.server.nodak.domain.notification.controller.NotificationController;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.domain.StarPost;
@@ -37,17 +38,27 @@ public class PostService {
 
     private final StarPostRepository starPostRepository;
 
+    private final NotificationController notificationController;
+
     @Transactional
     public void savePost(Long userId, PostRequest request) {
         User user = findUserById(userId);
         Category category = findCategoryByTitle(request.getChannel());
+
         Post post = createPost(user, category, request);
         Vote vote = createVote(post, request.getVoteTitle());
+
         List<VoteOption> list = request.getVoteOptionContent().entrySet().stream().map(e ->
                 createVoteOption(e.getKey(), e.getValue(), vote)
         ).toList();
 
         postRepository.save(post);
+        notifyMessageToFollowers(user, post);
+    }
+
+    // 알림 전송
+    private void notifyMessageToFollowers(User user, Post post) {
+        notificationController.notifyFollowers(user, post);
     }
 
     @Transactional(readOnly = true)
