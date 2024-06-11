@@ -1,5 +1,7 @@
 package com.server.nodak.domain.vote.service;
 
+import com.server.nodak.domain.post.domain.Post;
+import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.domain.vote.domain.Vote;
@@ -22,6 +24,7 @@ public class VoteService {
     private final VoteRepository voteRepository;
     private final VoteOptionRepository voteOptionRepository;
     private final VoteHistoryRepository voteHistoryRepository;
+    private final PostRepository postRepository;
 
     @Transactional
     public void registerVoteOption(Long userId, Long voteId, Long optionSeq) {
@@ -44,7 +47,10 @@ public class VoteService {
     }
 
     @Transactional(readOnly = true)
-    public VoteResponse findVoteResult(Long userId, Long voteId) {
+    public VoteResponse findVoteResult(Long userId, Long postId) {
+        Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException());
+        Long voteId = post.getVote().getId();
+
         findUserById(userId);
         findVoteById(voteId);
 

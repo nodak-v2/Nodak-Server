@@ -19,9 +19,9 @@ public class VoteController {
     private final VoteService voteService;
 
     @AuthorizationRequired(UserRole.GENERAL)
-    @GetMapping("/{voteId}")
-    public ResponseEntity<ApiResponse<VoteResponse>> voteResult(Principal principal, @PathVariable("voteId") Long voteId) {
-        VoteResponse result = voteService.findVoteResult(Long.parseLong(principal.getName()), voteId);
+    @GetMapping("/{postId}")
+    public ResponseEntity<ApiResponse<VoteResponse>> voteResult(Principal principal, @PathVariable("postId") Long postId) {
+        VoteResponse result = voteService.findVoteResult(Long.parseLong(principal.getName()), postId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
