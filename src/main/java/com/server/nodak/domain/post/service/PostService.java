@@ -1,6 +1,7 @@
 package com.server.nodak.domain.post.service;
 
 import com.server.nodak.domain.notification.controller.NotificationController;
+import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.domain.StarPost;
@@ -39,6 +40,7 @@ public class PostService {
     private final StarPostRepository starPostRepository;
 
     private final NotificationController notificationController;
+    private final NotificationService notificationService;
 
     @Transactional
     public void savePost(Long userId, PostRequest request) {
@@ -58,7 +60,7 @@ public class PostService {
 
     // 알림 전송
     private void notifyMessageToFollowers(User user, Post post) {
-        notificationController.notifyFollowers(user, post);
+        notificationService.notifyFollowers(user, post);
     }
 
     @Transactional(readOnly = true)
