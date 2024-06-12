@@ -76,6 +76,7 @@ dependencies {
 
     // Redis
     implementation group: 'org.springframework.data', name: 'spring-data-redis', version: '3.2.4'
+    implementation group: 'io.lettuce', name: 'lettuce-core', version: '6.3.2.RELEASE'
 }
 
 clean {

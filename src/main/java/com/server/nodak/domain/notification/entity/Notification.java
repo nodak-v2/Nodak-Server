@@ -9,16 +9,17 @@ import java.io.Serializable;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 public class Notification implements Serializable {
 
-    private Long writerId;
-    private String nickname;
     private Long postId;
+    private String message;
+    private Long timestamp;
+    private Long writerId;
 
-    public Notification(User writer, Post post) {
-        this.writerId = writer.getId();
-        this.nickname = writer.getNickname();
-        this.postId = post.getId();
+    public Notification(Long postId, String message, Long writerId) {
+        this.postId = postId;
+        this.message = message;
+        this.timestamp = System.currentTimeMillis();
+        this.writerId = writerId;
     }
 }
