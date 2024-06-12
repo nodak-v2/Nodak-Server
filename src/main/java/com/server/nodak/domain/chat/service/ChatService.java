@@ -6,9 +6,10 @@ import com.server.nodak.domain.chat.repository.ChatRoomRepository;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.DataNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,11 @@ public class ChatService {
         ChatRoom chatRoom = request.toEntity(requester, acceptor);
 
         chatRoomRepository.save(chatRoom);
+    }
+
+    @Transactional(readOnly = true)
+    public void findChatRoomList(long requesterId, Pageable pageable) {
+        chatRoomRepository.findChatRoom(requesterId, pageable);
     }
 
     private User findUserById(Long userId) {
