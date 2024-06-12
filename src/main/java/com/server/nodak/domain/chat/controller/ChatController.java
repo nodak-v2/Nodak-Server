@@ -27,6 +27,9 @@ public class ChatController {
     @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> saveChatRoom(@RequestBody ChatRoomCreateRequest request,
                                                           Principal principal) {
+        long requesterId = Long.parseLong(principal.getName());
+        chatService.saveChatRoom(requesterId, request);
+
         return ResponseEntity.ok().build();
     }
 
