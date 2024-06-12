@@ -1,6 +1,5 @@
 package com.server.nodak.domain.notification.controller;
 
-import com.server.nodak.domain.follow.service.FollowService;
 import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.exception.common.AuthorizationException;
@@ -16,8 +15,6 @@ import java.security.Principal;
 @RestController
 @RequiredArgsConstructor
 public class NotificationController {
-
-    private final FollowService followService;
     private final NotificationService notificationService;
 
     @GetMapping("/subscribe/{userId}")
@@ -27,7 +24,7 @@ public class NotificationController {
         return notificationService.getSseEmitter(userId);
     }
 
-    private static void validateUser(Long userId, Principal principal) {
+    private void validateUser(Long userId, Principal principal) {
         long currentUserId = Long.parseLong(principal.getName());
         if (currentUserId != userId) {
             throw new AuthorizationException();

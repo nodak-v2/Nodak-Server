@@ -45,11 +45,6 @@ public class NotificationService {
                 data.put("message", notification.getMessage());
                 emitter.send(SseEmitter.event().name("newPost").data(data, MediaType.APPLICATION_JSON));
             }
-            // 마지막으로 확인한 알림 ID 업데이트
-            if (!notifications.isEmpty()) {
-                Notification lastNotification = notifications.get(notifications.size() - 1);
-                updateUserLastSeenNotification(userId, lastNotification.getPostId());
-            }
         } catch (IOException e) {
             clients.remove(userId);
         }
@@ -59,50 +54,27 @@ public class NotificationService {
 
     public void saveNotificationToRedis(Long postId, String message, Long writerId) {
         Notification notification = new Notification(postId, message, writerId);
-        String key = "notification:" + postId;
 
         ObjectMapper objectMapper = new ObjectMapper();
         try {
             String notificationJson = objectMapper.writeValueAsString(notification);
-            redisTemplate.opsForZSet().add("notifications", notificationJson, postId);
+            redisTemplate.opsForZSet().add("notifications", notificationJson, notification.getTimestamp());
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
     }
 
-    public void updateUserLastSeenNotification(Long userId, Long postId) {
-        String key = "user:" + userId + ":lastSeenNotification";
-        redisTemplate.opsForValue().set(key, postId);
-    }
-
-    public Long getUserLastSeenNotification(Long userId) {
-        String key = "user:" + userId + ":lastSeenNotification";
-        Object value = redisTemplate.opsForValue().get(key);
-
-        if (value instanceof Integer) {
-            return ((Integer) value).longValue();
-        } else if (value instanceof Long) {
-            return (Long) value;
-        }
-        return null;
-    }
-
     // TODO: SCAN 을 통한 성능 개선
     public List<Notification> getUndeliveredNotifications(Long userId) {
-        Long lastSeenPostId = getUserLastSeenNotification(userId);
-
-        if (lastSeenPostId == null) {
-            lastSeenPostId = 0L;
-        }
-
         List<Long> followingIds = followService.getFollowees(userId).stream()
                 .map(UserInfoResponse::getUserId)
                 .collect(Collectors.toList());
 
         List<Notification> notifications = new ArrayList<>();
+        long oneWeekAgo = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000L;
 
-        // Sorted Set에서 lastSeenPostId보다 큰 값을 가져오기
-        Set<Object> notificationJsons = redisTemplate.opsForZSet().rangeByScore("notifications", lastSeenPostId + 1, Double.MAX_VALUE);
+        // Sorted Set에서 1주일 이내의 값을 가져오기
+        Set<Object> notificationJsons = redisTemplate.opsForZSet().rangeByScore("notifications", oneWeekAgo, Double.MAX_VALUE);
 
         ObjectMapper objectMapper = new ObjectMapper();
         for (Object notificationJson : notificationJsons) {
@@ -136,5 +108,4 @@ public class NotificationService {
             }
         });
     }
-
 }
