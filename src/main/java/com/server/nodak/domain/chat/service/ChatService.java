@@ -1,9 +1,12 @@
 package com.server.nodak.domain.chat.service;
 
 import com.server.nodak.domain.chat.domain.ChatRoom;
+import com.server.nodak.domain.chat.domain.Message;
 import com.server.nodak.domain.chat.dto.request.ChatRoomCreateRequest;
+import com.server.nodak.domain.chat.dto.request.MessageRequest;
 import com.server.nodak.domain.chat.dto.response.ChatRoomListResponse;
 import com.server.nodak.domain.chat.repository.ChatRoomRepository;
+import com.server.nodak.domain.chat.repository.MessageRepository;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.DataNotFoundException;
@@ -20,6 +23,8 @@ public class ChatService {
     private final UserRepository userRepository;
 
     private final ChatRoomRepository chatRoomRepository;
+
+    private final MessageRepository messageRepository;
 
 
     @Transactional
@@ -44,8 +49,24 @@ public class ChatService {
         chatRoomRepository.deleteById(chatRoomId);
     }
 
+    @Transactional
+    public void saveMessage(long requesterId, long chatRoomId, MessageRequest request) {
+        User user = findUserById(requesterId);
+        ChatRoom chatRoom = findChatRoomById(chatRoomId);
+        Message message = Message.builder()
+                .content(request.getContent())
+                .sendUser(user)
+                .chatRoom(chatRoom)
+                .build();
+
+        messageRepository.save(message);
+    }
+
+    private ChatRoom findChatRoomById(long chatRoomId) {
+        return chatRoomRepository.findById(chatRoomId).orElseThrow(() -> new DataNotFoundException());
+    }
+
     private User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException());
     }
-
 }
