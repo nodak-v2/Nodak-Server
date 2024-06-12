@@ -71,6 +71,22 @@ class ChatRoomRepositoryTest {
         fetch.forEach(e -> System.out.println(e.getChatRoomName()));
     }
 
+    @Test
+    @DisplayName("채팅방 삭제 테스트")
+    public void deleteById() {
+        // given
+        User requester = Utils.createUser();
+        User acceptor = Utils.createUser();
+        ChatRoom chatRoom = createChatRoom(requester, acceptor);
+        chatRoomRepository.save(chatRoom);
+
+        // when
+        chatRoomRepository.deleteById(chatRoom.getId());
+
+        // then
+        Assertions.assertThat(chatRoomRepository.existsById(chatRoom.getId())).isFalse();
+    }
+
     private List<ChatRoom> saveChatRoom(int index) {
         List<ChatRoom> chatRooms = new ArrayList<>();
         IntStream.rangeClosed(1, index).forEach(i -> {
