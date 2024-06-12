@@ -8,6 +8,7 @@ import com.server.nodak.global.common.response.ApiResponse;
 import com.server.nodak.security.aop.AuthorizationRequired;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -38,12 +39,12 @@ public class ChatController {
     // 채팅방 리스트 조회
     @GetMapping("/chatrooms")
     @AuthorizationRequired(UserRole.GENERAL)
-    public ResponseEntity<ApiResponse<ChatRoomListResponse>> getChatRoomList(@PageableDefault Pageable pageable,
-                                                                             Principal principal) {
+    public ResponseEntity<ApiResponse<Page<ChatRoomListResponse>>> getChatRoomList(@PageableDefault Pageable pageable,
+                                                                                   Principal principal) {
 
         long requesterId = Long.parseLong(principal.getName());
-        chatService.findChatRoomList(requesterId, pageable);
-        return ResponseEntity.ok().build();
+        Page<ChatRoomListResponse> chatRoomList = chatService.findChatRoomList(requesterId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(chatRoomList));
     }
 
     // 채팅방 삭제
