@@ -10,6 +10,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import com.server.nodak.domain.notification.controller.NotificationController;
+import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.domain.StarPost;
@@ -60,7 +61,7 @@ class PostServiceTest {
     StarPostRepository starPostRepository;
 
     @Mock
-    NotificationController notificationController;
+    NotificationService notificationService;
 
     User user;
     Category category;
