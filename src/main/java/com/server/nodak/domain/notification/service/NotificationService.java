@@ -1,25 +1,21 @@
 package com.server.nodak.domain.notification.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.nodak.domain.follow.service.FollowService;
 import com.server.nodak.domain.notification.entity.Notification;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
-import com.server.nodak.domain.user.repository.UserRepository;
-import com.server.nodak.exception.common.AuthorizationException;
+import com.server.nodak.domain.user.dto.UserInfoResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,11 +24,10 @@ public class NotificationService {
 
     private final Map<Long, SseEmitter> clients = new ConcurrentHashMap<>();
     private final RedisTemplate<String, Object> redisTemplate;
-    private final ValueOperations<String, Object> valueOps;
     private final FollowService followService;
-    private final NotificationService notificationService;
-    private final UserRepository userRepository;
 
+    /**
+     * SSE 연결 시, 동작 */
     public SseEmitter getSseEmitter(Long userId) {
         SseEmitter emitter = new SseEmitter(15 * 60 * 1000L);
         clients.put(userId, emitter);
@@ -40,17 +35,20 @@ public class NotificationService {
         emitter.onCompletion(() -> clients.remove(userId));
         emitter.onTimeout(() -> clients.remove(userId));
 
-        User user = userRepository.findById(userId).orElseThrow(() -> new AuthorizationException());
         try {
             emitter.send(SseEmitter.event().name("init").data("Connected"));
-            List<Notification> notifications = notificationService.getNotifications(userId);
+            List<Notification> notifications = getUndeliveredNotifications(userId);
 
             for (Notification notification : notifications) {
                 Map<String, Object> data = new HashMap<>();
-                data.put("userId", notification.getWriterId());
-                data.put("nickname", user.getNickname());
                 data.put("postId", notification.getPostId());
+                data.put("message", notification.getMessage());
                 emitter.send(SseEmitter.event().name("newPost").data(data, MediaType.APPLICATION_JSON));
+            }
+            // 마지막으로 확인한 알림 ID 업데이트
+            if (!notifications.isEmpty()) {
+                Notification lastNotification = notifications.get(notifications.size() - 1);
+                updateUserLastSeenNotification(userId, lastNotification.getPostId());
             }
         } catch (IOException e) {
             clients.remove(userId);
@@ -59,21 +57,78 @@ public class NotificationService {
         return emitter;
     }
 
+    public void saveNotificationToRedis(Long postId, String message, Long writerId) {
+        Notification notification = new Notification(postId, message, writerId);
+        String key = "notification:" + postId;
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            String notificationJson = objectMapper.writeValueAsString(notification);
+            redisTemplate.opsForZSet().add("notifications", notificationJson, postId);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void updateUserLastSeenNotification(Long userId, Long postId) {
+        String key = "user:" + userId + ":lastSeenNotification";
+        redisTemplate.opsForValue().set(key, postId);
+    }
+
+    public Long getUserLastSeenNotification(Long userId) {
+        String key = "user:" + userId + ":lastSeenNotification";
+        Object value = redisTemplate.opsForValue().get(key);
+
+        if (value instanceof Integer) {
+            return ((Integer) value).longValue();
+        } else if (value instanceof Long) {
+            return (Long) value;
+        }
+        return null;
+    }
+
+    // TODO: SCAN 을 통한 성능 개선
+    public List<Notification> getUndeliveredNotifications(Long userId) {
+        Long lastSeenPostId = getUserLastSeenNotification(userId);
+
+        if (lastSeenPostId == null) {
+            lastSeenPostId = 0L;
+        }
+
+        List<Long> followingIds = followService.getFollowees(userId).stream()
+                .map(UserInfoResponse::getUserId)
+                .collect(Collectors.toList());
+
+        List<Notification> notifications = new ArrayList<>();
+
+        // Sorted Set에서 lastSeenPostId보다 큰 값을 가져오기
+        Set<Object> notificationJsons = redisTemplate.opsForZSet().rangeByScore("notifications", lastSeenPostId + 1, Double.MAX_VALUE);
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (Object notificationJson : notificationJsons) {
+            try {
+                Notification notification = objectMapper.readValue(notificationJson.toString(), Notification.class);
+                if (notification != null && followingIds.contains(notification.getWriterId())) {
+                    notifications.add(notification);
+                }
+            } catch (JsonProcessingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return notifications;
+    }
+
     /**
      * user 의 팔로워들에게, Post 알림 전송 */
-    public void notifyFollowers(User user, Post post) {
+    public void notifyFollowersBySse(User user, Post post) {
         followService.getFollowers(user.getId()).forEach(follower -> {
             SseEmitter emitter = clients.get(follower.getUserId());
-
-            // Redis에 알림 저장
-            notificationService.saveNotificationToRedis(follower.getUserId(), user, post);
-
             if (emitter != null) {
                 try {
                     Map<String, Object> data = new HashMap<>();
-                    data.put("userId", user.getId());
-                    data.put("nickname", user.getNickname());
                     data.put("postId", post.getId());
+                    data.put("message", user.getNickname() + "님이 새로운 게시글을 작성했습니다.");
                     emitter.send(SseEmitter.event().name("newPost").data(data, MediaType.APPLICATION_JSON));
                 } catch (IOException e) {
                     clients.remove(follower.getUserId());
@@ -82,23 +137,4 @@ public class NotificationService {
         });
     }
 
-    public void saveNotificationToRedis(Long followerId, User writer, Post post) {
-        Notification notification = new Notification(writer, post);
-        String key = "notification:"+ followerId + ":" + System.currentTimeMillis();
-        valueOps.set(key, notification, 3, TimeUnit.DAYS);
-    }
-
-    public List<Notification> getNotifications(Long userId) {
-        // 키 패턴을 사용하여 모든 알림 가져오기
-        // TODO : SCAN 처리
-        Set<String> keys = redisTemplate.keys("notification:" + userId + ":*");
-        return keys.stream()
-                .map(key -> (Notification) valueOps.get(key))
-                .collect(Collectors.toList());
-    }
-
-    public void deleteNotifications(Long userId) {
-        Set<String> keys = redisTemplate.keys("notification:" + userId + ":*");
-        redisTemplate.delete(keys);
-    }
 }
