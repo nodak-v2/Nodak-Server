@@ -39,7 +39,13 @@ public class ChatService {
         return chatRoomRepository.findChatRoom(requesterId, pageable);
     }
 
+    @Transactional
+    public void deleteChatRoom(long chatRoomId) {
+        chatRoomRepository.deleteById(chatRoomId);
+    }
+
     private User findUserById(Long userId) {
         return userRepository.findById(userId).orElseThrow(() -> new DataNotFoundException());
     }
+
 }

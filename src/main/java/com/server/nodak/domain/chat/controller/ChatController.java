@@ -41,7 +41,6 @@ public class ChatController {
     @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Page<ChatRoomListResponse>>> getChatRoomList(@PageableDefault Pageable pageable,
                                                                                    Principal principal) {
-
         long requesterId = Long.parseLong(principal.getName());
         Page<ChatRoomListResponse> chatRoomList = chatService.findChatRoomList(requesterId, pageable);
         return ResponseEntity.ok(ApiResponse.success(chatRoomList));
@@ -49,9 +48,11 @@ public class ChatController {
 
     // 채팅방 삭제
     @DeleteMapping("/chatrooms/{chatRoomId}")
-    public ResponseEntity<ApiResponse<Void>> deleteChatRoom(@PathVariable long chatRoomId) {
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Void>> deleteChatRoom(@PathVariable long chatRoomId,
+                                                            Principal principal) {
+        chatService.deleteChatRoom(chatRoomId);
         return ResponseEntity.ok().build();
     }
-
 
 }
