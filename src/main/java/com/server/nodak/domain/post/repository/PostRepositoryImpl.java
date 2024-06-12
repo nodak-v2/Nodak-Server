@@ -72,7 +72,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                         .where(voteHistory.voteOption.in(post.vote.voteOptions)),
                                 post.user.nickname,
                                 post.user.profileImageUrl,
-                                post.imageUrl
+                                post.imageUrl,
+                                post.createdAt
                         )
                 )
                 .from(post)
