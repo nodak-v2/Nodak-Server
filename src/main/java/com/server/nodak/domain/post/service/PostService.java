@@ -1,6 +1,7 @@
 package com.server.nodak.domain.post.service;
 
 import com.server.nodak.domain.notification.controller.NotificationController;
+import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.domain.StarPost;
@@ -19,7 +20,6 @@ import com.server.nodak.exception.common.AuthorizationException;
 import com.server.nodak.exception.common.BadRequestException;
 import com.server.nodak.exception.common.ConflictException;
 import com.server.nodak.exception.common.DataNotFoundException;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,6 +39,7 @@ public class PostService {
     private final StarPostRepository starPostRepository;
 
     private final NotificationController notificationController;
+    private final NotificationService notificationService;
 
     @Transactional
     public void savePost(Long userId, PostRequest request) {
@@ -48,17 +49,14 @@ public class PostService {
         Post post = createPost(user, category, request);
         Vote vote = createVote(post, request.getVoteTitle());
 
-        List<VoteOption> list = request.getVoteOptionContent().entrySet().stream().map(e ->
-                createVoteOption(e.getKey(), e.getValue(), vote)
-        ).toList();
+        request.getVoteOptionContent().entrySet().stream()
+                .map(e -> createVoteOption(e.getKey(), e.getValue(), vote))
+                .toList();
 
         postRepository.save(post);
-        notifyMessageToFollowers(user, post);
-    }
 
-    // 알림 전송
-    private void notifyMessageToFollowers(User user, Post post) {
-        notificationController.notifyFollowers(user, post);
+        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.", user.getId());
+        notificationService.notifyFollowersBySse(user, post);
     }
 
     @Transactional(readOnly = true)
