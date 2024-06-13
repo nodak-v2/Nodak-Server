@@ -8,15 +8,16 @@ import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.domain.user.repository.UserHistoryRepository;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.BadRequestException;
 import com.server.nodak.exception.common.DataNotFoundException;
+import com.server.nodak.security.aop.IncreaseUserHistory;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +26,10 @@ public class CommentService {
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
     private final UserRepository userRepository;
+    private final UserHistoryRepository userHistoryRepository;
 
     @Transactional
+    @IncreaseUserHistory(incrementValue = 2)
     public void createComment(long postId, long userId, CreateCommentRequest commentRequest) {
         Post post = findPost(postId);
         User user = findUser(userId);
