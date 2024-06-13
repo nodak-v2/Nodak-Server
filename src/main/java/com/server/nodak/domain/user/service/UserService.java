@@ -38,8 +38,9 @@ public class UserService {
 
         int followerCount = followRepository.getUserFollowerCount(userId);
         int followeeCount = followRepository.getUserFolloweeCount(userId);
+        List<UserHistoryListResponse> userHistory = getUserHistory(userId);
 
-        return UserInfoResponse.of(user, followerCount, followeeCount);
+        return UserInfoResponse.of(user, followerCount, followeeCount, userHistory);
     }
 
     @Transactional
