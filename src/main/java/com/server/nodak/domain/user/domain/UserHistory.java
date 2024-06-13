@@ -49,9 +49,9 @@ public class UserHistory extends BaseEntity {
     }
 
     private Long checkLevel() {
-        if (this.count > 10) {
+        if (this.count >= 6) {
             return 3L;
-        } else if (this.count > 5) {
+        } else if (this.count >= 3) {
             return 2L;
         }
         return 1L;
