@@ -13,6 +13,7 @@ import com.server.nodak.domain.post.repository.CategoryRepository;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.post.repository.StarPostRepository;
 import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.domain.user.repository.UserHistoryRepository;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteOption;
@@ -20,6 +21,7 @@ import com.server.nodak.exception.common.AuthorizationException;
 import com.server.nodak.exception.common.BadRequestException;
 import com.server.nodak.exception.common.ConflictException;
 import com.server.nodak.exception.common.DataNotFoundException;
+import com.server.nodak.security.aop.IncreaseUserHistory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +43,10 @@ public class PostService {
     private final NotificationController notificationController;
     private final NotificationService notificationService;
 
+    private final UserHistoryRepository userHistoryRepository;
+
     @Transactional
+    @IncreaseUserHistory
     public void savePost(Long userId, PostRequest request) {
         User user = findUserById(userId);
         Category category = findCategoryByTitle(request.getChannel());
@@ -55,7 +60,8 @@ public class PostService {
 
         postRepository.save(post);
 
-        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.", user.getId());
+        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.",
+                user.getId());
         notificationService.notifyFollowersBySse(user, post);
     }
 
@@ -84,6 +90,7 @@ public class PostService {
     }
 
     @Transactional
+    @IncreaseUserHistory
     public void registerLike(Long userId, Long postId) {
         if (starPostRepository.findByUserIdAndPostId(userId, postId).isEmpty()) {
             StarPost starPost = createStarPost(findUserById(userId), findPostById(postId));
