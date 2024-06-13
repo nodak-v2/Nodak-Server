@@ -12,6 +12,7 @@ import com.server.nodak.domain.vote.repository.vote.VoteRepository;
 import com.server.nodak.domain.vote.repository.votehistory.VoteHistoryRepository;
 import com.server.nodak.domain.vote.repository.voteoption.VoteOptionRepository;
 import com.server.nodak.exception.common.BadRequestException;
+import com.server.nodak.security.aop.IncreaseUserHistory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,6 +28,7 @@ public class VoteService {
     private final PostRepository postRepository;
 
     @Transactional
+    @IncreaseUserHistory(incrementValue = 3)
     public void registerVoteOption(Long userId, Long voteId, Long optionSeq) {
         User user = findUserById(userId);
         Vote vote = findVoteById(voteId);
