@@ -5,6 +5,7 @@ import com.server.nodak.domain.user.domain.UserHistory;
 import com.server.nodak.domain.user.repository.UserHistoryRepository;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.DataNotFoundException;
+import java.lang.reflect.Method;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -14,6 +15,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -28,13 +30,16 @@ public class UserHistoryAspect {
     public void increaseHistoryPointCut() {
     }
 
-    @Around(value = "increaseHistoryPointCut() && args(userId, ..)")
-    public void increaseHistoryExecute(ProceedingJoinPoint joinPoint, Long userId) throws Throwable {
+    @Around(value = "increaseHistoryPointCut() && args(userId, request, ..)")
+    public void increaseHistoryExecute(ProceedingJoinPoint joinPoint, Long userId, Object request) throws Throwable {
 
         joinPoint.proceed();
 
-        System.out.println("userId : " + userId);
-        System.out.println("증가");
+        MethodSignature signature = (MethodSignature) joinPoint.getSignature();
+        Method method = signature.getMethod();
+        IncreaseUserHistory increaseUserHistory = method.getAnnotation(IncreaseUserHistory.class);
+        int incrementValue = increaseUserHistory.incrementValue();
+        System.out.println("increment Value : " + incrementValue);
 
         // 오늘 날짜에 대한 기록이 없다면
         LocalDateTime now = LocalDateTime.of(LocalDate.now(), LocalTime.of(0, 0));
@@ -52,7 +57,7 @@ public class UserHistoryAspect {
             userHistoryRepository.save(userHistory);
         } else {
             UserHistory userHistory = optionalUserHistory.get();
-            userHistory.increaseCount();
+            userHistory.increaseCount(incrementValue);
             userHistoryRepository.save(userHistory);
         }
     }

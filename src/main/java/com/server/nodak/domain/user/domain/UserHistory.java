@@ -57,7 +57,7 @@ public class UserHistory extends BaseEntity {
         return 1L;
     }
 
-    public void increaseCount() {
-        this.count++;
+    public void increaseCount(int incrementValue) {
+        this.count = count + incrementValue;
     }
 }

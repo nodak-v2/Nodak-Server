@@ -29,7 +29,7 @@ public class CommentService {
     private final UserHistoryRepository userHistoryRepository;
 
     @Transactional
-    @IncreaseUserHistory
+    @IncreaseUserHistory(incrementValue = 2)
     public void createComment(long postId, long userId, CreateCommentRequest commentRequest) {
         Post post = findPost(postId);
         User user = findUser(userId);

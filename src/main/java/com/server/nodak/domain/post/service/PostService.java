@@ -46,7 +46,7 @@ public class PostService {
     private final UserHistoryRepository userHistoryRepository;
 
     @Transactional
-    @IncreaseUserHistory
+    @IncreaseUserHistory(incrementValue = 2)
     public void savePost(Long userId, PostRequest request) {
         User user = findUserById(userId);
         Category category = findCategoryByTitle(request.getChannel());
