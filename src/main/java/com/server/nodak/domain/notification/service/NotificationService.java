@@ -64,11 +64,10 @@ public class NotificationService {
         }
     }
 
-    // TODO: SCAN 을 통한 성능 개선
     public List<Notification> getUndeliveredNotifications(Long userId) {
-        List<Long> followingIds = followService.getFollowees(userId).stream()
+        Set<Long> followingIds = followService.getFollowees(userId).stream()
                 .map(UserInfoResponse::getUserId)
-                .collect(Collectors.toList());
+                .collect(Collectors.toSet());
 
         List<Notification> notifications = new ArrayList<>();
         long oneWeekAgo = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000L;
