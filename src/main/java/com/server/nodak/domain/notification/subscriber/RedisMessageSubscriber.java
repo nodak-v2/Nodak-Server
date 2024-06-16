@@ -44,12 +44,6 @@ public class RedisMessageSubscriber implements MessageListener {
         } else if ("followEvent-channel".equals(channel)) {
             onFollowMessage(messageBody);
         }
-        try {
-            PostEvent postEvent = new ObjectMapper().readValue(messageBody, PostEvent.class);
-            notifyClients(postEvent);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     public void onPostMessage(String messageBody) {
