@@ -27,7 +27,7 @@ public class AuthorizationInterceptor implements HandlerInterceptor {
         Collection<? extends GrantedAuthority> possibleAuthority = roleToAuthority(annotation.value());
 
         if (!hasAuthority(possibleAuthority)) {
-            throw new AuthorizationException();
+            throw new AuthorizationException(annotation.status().value(), annotation.failureMessage());
         }
 
         return true;
