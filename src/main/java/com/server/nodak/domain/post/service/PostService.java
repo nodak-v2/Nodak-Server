@@ -1,6 +1,5 @@
 package com.server.nodak.domain.post.service;
 
-import com.server.nodak.domain.notification.controller.NotificationController;
 import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
@@ -12,8 +11,8 @@ import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.post.repository.CategoryRepository;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.post.repository.StarPostRepository;
+import com.server.nodak.domain.notification.event.PostEvent;
 import com.server.nodak.domain.user.domain.User;
-import com.server.nodak.domain.user.repository.UserHistoryRepository;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteOption;
@@ -23,6 +22,8 @@ import com.server.nodak.exception.common.ConflictException;
 import com.server.nodak.exception.common.DataNotFoundException;
 import com.server.nodak.security.aop.IncreaseUserHistory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,10 +41,10 @@ public class PostService {
 
     private final StarPostRepository starPostRepository;
 
-    private final NotificationController notificationController;
     private final NotificationService notificationService;
 
-    private final UserHistoryRepository userHistoryRepository;
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
 
     @Transactional
     @IncreaseUserHistory(incrementValue = 2)
@@ -60,9 +61,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.",
-                user.getId());
-        notificationService.notifyFollowersBySse(user, post);
+        rabbitTemplate.convertAndSend("post-exchange", "post.created", new PostEvent(post.getId(), user));
     }
 
     @Transactional(readOnly = true)

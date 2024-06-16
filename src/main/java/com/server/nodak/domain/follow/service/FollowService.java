@@ -2,11 +2,14 @@ package com.server.nodak.domain.follow.service;
 
 import com.server.nodak.domain.follow.domain.Follow;
 import com.server.nodak.domain.follow.repository.FollowRepository;
+import com.server.nodak.domain.notification.event.FollowEvent;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.dto.UserInfoResponse;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.BadRequestException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,6 +23,9 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+
+    private final RabbitTemplate rabbitTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional(readOnly = true)
     public int getUserFollowerCount(Long userId) {
@@ -38,19 +44,25 @@ public class FollowService {
         }
         User follower = checkIfUserExists(userId);
         User followee = checkIfUserExists(followeeId);
+        checkIfFollowAlreadyExists(userId, followeeId);
 
         Optional<Follow> followOptional = followRepository.checkIfDeletedFollowExists(userId, followeeId);
+
         if (followOptional.isPresent()) {
             followOptional.get().updateDelete(false);
             return;
         }
+        Follow follow = Follow.create(follower, followee);
+        followRepository.save(follow);
 
+        // send to Message broker
+        rabbitTemplate.convertAndSend("follow-exchange", "follow.created", new FollowEvent(follower, followee));
+    }
+
+    private void checkIfFollowAlreadyExists(Long userId, Long followeeId) {
         if (followRepository.getFollowByRelation(userId, followeeId).isPresent()) {
             throw new BadRequestException("Already following this user.");
         }
-
-        Follow follow = Follow.create(follower, followee);
-        followRepository.save(follow);
     }
 
     private User checkIfUserExists(Long userId) {
@@ -71,6 +83,9 @@ public class FollowService {
 
         follow.updateDelete(true);
         followRepository.save(follow);
+
+        String key = "follow:" + userId;
+        redisTemplate.opsForSet().remove(key, followeeId);
     }
 
     @Transactional(readOnly = true)
