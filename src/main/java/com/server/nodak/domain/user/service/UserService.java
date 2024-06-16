@@ -76,9 +76,11 @@ public class UserService {
         List<UserHistoryListResponse> result = new ArrayList<>();
 
         int historiesIdx = 0;
-
-        if (histories.size() != 0) {
+        int historiesLength = histories.size();
+        if (historiesLength != 0) {
             for (long i = 0; i < HISTORY_EXPIRATION_DAYS; i++) {
+                if (historiesLength <= historiesIdx) break;
+                
                 if (startAt.plusDays(i).toLocalDate()
                         .equals(histories.get(historiesIdx).getActionDateTime().toLocalDate())) {
                     result.add(histories.get(historiesIdx).toListResponse());
