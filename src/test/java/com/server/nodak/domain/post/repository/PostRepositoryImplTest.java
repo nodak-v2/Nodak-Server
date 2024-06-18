@@ -88,6 +88,9 @@ class PostRepositoryImplTest {
         // @Transactional 어노테이션은 데이터 정합성을 위해 AUTO_INCREMENT를 롤백해주지 않아서 nativeQuery를 작성했습니다.
         this.em.createNativeQuery("ALTER TABLE users AUTO_INCREMENT = 1").executeUpdate();
         this.em.createNativeQuery("ALTER TABLE post AUTO_INCREMENT = 1").executeUpdate();
+        this.em.createNativeQuery("ALTER TABLE vote AUTO_INCREMENT = 1").executeUpdate();
+        this.em.createNativeQuery("ALTER TABLE vote_option AUTO_INCREMENT = 1").executeUpdate();
+        this.em.createNativeQuery("ALTER TABLE vote_history AUTO_INCREMENT = 1").executeUpdate();
 
         pageRequest = PageRequest.of(0, 10);
         user = createUser();
@@ -96,6 +99,85 @@ class PostRepositoryImplTest {
         em.persist(user);
         em.persist(category1);
         em.persist(category2);
+    }
+
+    @Test
+    @DisplayName("findMyPosting 테스트")
+    public void findMyPosting() {
+        // Given
+        savePostAndVoteData(10);
+        Long userId = users.get(rnd.nextInt(1, users.size() - 1)).getId();
+        List<Long> expectIds = posts.stream().filter(post -> post.getUser().getId().equals(userId))
+                .mapToLong(post -> post.getId()).boxed().distinct().toList();
+
+        // When
+        Page<PostSearchResponse> findPosts = postRepository.findMyPosting(userId, pageRequest);
+
+        // Then
+        findPosts.getContent().stream().forEach(e ->
+                Assertions.assertThat(expectIds.contains(e.getPostId()))
+                        .isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("findMyComment 테스트")
+    public void findMyComment() {
+        // Given
+        savePostAndVoteData(10);
+        saveCommentData(3);
+        Long userId = users.get(rnd.nextInt(1, users.size() - 1)).getId();
+        List<Long> expectIds = comments.stream().filter(comment -> comment.getUser().getId().equals(userId))
+                .mapToLong(comment -> comment.getPost().getId()).boxed().distinct().toList();
+
+        // When
+        Page<PostSearchResponse> findPosts = postRepository.findMyComment(userId, pageRequest);
+
+        // Then
+        findPosts.getContent().stream().forEach(e ->
+                Assertions.assertThat(expectIds.contains(e.getPostId())).isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("findMyVoteHistory 테스트")
+    public void findMyVoteHistory() {
+        // Given
+        savePostAndVoteData(5);
+        saveVoteOptionAndVoteHistory(20);
+        Long userId = users.get(rnd.nextInt(1, users.size() - 1)).getId();
+        List<Long> expectIds = voteHistories.stream()
+                .filter(voteHistory -> voteHistory.getUser().getId().equals(userId))
+                .mapToLong(voteHistory -> voteHistory.getVoteOption()
+                        .getVote().getPost().getId()).boxed().distinct().toList();
+
+        // When
+        Page<PostSearchResponse> findPosts = postRepository.findMyVoteHistory(userId, pageRequest);
+
+        // Then
+        findPosts.getContent().stream().forEach(e ->
+                Assertions.assertThat(expectIds.contains(e.getPostId())).isTrue()
+        );
+    }
+
+    @Test
+    @DisplayName("findMyLike 테스트")
+    public void findMyLike() {
+        // Given
+        savePostAndVoteData(5);
+        saveLikeData(10);
+        Long userId = users.get(0).getId();
+        List<Long> expectIds = starPosts.stream()
+                .filter(starPost -> starPost.getUser().getId().equals(userId))
+                .mapToLong(starPost -> starPost.getPost().getId()).distinct().boxed().toList();
+
+        // When
+        Page<PostSearchResponse> findPosts = postRepository.findMyLike(userId, pageRequest);
+
+        // Then
+        findPosts.getContent().stream().forEach(e ->
+                Assertions.assertThat(expectIds.contains(e.getPostId())).isTrue()
+        );
     }
 
     @Test
@@ -203,9 +285,9 @@ class PostRepositoryImplTest {
         int commentCount = 100;
         int likeCount = 100;
 
-        createPostAndVoteData(postCount);
-        createCommentData(commentCount);
-        createLikeData(likeCount);
+        savePostAndVoteData(postCount);
+        saveCommentData(commentCount);
+        saveLikeData(likeCount);
 
         PostSearchRequest request = PostSearchRequest.builder()
                 .keyword(keyword)
@@ -228,16 +310,46 @@ class PostRepositoryImplTest {
 
     }
 
+//    private void saveVoteHistory(int count) {
+//        List<VoteHistory> saveVoteHistories = IntStream.rangeClosed(1, count).mapToObj(index -> {
+//            Long userIdx = rnd.nextLong(1, users.size() - 1);
+//            Long voteOptionIdx = rnd.nextLong(1, voteOptions.size() - 1);
+//            User user = userRepository.findById(userIdx).get();
+//            VoteOption voteOption = voteOptionRepository.findById(voteOptionIdx).get();
+//            VoteHistory voteHistory = createVoteHistory(user, voteOption);
+//            voteHistories.add(voteHistory);
+//            return voteHistory;
+//        }).toList();
+//
+//        voteHistoryRepository.saveAll(saveVoteHistories);
+//    }
+
+    private void saveVoteOptionAndVoteHistory(int count) {
+        IntStream.rangeClosed(1, count).forEach(index -> {
+            Long userIdx = rnd.nextLong(1, users.size());
+            Long voteIdx = rnd.nextLong(1, votes.size());
+            User user = userRepository.findById(userIdx).get();
+            Vote vote = voteRepository.findById(voteIdx).get();
+            VoteOption voteOption = createVoteOption(vote, null, randomUUID(1, 10));
+            voteOptions.add(voteOption);
+            voteOptionRepository.save(voteOption);
+            VoteHistory voteHistory = createVoteHistory(user, voteOption);
+            voteHistories.add(voteHistory);
+            voteHistoryRepository.save(voteHistory);
+
+        });
+    }
+
     private List<VoteOption> createVoteOptions(Vote vote, int size) {
         return IntStream.rangeClosed(1, size).mapToObj(e ->
                 createVoteOption(vote, e, String.format("VoteOption_content_%d", e))
         ).collect(Collectors.toList());
     }
 
-    public void createLikeData(int count) {
+    public void saveLikeData(int count) {
         List<StarPost> saveStarPosts = IntStream.rangeClosed(1, count).mapToObj(index -> {
-            Long userIdx = rnd.nextLong(1, users.size() - 1);
-            Long postIdx = rnd.nextLong(1, posts.size() - 1);
+            Long userIdx = rnd.nextLong(1, users.size());
+            Long postIdx = rnd.nextLong(1, posts.size());
             User user = userRepository.findById(userIdx).get();
             Post post = postRepository.findById(postIdx).get();
 
@@ -249,10 +361,10 @@ class PostRepositoryImplTest {
         starPostRepository.saveAll(saveStarPosts);
     }
 
-    public void createCommentData(int count) {
+    public void saveCommentData(int count) {
         List<Comment> saveComments = IntStream.rangeClosed(1, count).mapToObj(index -> {
-            Long userIdx = rnd.nextLong(1, users.size() - 1);
-            Long postIdx = rnd.nextLong(1, posts.size() - 1);
+            Long userIdx = rnd.nextLong(1, users.size());
+            Long postIdx = rnd.nextLong(1, posts.size());
             User user = userRepository.findById(userIdx).get();
             Post post = postRepository.findById(postIdx).get();
             Comment comment = createComment(user, post, randomUUID(1, 10));
@@ -263,7 +375,7 @@ class PostRepositoryImplTest {
         commentRepository.saveAll(saveComments);
     }
 
-    public void createPostAndVoteData(int count) {
+    public void savePostAndVoteData(int count) {
         IntStream.rangeClosed(1, count)
                 .forEach(index -> {
                     User user = createUser();
