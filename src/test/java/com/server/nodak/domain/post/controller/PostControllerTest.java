@@ -88,7 +88,6 @@ class PostControllerTest {
         // Given
         String userId = String.valueOf(rnd.nextLong(10));
         PostRequest postRequest = PostRequest.builder()
-                .title("Post_title")
                 .content("Post_content")
                 .voteTitle("Vote_title")
                 .imageUrl("http://image.com")
@@ -112,7 +111,6 @@ class PostControllerTest {
         Long postId = rnd.nextLong(10);
         String userId = String.valueOf(rnd.nextLong(10));
         PostRequest postRequest = PostRequest.builder()
-                .title("Post_title")
                 .content("Post_content")
                 .voteTitle("Vote_title")
                 .imageUrl("http://image.com")
@@ -177,9 +175,9 @@ class PostControllerTest {
 
     public String postRequestByJson(PostRequest req) {
         return String.format(
-                "{\"title\" : \"%s\", \"content\" : \"%s\", \"imageUrl\" : \"%s\","
+                "{\"content\" : \"%s\", \"imageUrl\" : \"%s\","
                         + " \"channel\" : \"%s\", \"voteTitle\" : \"%s\", \"voteOptionContent\" : { \"%d\": \"%s\"} }"
-                , req.getTitle(), req.getContent(), req.getImageUrl(), req.getVoteTitle(), req.getChannel(),
+                , req.getContent(), req.getImageUrl(), req.getVoteTitle(), req.getChannel(),
                 0,
                 "투표 옵션");
     }

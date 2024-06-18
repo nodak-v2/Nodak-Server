@@ -1,5 +1,14 @@
 package com.server.nodak.domain.comment.service;
 
+import static com.server.nodak.domain.vote.utils.Utils.createUser;
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.server.nodak.domain.comment.domain.Comment;
 import com.server.nodak.domain.comment.dto.request.CreateCommentRequest;
 import com.server.nodak.domain.comment.dto.request.UpdateCommentRequest;
@@ -10,6 +19,9 @@ import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,17 +30,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static com.server.nodak.domain.vote.utils.Utils.createUser;
-import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class CommentServiceTest {
@@ -63,7 +64,6 @@ class CommentServiceTest {
         Category category = new Category("카테고리1");
 
         post = Post.builder()
-                .title("게시글 제목1")
                 .content("게시글 본문1")
                 .user(user)
                 .category(category)
@@ -92,7 +92,7 @@ class CommentServiceTest {
         CreateCommentRequest createCommentRequest = new CreateCommentRequest("댓글 댓글");
 
         // when
-        commentService.createComment(1L, 1L ,createCommentRequest);
+        commentService.createComment(1L, 1L, createCommentRequest);
 
         // then
         verify(commentRepository).save(any(Comment.class));

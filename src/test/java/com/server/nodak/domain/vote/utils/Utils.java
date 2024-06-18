@@ -33,7 +33,6 @@ public class Utils {
 
     public static Post createPost(User user, String title, String content, Category category) {
         return Post.builder()
-                .title(title)
                 .content(content)
                 .imageUrl("abc.abc")
                 .user(user)
@@ -57,10 +56,9 @@ public class Utils {
         return new Category(title);
     }
 
-    public static PostRequest createPostRequest(String title, String channel, String postContent, String voteTitle,
+    public static PostRequest createPostRequest(String channel, String postContent, String voteTitle,
                                                 String imageUrl, Map<Integer, String> voteOption) {
         return PostRequest.builder()
-                .title(title)
                 .channel(channel)
                 .content(postContent)
                 .voteTitle(voteTitle)

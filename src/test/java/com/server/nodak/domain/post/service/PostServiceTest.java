@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.server.nodak.domain.notification.controller.NotificationController;
 import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
@@ -76,7 +75,7 @@ class PostServiceTest {
     @DisplayName("게시글 저장 테스트")
     void savePost() {
         // Given
-        PostRequest postRequest = createPostRequest("Post_title", category.getTitle(), "Post_content", "Vote_title",
+        PostRequest postRequest = createPostRequest(category.getTitle(), "Post_content", "Vote_title",
                 "http://image.com", createVoteOptionMap());
         given(userRepository.findById(user.getId())).willReturn(Optional.ofNullable(user));
         given(categoryRepository.findByTitle(postRequest.getChannel())).willReturn(Optional.ofNullable(category));
@@ -113,7 +112,6 @@ class PostServiceTest {
         // Given
         Long postId = rnd.nextLong(1, 10);
         PostResponse postResponse = Mockito.spy(PostResponse.builder()
-                .title("게시글 제목")
                 .author("작성자")
                 .profileImageUrl("http://프로필이미지")
                 .createdAt(LocalDateTime.now())
@@ -128,7 +126,6 @@ class PostServiceTest {
         PostResponse response = postService.findPost(user.getId(), postId);
 
         // Then
-        Assertions.assertThat(response.getTitle()).isEqualTo(postResponse.getTitle());
         Assertions.assertThat(response.getAuthor()).isEqualTo(postResponse.getAuthor());
         Assertions.assertThat(response.getCreatedAt()).isEqualTo(postResponse.getCreatedAt());
         Assertions.assertThat(response.getContent()).isEqualTo(postResponse.getContent());
@@ -142,7 +139,7 @@ class PostServiceTest {
     public void updatePost() {
         // Given
         Post post = createPost(user, randomUUID(), randomUUID(), category);
-        PostRequest postRequest = createPostRequest("Post_title", category.getTitle(), "Post_content", "Vote_title",
+        PostRequest postRequest = createPostRequest(category.getTitle(), "Post_content", "Vote_title",
                 "http://image.com", createVoteOptionMap());
         given(postRepository.findByIdAndUserId(post.getId(), user.getId())).willReturn(Optional.of(post));
 
