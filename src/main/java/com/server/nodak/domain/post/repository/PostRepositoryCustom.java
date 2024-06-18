@@ -13,4 +13,6 @@ public interface PostRepositoryCustom {
     Optional<PostResponse> findOne(Long userId, Long postId);
 
     Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable);
+
+    Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable);
 }

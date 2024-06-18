@@ -113,6 +113,11 @@ public class PostService {
         return postRepository.findMyPosting(userId, pageable);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable) {
+        return postRepository.findMyVoteHistory(userId, pageable);
+    }
+
     private VoteOption createVoteOption(int seq, String content, Vote vote) {
         return VoteOption.builder()
                 .seq(seq)

@@ -20,4 +20,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     @Override
     Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable);
+
+    @Override
+    Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable);
 }

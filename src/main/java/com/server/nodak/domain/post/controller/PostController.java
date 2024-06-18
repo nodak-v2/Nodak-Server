@@ -52,6 +52,16 @@ public class PostController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @GetMapping("/myVoteHistory")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Page<PostSearchResponse>>> myVoteHistory(Principal principal,
+                                                                               @PageableDefault Pageable pageable) {
+        Page<PostSearchResponse> response = postService.findMyVoteHistory(Long.parseLong(principal.getName()),
+                pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+
     @PostMapping
     @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> registerPost(@RequestBody PostRequest request, Principal principal) {
