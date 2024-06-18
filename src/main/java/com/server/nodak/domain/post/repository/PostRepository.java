@@ -26,4 +26,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
 
     @Override
     Page<PostSearchResponse> findMyComment(Long userId, Pageable pageable);
+
+    @Override
+    Page<PostSearchResponse> findMyLike(Long userId, Pageable pageable);
 }

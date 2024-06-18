@@ -70,6 +70,15 @@ public class PostController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @GetMapping("/myLike")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Page<PostSearchResponse>>> myLike(Principal principal,
+                                                                        @PageableDefault Pageable pageable) {
+        Page<PostSearchResponse> response = postService.findMyLike(Long.parseLong(principal.getName()),
+                pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
     @PostMapping
     @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> registerPost(@RequestBody PostRequest request, Principal principal) {
