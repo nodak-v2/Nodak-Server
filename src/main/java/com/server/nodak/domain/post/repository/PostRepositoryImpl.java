@@ -1,5 +1,6 @@
 package com.server.nodak.domain.post.repository;
 
+import static com.server.nodak.domain.comment.domain.QComment.comment;
 import static com.server.nodak.domain.post.domain.QPost.post;
 import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
 
@@ -27,6 +28,62 @@ import org.springframework.data.domain.Pageable;
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public Page<PostSearchResponse> findMyComment(Long userId, Pageable pageable) {
+        List<Long> postIds = queryFactory.select(comment.post.id)
+                .from(comment)
+                .where(comment.user.id.eq(userId))
+                .fetch();
+
+        List<PostSearchResponse> fetch = queryFactory.select(
+                        new QPostSearchResponse(
+                                post.id,
+                                post.vote.id,
+                                post.title,
+                                post.comments.size(),
+                                post.starPosts.size(),
+                                JPAExpressions
+                                        .select(voteHistory.count())
+                                        .from(voteHistory)
+                                        .where(voteHistory.voteOption.in(post.vote.voteOptions)),
+                                post.user.nickname,
+                                post.user.profileImageUrl,
+                                post.imageUrl,
+                                post.createdAt
+                        )
+                )
+                .from(post)
+                .where(post.id.in(postIds))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(post.createdAt.desc())
+                .fetch();
+
+        long count = findMyCommentForCount(userId);
+
+        return new PageImpl<>(fetch, pageable, count);
+    }
+
+    private long findMyCommentForCount(Long userId) {
+        List<Long> postIds = queryFactory.select(comment.post.id)
+                .from(comment)
+                .where(comment.user.id.eq(userId))
+                .fetch();
+
+        Long count = queryFactory.select(
+                        post.count()
+                )
+                .from(post)
+                .where(post.id.in(postIds))
+                .fetchOne();
+
+        if (count == null) {
+            count = 0L;
+        }
+
+        return count;
+    }
 
     @Override
     public Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable) {

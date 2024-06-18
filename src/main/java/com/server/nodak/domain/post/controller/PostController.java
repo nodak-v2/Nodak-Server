@@ -61,6 +61,14 @@ public class PostController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @GetMapping("/myComment")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Page<PostSearchResponse>>> myComment(Principal principal,
+                                                                           @PageableDefault Pageable pageable) {
+        Page<PostSearchResponse> response = postService.findMyComment(Long.parseLong(principal.getName()),
+                pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
 
     @PostMapping
     @AuthorizationRequired(UserRole.GENERAL)

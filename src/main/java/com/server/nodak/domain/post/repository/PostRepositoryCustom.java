@@ -15,4 +15,6 @@ public interface PostRepositoryCustom {
     Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable);
 
     Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable);
+
+    Page<PostSearchResponse> findMyComment(Long userId, Pageable pageable);
 }
