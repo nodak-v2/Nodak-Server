@@ -11,4 +11,6 @@ public interface PostRepositoryCustom {
     Page<PostSearchResponse> search(PostSearchRequest request, Pageable pageable);
 
     Optional<PostResponse> findOne(Long userId, Long postId);
+
+    Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable);
 }

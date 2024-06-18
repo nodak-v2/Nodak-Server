@@ -108,6 +108,11 @@ public class PostService {
         starPostRepository.save(starPost);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable) {
+        return postRepository.findMyPosting(userId, pageable);
+    }
+
     private VoteOption createVoteOption(int seq, String content, Vote vote) {
         return VoteOption.builder()
                 .seq(seq)

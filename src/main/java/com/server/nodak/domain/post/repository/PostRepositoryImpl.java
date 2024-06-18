@@ -29,6 +29,52 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     private final JPAQueryFactory queryFactory;
 
     @Override
+    public Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable) {
+        List<PostSearchResponse> fetch = queryFactory.select(
+                        new QPostSearchResponse(
+                                post.id,
+                                post.vote.id,
+                                post.title,
+                                post.comments.size(),
+                                post.starPosts.size(),
+                                JPAExpressions
+                                        .select(voteHistory.count())
+                                        .from(voteHistory)
+                                        .where(voteHistory.voteOption.in(post.vote.voteOptions)),
+                                post.user.nickname,
+                                post.user.profileImageUrl,
+                                post.imageUrl,
+                                post.createdAt
+                        )
+                )
+                .from(post)
+                .where(post.user.id.eq(userId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(post.createdAt.desc())
+                .fetch();
+
+        long count = findMyPostingForCount(userId);
+
+        return new PageImpl<>(fetch, pageable, count);
+    }
+
+    private long findMyPostingForCount(Long userId) {
+        Long count = queryFactory.select(
+                        post.count()
+                )
+                .from(post)
+                .where(post.user.id.eq(userId))
+                .fetchOne();
+
+        if (count == null) {
+            count = 0L;
+        }
+
+        return count;
+    }
+
+    @Override
     public Optional<PostResponse> findOne(Long userId, Long postId) {
         QStarPost starPost = QStarPost.starPost;
         PostResponse postResponse = queryFactory.select(
