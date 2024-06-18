@@ -119,7 +119,6 @@ public class PostService {
     private Post createPost(User user, Category category, PostRequest req) {
         return Post.builder()
                 .user(user)
-                .title(req.getTitle())
                 .content(req.getContent())
                 .category(category)
                 .imageUrl(req.getImageUrl())

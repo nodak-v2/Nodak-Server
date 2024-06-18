@@ -33,7 +33,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QStarPost starPost = QStarPost.starPost;
         PostResponse postResponse = queryFactory.select(
                         new QPostResponse(
-                                post.title,
                                 post.user.nickname,
                                 userId != null ?
                                         post.user.id.eq(userId) : Expressions.FALSE,
@@ -63,7 +62,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         new QPostSearchResponse(
                                 post.id,
                                 post.vote.id,
-                                post.title,
                                 post.comments.size(),
                                 post.starPosts.size(),
                                 JPAExpressions
@@ -110,17 +108,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private BooleanBuilder searchCondition(PostSearchRequest request) {
         return new BooleanBuilder()
-                .and(titleContains(request.getKeyword()))
-                .or(contentContains(request.getKeyword()));
+                .and(contentContains(request.getKeyword()));
     }
 
     private BooleanBuilder searchCategory(PostSearchRequest request) {
         return new BooleanBuilder()
                 .and(catergoryIdEq(request.getCategoryId()));
-    }
-
-    private BooleanExpression titleContains(String title) {
-        return title != null ? post.title.contains(title) : null;
     }
 
     private BooleanExpression contentContains(String content) {
