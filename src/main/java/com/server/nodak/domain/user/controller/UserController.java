@@ -1,6 +1,7 @@
 package com.server.nodak.domain.user.controller;
 
 import static com.server.nodak.global.common.response.ApiResponse.success;
+import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.ResponseEntity.ok;
 
 import com.server.nodak.domain.user.domain.UserRole;
@@ -11,9 +12,12 @@ import com.server.nodak.domain.user.dto.UserUpdateDTO;
 import com.server.nodak.domain.user.service.UserService;
 import com.server.nodak.global.common.response.ApiResponse;
 import com.server.nodak.security.aop.AuthorizationRequired;
+
 import java.security.Principal;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,9 +33,9 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/status")
-    @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
+    @AuthorizationRequired(value = {UserRole.GENERAL, UserRole.MANAGER}, failureMessage = "로그인 정보가 없습니다.", status = OK)
     public ResponseEntity<ApiResponse<CurrentUserInfoResponse>> getStatus() {
-        return ok(success(userService.getCurrentUserInfo()));
+        return ok(success("로그인 정보가 있습니다.", userService.getCurrentUserInfo()));
     }
 
     @GetMapping("/{userId}")
