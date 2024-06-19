@@ -1,23 +1,19 @@
 package com.server.nodak.domain.user.controller;
 
 import static com.server.nodak.global.common.response.ApiResponse.success;
-import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.ResponseEntity.ok;
 
 import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.domain.user.dto.CurrentUserInfoResponse;
-import com.server.nodak.domain.user.dto.UserHistoryListResponse;
 import com.server.nodak.domain.user.dto.UserInfoResponse;
 import com.server.nodak.domain.user.dto.UserUpdateDTO;
 import com.server.nodak.domain.user.service.UserService;
 import com.server.nodak.global.common.response.ApiResponse;
+import com.server.nodak.security.SecurityUtils;
 import com.server.nodak.security.aop.AuthorizationRequired;
-
 import java.security.Principal;
-import java.util.List;
-
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -37,10 +33,17 @@ public class UserController {
     public ResponseEntity<ApiResponse<CurrentUserInfoResponse>> getStatus() {
         return ok(success("로그인 정보가 있습니다.", userService.getCurrentUserInfo()));
     }
-
+    
     @GetMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@PathVariable("userId") Long userId) {
-        return ok(success(userService.getUserInfo(userId)));
+    public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@PathVariable("userId") Long userId,
+                                                                     Principal principal) {
+        UserInfoResponse userInfo;
+        if (!SecurityUtils.isAuthenticated()) {
+            userInfo = userService.getUserInfo(userId, null);
+            return ok(success(userInfo));
+        }
+        userInfo = userService.getUserInfo(userId, Long.parseLong(principal.getName()));
+        return ok(success(userInfo));
     }
 
     @PatchMapping
@@ -50,12 +53,12 @@ public class UserController {
         return ok(success());
     }
 
-    @GetMapping("/history")
-    @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
-    public ResponseEntity<ApiResponse<List<UserHistoryListResponse>>> getUserHistory(Principal principal) {
-        long userId = Long.parseLong(principal.getName());
-
-        return ResponseEntity.ok(success(userService.getUserHistory(userId)));
-    }
+//    @GetMapping("/history")
+//    @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
+//    public ResponseEntity<ApiResponse<List<UserHistoryListResponse>>> getUserHistory(Principal principal) {
+//        long userId = Long.parseLong(principal.getName());
+//
+//        return ResponseEntity.ok(success(userService.getUserHistory(userId)));
+//    }
 
 }
