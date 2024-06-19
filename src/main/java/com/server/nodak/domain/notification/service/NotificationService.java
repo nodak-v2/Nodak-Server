@@ -6,17 +6,20 @@ import com.server.nodak.domain.follow.service.FollowService;
 import com.server.nodak.domain.notification.entity.Notification;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
-import com.server.nodak.domain.user.dto.UserInfoResponse;
+import com.server.nodak.domain.user.dto.UserInfoDTO;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +30,8 @@ public class NotificationService {
     private final FollowService followService;
 
     /**
-     * SSE 연결 시, 동작 */
+     * SSE 연결 시, 동작
+     */
     public SseEmitter getSseEmitter(Long userId) {
         SseEmitter emitter = new SseEmitter(15 * 60 * 1000L);
         clients.put(userId, emitter);
@@ -67,14 +71,15 @@ public class NotificationService {
     // TODO: SCAN 을 통한 성능 개선
     public List<Notification> getUndeliveredNotifications(Long userId) {
         List<Long> followingIds = followService.getFollowees(userId).stream()
-                .map(UserInfoResponse::getUserId)
+                .map(UserInfoDTO::getUserId)
                 .collect(Collectors.toList());
 
         List<Notification> notifications = new ArrayList<>();
         long oneWeekAgo = System.currentTimeMillis() - 7 * 24 * 60 * 60 * 1000L;
 
         // Sorted Set에서 1주일 이내의 값을 가져오기
-        Set<Object> notificationJsons = redisTemplate.opsForZSet().rangeByScore("notifications", oneWeekAgo, Double.MAX_VALUE);
+        Set<Object> notificationJsons = redisTemplate.opsForZSet()
+                .rangeByScore("notifications", oneWeekAgo, Double.MAX_VALUE);
 
         ObjectMapper objectMapper = new ObjectMapper();
         for (Object notificationJson : notificationJsons) {
@@ -92,7 +97,8 @@ public class NotificationService {
     }
 
     /**
-     * user 의 팔로워들에게, Post 알림 전송 */
+     * user 의 팔로워들에게, Post 알림 전송
+     */
     public void notifyFollowersBySse(User user, Post post) {
         followService.getFollowers(user.getId()).forEach(follower -> {
             SseEmitter emitter = clients.get(follower.getUserId());

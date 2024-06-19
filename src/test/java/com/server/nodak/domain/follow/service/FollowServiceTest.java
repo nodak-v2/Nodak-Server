@@ -1,12 +1,23 @@
 package com.server.nodak.domain.follow.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import com.server.nodak.domain.follow.domain.Follow;
 import com.server.nodak.domain.follow.repository.FollowRepository;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.domain.UserProvider;
-import com.server.nodak.domain.user.dto.UserInfoResponse;
+import com.server.nodak.domain.user.dto.UserInfoDTO;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.BadRequestException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -15,30 +26,17 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.*;
-
 @SpringBootTest
 class FollowServiceTest {
 
-    @Mock
-    private FollowRepository followRepository;
-
-    @Mock
-    private UserRepository userRepository;
-
-    @InjectMocks
-    private FollowService followService;
-
     User follower;
     User followee;
+    @Mock
+    private FollowRepository followRepository;
+    @Mock
+    private UserRepository userRepository;
+    @InjectMocks
+    private FollowService followService;
 
     @BeforeEach
     public void setUp() {
@@ -95,12 +93,12 @@ class FollowServiceTest {
     @Test
     @DisplayName("팔로워 리스트 가져오기")
     public void getFollowersTest() {
-        List<User> followers = Arrays.asList(follower);
+        List<User> followers = Collections.singletonList(follower);
         given(followRepository.getFollowersByUserId(anyLong())).willReturn(followers);
-        given(followRepository.getUserFollowerCount(anyLong())).willReturn(1);
-        given(followRepository.getUserFolloweeCount(anyLong())).willReturn(1);
+        given(followRepository.getUserFollowerCount(anyLong())).willReturn(1L);
+        given(followRepository.getUserFolloweeCount(anyLong())).willReturn(1L);
 
-        List<UserInfoResponse> result = followService.getFollowers(2L);
+        List<UserInfoDTO> result = followService.getFollowers(2L);
 
         assertEquals(1, result.size());
         assertEquals(follower.getId(), result.get(0).getUserId());
@@ -109,12 +107,12 @@ class FollowServiceTest {
     @Test
     @DisplayName("팔로우 리스트 가져오기")
     public void getFolloweesTest() {
-        List<User> followees = Arrays.asList(followee);
+        List<User> followees = Collections.singletonList(followee);
         given(followRepository.getFolloweesByUserId(anyLong())).willReturn(followees);
-        given(followRepository.getUserFollowerCount(anyLong())).willReturn(1);
-        given(followRepository.getUserFolloweeCount(anyLong())).willReturn(1);
+        given(followRepository.getUserFollowerCount(anyLong())).willReturn(1L);
+        given(followRepository.getUserFolloweeCount(anyLong())).willReturn(1L);
 
-        List<UserInfoResponse> result = followService.getFollowees(1L);
+        List<UserInfoDTO> result = followService.getFollowees(1L);
 
         assertEquals(1, result.size());
         assertEquals(followee.getId(), result.get(0).getUserId());
