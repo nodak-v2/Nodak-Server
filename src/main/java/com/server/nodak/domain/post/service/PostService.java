@@ -22,6 +22,7 @@ import com.server.nodak.exception.common.BadRequestException;
 import com.server.nodak.exception.common.ConflictException;
 import com.server.nodak.exception.common.DataNotFoundException;
 import com.server.nodak.security.aop.IncreaseUserHistory;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,14 +55,17 @@ public class PostService {
         Post post = createPost(user, category, request);
         Vote vote = createVote(post, request);
 
-        request.getVoteOptionContent().entrySet().stream()
-                .map(e -> createVoteOption(e.getKey(), e.getValue(), vote))
-                .toList();
+        AtomicInteger index = new AtomicInteger(1);
+
+        request.getVoteOptionContent().stream()
+                .map(voteOption -> createVoteOption(index.getAndIncrement(), voteOption.getOption(),
+                        voteOption.getImageUrl(), vote)).toList();
 
         postRepository.save(post);
-
-        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.", user.getId());
-        notificationService.notifyFollowersBySse(user, post);
+//
+//        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.",
+//                user.getId());
+//        notificationService.notifyFollowersBySse(user, post);
     }
 
     @Transactional(readOnly = true)
@@ -127,10 +131,11 @@ public class PostService {
         return postRepository.findMyLike(userId, pageable);
     }
 
-    private VoteOption createVoteOption(int seq, String content, Vote vote) {
+    private VoteOption createVoteOption(int seq, String content, String imageUrl, Vote vote) {
         return VoteOption.builder()
                 .seq(seq)
                 .content(content)
+                .imageUrl(imageUrl)
                 .vote(vote)
                 .build();
     }
@@ -179,7 +184,7 @@ public class PostService {
         Post post = findPostByIdAndUserId(postId, userId);
         Vote vote = post.getVote();
 
-        if (vote.isTerminated() == true){
+        if (vote.isTerminated()) {
             throw new BadRequestException("vote has already terminated.");
         }
         vote.setTerminated(true);
