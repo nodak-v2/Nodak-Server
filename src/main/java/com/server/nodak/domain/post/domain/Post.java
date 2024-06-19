@@ -3,8 +3,10 @@ package com.server.nodak.domain.post.domain;
 import com.server.nodak.domain.comment.domain.Comment;
 import com.server.nodak.domain.model.BaseEntity;
 import com.server.nodak.domain.post.dto.PostRequest;
+import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.vote.domain.Vote;
+import com.server.nodak.domain.vote.domain.VoteOption;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -55,10 +57,10 @@ public class Post extends BaseEntity {
     private Category category;
 
     @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<StarPost> starPosts = new ArrayList<>();
+    private final List<StarPost> starPosts = new ArrayList<>();
 
     @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private List<Comment> comments = new ArrayList<>();
+    private final List<Comment> comments = new ArrayList<>();
 
     @OneToOne(mappedBy = "post", cascade = {CascadeType.PERSIST,
             CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
@@ -92,7 +94,7 @@ public class Post extends BaseEntity {
     }
 
     public void delete(boolean isDeleted) {
-        this.isDeleted = isDeleted ? true : false;
+        this.isDeleted = isDeleted;
     }
 
     public void update(PostRequest request) {
@@ -113,5 +115,26 @@ public class Post extends BaseEntity {
 
     public void removeComment(Comment comment) {
         this.comments.remove(comment);
+    }
+
+    public PostSearchResponse toSearchResponse() {
+        long voterCount = 0;
+
+        for (VoteOption voteOption : this.vote.getVoteOptions()) {
+            voterCount += voteOption.getVoteHistories().size();
+        }
+
+        return PostSearchResponse.builder()
+                .postId(this.getId())
+                .voteId(this.vote.getId())
+                .title(this.getTitle())
+                .commentCount(this.comments.size())
+                .likeCount(this.starPosts.size())
+                .voterCount(voterCount)
+                .author(this.user.getNickname())
+                .profileImageUrl(this.user.getProfileImageUrl())
+                .postImageUrl(this.imageUrl)
+                .createdAt(this.getCreatedAt())
+                .build();
     }
 }

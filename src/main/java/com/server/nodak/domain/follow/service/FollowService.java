@@ -3,16 +3,15 @@ package com.server.nodak.domain.follow.service;
 import com.server.nodak.domain.follow.domain.Follow;
 import com.server.nodak.domain.follow.repository.FollowRepository;
 import com.server.nodak.domain.user.domain.User;
-import com.server.nodak.domain.user.dto.UserInfoResponse;
+import com.server.nodak.domain.user.dto.UserInfoDTO;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.BadRequestException;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,12 +21,12 @@ public class FollowService {
     private final UserRepository userRepository;
 
     @Transactional(readOnly = true)
-    public int getUserFollowerCount(Long userId) {
+    public long getUserFollowerCount(Long userId) {
         return followRepository.getUserFollowerCount(userId);
     }
 
     @Transactional(readOnly = true)
-    public int getUserFolloweeCount(Long userId) {
+    public long getUserFolloweeCount(Long userId) {
         return followRepository.getUserFolloweeCount(userId);
     }
 
@@ -74,26 +73,26 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserInfoResponse> getFollowers(Long userId) {
+    public List<UserInfoDTO> getFollowers(Long userId) {
         List<User> followers = followRepository.getFollowersByUserId(userId);
 
-        int followerCount = followRepository.getUserFollowerCount(userId);
-        int followeeCount = followRepository.getUserFolloweeCount(userId);
+        long followerCount = followRepository.getUserFollowerCount(userId);
+        long followeeCount = followRepository.getUserFolloweeCount(userId);
 
         return followers.stream()
-                .map(user -> UserInfoResponse.of(user, followerCount, followeeCount))
+                .map(user -> UserInfoDTO.of(user, followerCount, followeeCount))
                 .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public List<UserInfoResponse> getFollowees(Long userId) {
+    public List<UserInfoDTO> getFollowees(Long userId) {
         List<User> followees = followRepository.getFolloweesByUserId(userId);
 
-        int followerCount = followRepository.getUserFollowerCount(userId);
-        int followeeCount = followRepository.getUserFolloweeCount(userId);
+        long followerCount = followRepository.getUserFollowerCount(userId);
+        long followeeCount = followRepository.getUserFolloweeCount(userId);
 
         return followees.stream()
-                .map(user -> UserInfoResponse.of(user, followerCount, followeeCount))
+                .map(user -> UserInfoDTO.of(user, followerCount, followeeCount))
                 .collect(Collectors.toList());
     }
 }
