@@ -32,7 +32,12 @@ public class ReplyResponse {
         this.userId = user.getId();
         this.profileImageUrl = user.getProfileImageUrl();
         this.nickname = user.getNickname();
-        this.content = reply.getContent();
+
+        if (reply.isDeleted()) {
+            this.content = "삭제된 댓글입니다.";
+        } else {
+            this.content = reply.getContent();
+        }
         this.createdAt = reply.getCreatedAt();
     }
 }
