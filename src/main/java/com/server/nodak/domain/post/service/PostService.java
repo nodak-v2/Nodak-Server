@@ -173,4 +173,15 @@ public class PostService {
     private Post findPostByIdAndUserId(Long postId, Long userId) {
         return postRepository.findByIdAndUserId(postId, userId).orElseThrow(() -> new AuthorizationException());
     }
+
+    @Transactional
+    public void terminateVote(long userId, Long postId) {
+        Post post = findPostByIdAndUserId(postId, userId);
+        Vote vote = post.getVote();
+
+        if (vote.isTerminated() == true){
+            throw new BadRequestException("vote has already terminated.");
+        }
+        vote.setTerminated(true);
+    }
 }
