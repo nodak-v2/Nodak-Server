@@ -9,7 +9,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.server.nodak.domain.notification.controller.NotificationController;
 import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
@@ -18,6 +17,7 @@ import com.server.nodak.domain.post.dto.PostRequest;
 import com.server.nodak.domain.post.dto.PostResponse;
 import com.server.nodak.domain.post.dto.PostSearchRequest;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
+import com.server.nodak.domain.post.dto.VoteOptionRequest;
 import com.server.nodak.domain.post.repository.CategoryRepository;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.post.repository.StarPostRepository;
@@ -25,7 +25,6 @@ import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.LongStream;
@@ -77,7 +76,7 @@ class PostServiceTest {
     void savePost() {
         // Given
         PostRequest postRequest = createPostRequest("Post_title", category.getTitle(), "Post_content", "Vote_title",
-                "http://image.com", createVoteOptionMap());
+                "http://image.com", createVoteOptionList());
         given(userRepository.findById(user.getId())).willReturn(Optional.ofNullable(user));
         given(categoryRepository.findByTitle(postRequest.getChannel())).willReturn(Optional.ofNullable(category));
 
@@ -143,7 +142,7 @@ class PostServiceTest {
         // Given
         Post post = createPost(user, randomUUID(), randomUUID(), category);
         PostRequest postRequest = createPostRequest("Post_title", category.getTitle(), "Post_content", "Vote_title",
-                "http://image.com", createVoteOptionMap());
+                "http://image.com", createVoteOptionList());
         given(postRepository.findByIdAndUserId(post.getId(), user.getId())).willReturn(Optional.of(post));
 
         // When
@@ -215,11 +214,17 @@ class PostServiceTest {
                 .toList();
     }
 
-    public Map<Integer, String> createVoteOptionMap() {
-        return Map.of(
-                1, "voteOption1",
-                2, "voteOption2",
-                3, "voteOption3"
+    public List<VoteOptionRequest> createVoteOptionList() {
+        return List.of(
+                VoteOptionRequest.builder()
+                        .option("voteOption1")
+                        .imageUrl("image1").build(),
+                VoteOptionRequest.builder()
+                        .option("voteOption2")
+                        .imageUrl("image2").build(),
+                VoteOptionRequest.builder()
+                        .option("voteOption3")
+                        .imageUrl("image3").build()
         );
     }
 }
