@@ -54,6 +54,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.profileImageUrl,
                                 post.imageUrl,
                                 post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
                                 post.vote.isTerminated,
                                 Expressions.constant(new ArrayList<>())
                         )
@@ -128,6 +130,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.profileImageUrl,
                                 post.imageUrl,
                                 post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
                                 post.vote.isTerminated,
                                 Expressions.constant(new ArrayList<>())
                         )
@@ -202,6 +206,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.profileImageUrl,
                                 post.imageUrl,
                                 post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
                                 post.vote.isTerminated,
                                 Expressions.constant(new ArrayList<>())
                         )
@@ -271,6 +277,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.profileImageUrl,
                                 post.imageUrl,
                                 post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
                                 post.vote.isTerminated,
                                 Expressions.constant(new ArrayList<>())
                         )
@@ -366,6 +374,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.profileImageUrl,
                                 post.imageUrl,
                                 post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
                                 post.vote.isTerminated,
                                 Expressions.constant(new ArrayList<>())
                         )

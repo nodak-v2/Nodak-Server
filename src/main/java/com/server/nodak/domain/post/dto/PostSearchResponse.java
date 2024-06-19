@@ -26,6 +26,11 @@ public class PostSearchResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createdAt;
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime startDate;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
+    private LocalDateTime endDate;
     private boolean isTerminated;
 
     @Nullable
@@ -34,7 +39,7 @@ public class PostSearchResponse {
     @QueryProjection
     public PostSearchResponse(Long postId, Long voteId, String title, Integer commentCount, Integer likeCount,
                               Long voterCount, String author, String profileImageUrl, String postImageUrl,
-                              LocalDateTime createdAt, boolean isTerminated, List<String> voteOptions) {
+                              LocalDateTime createdAt, LocalDateTime startDate, LocalDateTime endDate, boolean isTerminated, List<String> voteOptions) {
         this.postId = postId;
         this.voteId = voteId;
         this.title = title;
@@ -45,6 +50,8 @@ public class PostSearchResponse {
         this.profileImageUrl = profileImageUrl;
         this.postImageUrl = postImageUrl;
         this.createdAt = createdAt;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.isTerminated = isTerminated;
         this.voteOptions = voteOptions;
     }
