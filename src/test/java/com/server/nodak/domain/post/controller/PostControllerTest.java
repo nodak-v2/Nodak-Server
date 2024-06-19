@@ -178,7 +178,7 @@ class PostControllerTest {
     public String postRequestByJson(PostRequest req) {
         return String.format(
                 "{\"title\" : \"%s\", \"content\" : \"%s\", \"imageUrl\" : \"%s\","
-                        + " \"channel\" : \"%s\", \"voteTitle\" : \"%s\", \"voteOptionContent\" : { \"%d\": \"%s\"} }"
+                        + " \"channel\" : \"%s\", \"voteTitle\" : \"%s\", \"voteOptionContent\" : [ {\"%d\": \"%s\" } ] }"
                 , req.getTitle(), req.getContent(), req.getImageUrl(), req.getVoteTitle(), req.getChannel(),
                 0,
                 "투표 옵션");
