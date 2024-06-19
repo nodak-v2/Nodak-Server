@@ -52,7 +52,7 @@ public class PostService {
         Category category = findCategoryByTitle(request.getChannel());
 
         Post post = createPost(user, category, request);
-        Vote vote = createVote(post, request.getVoteTitle());
+        Vote vote = createVote(post, request);
 
         request.getVoteOptionContent().entrySet().stream()
                 .map(e -> createVoteOption(e.getKey(), e.getValue(), vote))
@@ -60,8 +60,7 @@ public class PostService {
 
         postRepository.save(post);
 
-        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.",
-                user.getId());
+        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.", user.getId());
         notificationService.notifyFollowersBySse(user, post);
     }
 
@@ -146,10 +145,12 @@ public class PostService {
                 .build();
     }
 
-    private Vote createVote(Post post, String title) {
+    private Vote createVote(Post post, PostRequest postRequest) {
         return Vote.builder()
+                .title(postRequest.getTitle())
+                .startDate(postRequest.getStartDate())
+                .endDate(postRequest.getEndDate())
                 .post(post)
-                .title(title)
                 .build();
     }
 

@@ -41,7 +41,6 @@ public class VoteOption extends BaseEntity {
             CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VoteHistory> voteHistories = new ArrayList<>();
 
-
     @Builder
     public VoteOption(String content, int seq, Vote vote) {
         this.content = content;
