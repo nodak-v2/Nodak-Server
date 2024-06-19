@@ -108,6 +108,26 @@ public class PostService {
         starPostRepository.save(starPost);
     }
 
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable) {
+        return postRepository.findMyPosting(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable) {
+        return postRepository.findMyVoteHistory(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyComment(Long userId, Pageable pageable) {
+        return postRepository.findMyComment(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyLike(Long userId, Pageable pageable) {
+        return postRepository.findMyLike(userId, pageable);
+    }
+
     private VoteOption createVoteOption(int seq, String content, Vote vote) {
         return VoteOption.builder()
                 .seq(seq)

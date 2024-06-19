@@ -1,6 +1,8 @@
 package com.server.nodak.domain.post.repository;
 
+import static com.server.nodak.domain.comment.domain.QComment.comment;
 import static com.server.nodak.domain.post.domain.QPost.post;
+import static com.server.nodak.domain.post.domain.QStarPost.starPost;
 import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
 
 import com.querydsl.core.BooleanBuilder;
@@ -27,6 +29,220 @@ import org.springframework.data.domain.Pageable;
 public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
+
+    @Override
+    public Page<PostSearchResponse> findMyLike(Long userId, Pageable pageable) {
+        List<Long> postIds = queryFactory.select(starPost.post.id).distinct()
+                .from(starPost)
+                .where(starPost.user.id.eq(userId))
+                .fetch();
+
+        List<PostSearchResponse> fetch = queryFactory.select(
+                        new QPostSearchResponse(
+                                post.id,
+                                post.vote.id,
+                                post.title,
+                                post.comments.size(),
+                                post.starPosts.size(),
+                                JPAExpressions
+                                        .select(voteHistory.count())
+                                        .from(voteHistory)
+                                        .where(voteHistory.voteOption.in(post.vote.voteOptions)),
+                                post.user.nickname,
+                                post.user.profileImageUrl,
+                                post.imageUrl,
+                                post.createdAt
+                        )
+                )
+                .from(post)
+                .where(post.id.in(postIds))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(post.createdAt.desc())
+                .fetch();
+
+        long count = findMyLikeForCount(userId);
+
+        return new PageImpl<>(fetch, pageable, count);
+    }
+
+    private long findMyLikeForCount(Long userId) {
+        List<Long> postIds = queryFactory.select(starPost.post.id).distinct()
+                .from(starPost)
+                .where(starPost.user.id.eq(userId))
+                .fetch();
+
+        Long count = queryFactory.select(
+                        post.count()
+                )
+                .from(post)
+                .where(post.id.in(postIds))
+                .fetchOne();
+
+        if (count == null) {
+            count = 0L;
+        }
+
+        return count;
+    }
+
+    @Override
+    public Page<PostSearchResponse> findMyComment(Long userId, Pageable pageable) {
+        List<Long> postIds = queryFactory.select(comment.post.id)
+                .from(comment)
+                .where(comment.user.id.eq(userId))
+                .fetch();
+
+        List<PostSearchResponse> fetch = queryFactory.select(
+                        new QPostSearchResponse(
+                                post.id,
+                                post.vote.id,
+                                post.title,
+                                post.comments.size(),
+                                post.starPosts.size(),
+                                JPAExpressions
+                                        .select(voteHistory.count())
+                                        .from(voteHistory)
+                                        .where(voteHistory.voteOption.in(post.vote.voteOptions)),
+                                post.user.nickname,
+                                post.user.profileImageUrl,
+                                post.imageUrl,
+                                post.createdAt
+                        )
+                )
+                .from(post)
+                .where(post.id.in(postIds))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(post.createdAt.desc())
+                .fetch();
+
+        long count = findMyCommentForCount(userId);
+
+        return new PageImpl<>(fetch, pageable, count);
+    }
+
+    private long findMyCommentForCount(Long userId) {
+        List<Long> postIds = queryFactory.select(comment.post.id)
+                .from(comment)
+                .where(comment.user.id.eq(userId))
+                .fetch();
+
+        Long count = queryFactory.select(
+                        post.count()
+                )
+                .from(post)
+                .where(post.id.in(postIds))
+                .fetchOne();
+
+        if (count == null) {
+            count = 0L;
+        }
+
+        return count;
+    }
+
+    @Override
+    public Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable) {
+        List<Long> voteIds = queryFactory.select(voteHistory.voteOption.vote.id)
+                .from(voteHistory)
+                .where(voteHistory.user.id.eq(userId))
+                .fetch();
+
+        List<PostSearchResponse> fetch = queryFactory.select(
+                        new QPostSearchResponse(
+                                post.id,
+                                post.vote.id,
+                                post.title,
+                                post.comments.size(),
+                                post.starPosts.size(),
+                                JPAExpressions
+                                        .select(voteHistory.count())
+                                        .from(voteHistory)
+                                        .where(voteHistory.voteOption.in(post.vote.voteOptions)),
+                                post.user.nickname,
+                                post.user.profileImageUrl,
+                                post.imageUrl,
+                                post.createdAt
+                        )
+                )
+                .from(post)
+                .where(post.vote.id.in(voteIds))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(post.createdAt.desc())
+                .fetch();
+
+        long count = findMyVoteHistoryForCount(userId);
+
+        return new PageImpl<>(fetch, pageable, count);
+    }
+
+    private long findMyVoteHistoryForCount(Long userId) {
+        List<Long> voteIds = queryFactory.select(voteHistory.voteOption.vote.id)
+                .from(voteHistory)
+                .where(voteHistory.user.id.eq(userId))
+                .fetch();
+
+        Long count = queryFactory.select(
+                        post.count()
+                )
+                .from(post)
+                .where(post.vote.id.in(voteIds))
+                .fetchOne();
+
+        if (count == null) {
+            count = 0L;
+        }
+
+        return count;
+    }
+
+    @Override
+    public Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable) {
+        List<PostSearchResponse> fetch = queryFactory.select(
+                        new QPostSearchResponse(
+                                post.id,
+                                post.vote.id,
+                                post.title,
+                                post.comments.size(),
+                                post.starPosts.size(),
+                                JPAExpressions
+                                        .select(voteHistory.count())
+                                        .from(voteHistory)
+                                        .where(voteHistory.voteOption.in(post.vote.voteOptions)),
+                                post.user.nickname,
+                                post.user.profileImageUrl,
+                                post.imageUrl,
+                                post.createdAt
+                        )
+                )
+                .from(post)
+                .where(post.user.id.eq(userId))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(post.createdAt.desc())
+                .fetch();
+
+        long count = findMyPostingForCount(userId);
+
+        return new PageImpl<>(fetch, pageable, count);
+    }
+
+    private long findMyPostingForCount(Long userId) {
+        Long count = queryFactory.select(
+                        post.count()
+                )
+                .from(post)
+                .where(post.user.id.eq(userId))
+                .fetchOne();
+
+        if (count == null) {
+            count = 0L;
+        }
+
+        return count;
+    }
 
     @Override
     public Optional<PostResponse> findOne(Long userId, Long postId) {

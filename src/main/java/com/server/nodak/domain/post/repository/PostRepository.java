@@ -17,4 +17,16 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     Optional<PostResponse> findOne(Long userId, Long postId);
 
     Optional<Post> findByIdAndUserId(Long postId, Long userId);
+
+    @Override
+    Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable);
+
+    @Override
+    Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable);
+
+    @Override
+    Page<PostSearchResponse> findMyComment(Long userId, Pageable pageable);
+
+    @Override
+    Page<PostSearchResponse> findMyLike(Long userId, Pageable pageable);
 }
