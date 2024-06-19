@@ -1,28 +1,30 @@
 package com.server.nodak.domain.post.repository;
 
-import static com.server.nodak.domain.comment.domain.QComment.comment;
-import static com.server.nodak.domain.post.domain.QPost.post;
-import static com.server.nodak.domain.post.domain.QStarPost.starPost;
-import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
-
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.nodak.domain.post.domain.QStarPost;
-import com.server.nodak.domain.post.dto.PostResponse;
-import com.server.nodak.domain.post.dto.PostSearchRequest;
-import com.server.nodak.domain.post.dto.PostSearchResponse;
-import com.server.nodak.domain.post.dto.QPostResponse;
-import com.server.nodak.domain.post.dto.QPostSearchResponse;
-import java.util.List;
-import java.util.Optional;
+import com.server.nodak.domain.post.dto.*;
+import com.server.nodak.domain.vote.domain.QVoteOption;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import static com.server.nodak.domain.comment.domain.QComment.comment;
+import static com.server.nodak.domain.post.domain.QPost.post;
+import static com.server.nodak.domain.post.domain.QStarPost.starPost;
+import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
+import static com.server.nodak.domain.vote.domain.QVoteOption.voteOption;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -51,7 +53,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.nickname,
                                 post.user.profileImageUrl,
                                 post.imageUrl,
-                                post.createdAt
+                                post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
+                                post.vote.isTerminated,
+                                Expressions.constant(new ArrayList<>())
                         )
                 )
                 .from(post)
@@ -60,6 +66,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .orderBy(post.createdAt.desc())
                 .fetch();
+
+        // Fetch voteOptions separately
+        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+                .collect(Collectors.toMap(
+                        PostSearchResponse::getVoteId,
+                        response -> queryFactory.select(voteOption.content)
+                                .from(voteOption)
+                                .where(voteOption.vote.id.eq(response.getVoteId()))
+                                .fetch()
+                ));
+
+        // Set voteOptions for each PostSearchResponse
+        fetch.forEach(response -> {
+            List<String> options = voteOptionsMap.get(response.getVoteId());
+            response.setVoteOptions(options);
+        });
 
         long count = findMyLikeForCount(userId);
 
@@ -107,7 +129,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.nickname,
                                 post.user.profileImageUrl,
                                 post.imageUrl,
-                                post.createdAt
+                                post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
+                                post.vote.isTerminated,
+                                Expressions.constant(new ArrayList<>())
                         )
                 )
                 .from(post)
@@ -116,6 +142,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .orderBy(post.createdAt.desc())
                 .fetch();
+
+        // Fetch voteOptions separately
+        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+                .collect(Collectors.toMap(
+                        PostSearchResponse::getVoteId,
+                        response -> queryFactory.select(voteOption.content)
+                                .from(voteOption)
+                                .where(voteOption.vote.id.eq(response.getVoteId()))
+                                .fetch()
+                ));
+
+        // Set voteOptions for each PostSearchResponse
+        fetch.forEach(response -> {
+            List<String> options = voteOptionsMap.get(response.getVoteId());
+            response.setVoteOptions(options);
+        });
 
         long count = findMyCommentForCount(userId);
 
@@ -163,7 +205,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.nickname,
                                 post.user.profileImageUrl,
                                 post.imageUrl,
-                                post.createdAt
+                                post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
+                                post.vote.isTerminated,
+                                Expressions.constant(new ArrayList<>())
                         )
                 )
                 .from(post)
@@ -172,6 +218,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .orderBy(post.createdAt.desc())
                 .fetch();
+
+        // Fetch voteOptions separately
+        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+                .collect(Collectors.toMap(
+                        PostSearchResponse::getVoteId,
+                        response -> queryFactory.select(voteOption.content)
+                                .from(voteOption)
+                                .where(voteOption.vote.id.eq(response.getVoteId()))
+                                .fetch()
+                ));
+
+        // Set voteOptions for each PostSearchResponse
+        fetch.forEach(response -> {
+            List<String> options = voteOptionsMap.get(response.getVoteId());
+            response.setVoteOptions(options);
+        });
 
         long count = findMyVoteHistoryForCount(userId);
 
@@ -214,7 +276,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.nickname,
                                 post.user.profileImageUrl,
                                 post.imageUrl,
-                                post.createdAt
+                                post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
+                                post.vote.isTerminated,
+                                Expressions.constant(new ArrayList<>())
                         )
                 )
                 .from(post)
@@ -223,6 +289,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .orderBy(post.createdAt.desc())
                 .fetch();
+
+        // Fetch voteOptions separately
+        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+                .collect(Collectors.toMap(
+                        PostSearchResponse::getVoteId,
+                        response -> queryFactory.select(voteOption.content)
+                                .from(voteOption)
+                                .where(voteOption.vote.id.eq(response.getVoteId()))
+                                .fetch()
+                ));
+
+        // Set voteOptions for each PostSearchResponse
+        fetch.forEach(response -> {
+            List<String> options = voteOptionsMap.get(response.getVoteId());
+            response.setVoteOptions(options);
+        });
 
         long count = findMyPostingForCount(userId);
 
@@ -275,6 +357,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     @Override
     public Page<PostSearchResponse> search(PostSearchRequest request, Pageable pageable) {
+        QVoteOption voteOption = QVoteOption.voteOption;
+
         List<PostSearchResponse> fetch = queryFactory.select(
                         new QPostSearchResponse(
                                 post.id,
@@ -289,7 +373,11 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 post.user.nickname,
                                 post.user.profileImageUrl,
                                 post.imageUrl,
-                                post.createdAt
+                                post.createdAt,
+                                post.vote.startDate,
+                                post.vote.endDate,
+                                post.vote.isTerminated,
+                                Expressions.constant(new ArrayList<>())
                         )
                 )
                 .from(post)
@@ -301,6 +389,22 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .limit(pageable.getPageSize())
                 .orderBy(post.createdAt.desc())
                 .fetch();
+
+        // Fetch voteOptions separately
+        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+                .collect(Collectors.toMap(
+                        PostSearchResponse::getVoteId,
+                        response -> queryFactory.select(voteOption.content)
+                                .from(voteOption)
+                                .where(voteOption.vote.id.eq(response.getVoteId()))
+                                .fetch()
+                ));
+
+        // Set voteOptions for each PostSearchResponse
+        fetch.forEach(response -> {
+            List<String> options = voteOptionsMap.get(response.getVoteId());
+            response.setVoteOptions(options);
+        });
 
         long count = searchForCount(request);
 

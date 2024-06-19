@@ -27,7 +27,7 @@ public class VoteController {
 
     @AuthorizationRequired(UserRole.GENERAL)
     @PostMapping("/{voteId}")
-    public ResponseEntity<ApiResponse<Void>> registerVote(
+    public ResponseEntity<ApiResponse<Void>> vote (
             Principal principal,
             @PathVariable("voteId") Long voteId,
             @RequestParam Long option

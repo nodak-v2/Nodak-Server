@@ -1,5 +1,6 @@
 package com.server.nodak.domain.post.dto;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 import lombok.Builder;
 import lombok.Data;
@@ -13,4 +14,6 @@ public class PostRequest {
     private String channel;
     private String voteTitle;
     private Map<Integer, String> voteOptionContent;
+    private LocalDateTime startDate;
+    private LocalDateTime endDate;
 }

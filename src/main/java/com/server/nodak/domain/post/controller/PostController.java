@@ -114,4 +114,11 @@ public class PostController {
         postService.removePost(Long.parseLong(principal.getName()), postId);
         return ResponseEntity.ok().build();
     }
+
+    @PatchMapping("/{postId}/terminate")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Void>> terminateVote(@PathVariable Long postId, Principal principal) {
+        postService.terminateVote(Long.parseLong(principal.getName()), postId);
+        return ResponseEntity.ok().build();
+    }
 }
