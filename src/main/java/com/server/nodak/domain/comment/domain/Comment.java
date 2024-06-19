@@ -2,15 +2,10 @@ package com.server.nodak.domain.comment.domain;
 
 import com.server.nodak.domain.model.BaseEntity;
 import com.server.nodak.domain.post.domain.Post;
+import com.server.nodak.domain.post.domain.StarPost;
+import com.server.nodak.domain.reply.entity.Reply;
 import com.server.nodak.domain.user.domain.User;
-import jakarta.persistence.Column;
-import jakarta.persistence.ConstraintMode;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
 import lombok.Getter;
@@ -19,6 +14,9 @@ import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -43,6 +41,9 @@ public class Comment extends BaseEntity {
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
     @ColumnDefault("false")
     private boolean isDeleted;
+
+    @OneToMany(mappedBy = "comment", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private List<Reply> replies = new ArrayList<>();
 
     @Builder
     public Comment(String content, User user, Post post) {
