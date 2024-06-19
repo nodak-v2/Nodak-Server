@@ -1,9 +1,11 @@
 package com.server.nodak.domain.reply.service;
 
 import com.server.nodak.domain.comment.domain.Comment;
+import com.server.nodak.domain.comment.repository.CommentJpaRepository;
 import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.reply.dto.CreateReplyRequest;
 import com.server.nodak.domain.reply.dto.DeleteReplyRequest;
+import com.server.nodak.domain.reply.dto.MyReplyHistory;
 import com.server.nodak.domain.reply.dto.ReplyResponse;
 import com.server.nodak.domain.reply.entity.Reply;
 import com.server.nodak.domain.reply.repository.ReplyRepository;
@@ -24,12 +26,13 @@ public class ReplyService {
 
     private final ReplyRepository replyRepository;
     private final CommentRepository commentRepository;
+    private final CommentJpaRepository commentJpaRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public ReplyResponse createReply(long userId, CreateReplyRequest replyRequest) {
         Long commentId = replyRequest.getCommentId();
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new DataNotFoundException());
+        Comment comment = commentJpaRepository.findById(commentId).orElseThrow(() -> new DataNotFoundException());
 
         User user = userRepository.findById(userId).orElseThrow(() -> new BadRequestException());
         Reply reply = Reply.builder()
@@ -55,18 +58,25 @@ public class ReplyService {
     }
 
     public List<ReplyResponse> getAllByCommentId(Long commentId) {
-        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new BadRequestException());
+        Comment comment = commentJpaRepository.findById(commentId).orElseThrow(() -> new BadRequestException());
         List<Reply> replies = comment.getReplies();
 
         List<ReplyResponse> result = new ArrayList<>();
 
         for (Reply reply : replies) {
             ReplyResponse replyResponse = new ReplyResponse(reply);
-
-            if (reply.isDeleted()) {
-                replyResponse.setContent("삭제된 댓글입니다.");;
-            }
             result.add(replyResponse);
+        }
+        return result;
+    }
+
+    public List<MyReplyHistory> getAllReplyByUser(long userId) {
+        List<Reply> replies = replyRepository.getAllByUserId(userId);
+        List<MyReplyHistory> result = new ArrayList<>();
+
+        for (Reply reply : replies) {
+            ReplyResponse replyResponse = new ReplyResponse(reply);
+            result.add(new MyReplyHistory(replyResponse, reply.getComment().getPost().getId()));
         }
         return result;
     }
