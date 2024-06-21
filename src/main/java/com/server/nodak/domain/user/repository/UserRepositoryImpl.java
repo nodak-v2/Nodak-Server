@@ -80,7 +80,8 @@ public class UserRepositoryImpl implements UserRepository {
                                 myId != null ? (
                                         JPAExpressions.selectOne()
                                                 .from(follow)
-                                                .where(follow.follower.id.eq(userId).and(follow.followee.id.eq(myId)))
+                                                .where(follow.follower.id.eq(myId).and(follow.followee.id.eq(userId)))
+                                                .where(follow.isDeleted.eq(false))
                                                 .exists()
                                 ) : Expressions.FALSE
                         )
