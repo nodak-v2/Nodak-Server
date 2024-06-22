@@ -56,7 +56,7 @@ public class UserController {
         return ok(success());
     }
 
-    @PostMapping
+    @PostMapping("/logout")
     @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
     public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request, HttpServletResponse response) {
         userService.logout(request, response);
