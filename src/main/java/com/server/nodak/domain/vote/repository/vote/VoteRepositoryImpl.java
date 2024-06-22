@@ -1,17 +1,22 @@
 package com.server.nodak.domain.vote.repository.vote;
 
-import com.querydsl.jpa.JPAExpressions;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.server.nodak.domain.vote.domain.QVoteOption;
-import com.server.nodak.domain.vote.dto.*;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-import java.util.List;
-
 import static com.server.nodak.domain.vote.domain.QVote.vote;
 import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
 import static com.server.nodak.domain.vote.domain.QVoteOption.voteOption;
+
+import com.querydsl.jpa.JPAExpressions;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.server.nodak.domain.vote.domain.QVoteOption;
+import com.server.nodak.domain.vote.dto.QVoteOptionResult;
+import com.server.nodak.domain.vote.dto.QVoteResult;
+import com.server.nodak.domain.vote.dto.VoteAfterResultResponse;
+import com.server.nodak.domain.vote.dto.VoteBeforeResultResponse;
+import com.server.nodak.domain.vote.dto.VoteOptionResult;
+import com.server.nodak.domain.vote.dto.VoteResponse;
+import com.server.nodak.domain.vote.dto.VoteResult;
+import java.util.List;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -47,7 +52,8 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
 
         List<VoteOptionResult> voteOptionResults = queryFactory.select(
                         new QVoteOptionResult(
-                                subVoteOption.id, subVoteOption.seq, subVoteOption.content, subVoteOption.voteHistories.size()
+                                subVoteOption.id, subVoteOption.seq, subVoteOption.content, subVoteOption.imageUrl,
+                                subVoteOption.voteHistories.size()
                         )
                 )
                 .from(subVoteOption)
@@ -78,7 +84,8 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
 
         List<VoteOptionResult> voteOptionResults = queryFactory.select(
                         new QVoteOptionResult(
-                                subVoteOption.id, subVoteOption.seq, subVoteOption.content, subVoteOption.voteHistories.size()
+                                subVoteOption.id, subVoteOption.seq, subVoteOption.content, subVoteOption.imageUrl,
+                                subVoteOption.voteHistories.size()
                         )
                 )
                 .from(subVoteOption)
