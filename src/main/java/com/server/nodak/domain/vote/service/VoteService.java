@@ -53,11 +53,13 @@ public class VoteService {
         Post post = postRepository.findById(postId).orElseThrow(() -> new BadRequestException());
         Long voteId = post.getVote().getId();
 
-        findUserById(userId);
         findVoteById(voteId);
-
-        if (voteRepository.existsHistoryByVoteId(userId, voteId)) {
-            return voteRepository.findVoteAfter(userId, voteId);
+        if (userId != null) {
+            findUserById(userId);
+            if (voteRepository.existsHistoryByVoteId(userId, voteId)) {
+                return voteRepository.findVoteAfter(userId, voteId);
+            }
+            return voteRepository.findVoteBefore(voteId);
         }
         return voteRepository.findVoteBefore(voteId);
     }
