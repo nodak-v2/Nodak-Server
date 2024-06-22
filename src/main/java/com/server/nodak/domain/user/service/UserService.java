@@ -14,6 +14,9 @@ import com.server.nodak.domain.user.repository.UserHistoryRepository;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.DataNotFoundException;
 import com.server.nodak.security.SecurityUtils;
+import com.server.nodak.utils.HttpServletUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +32,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserHistoryRepository userHistoryRepository;
     private final PostRepository postRepository;
+    private final HttpServletUtils servletUtils;
 
     @Transactional(readOnly = true)
     public CurrentUserInfoResponse getCurrentUserInfo() {
         return CurrentUserInfoResponse.of(SecurityUtils.getUser());
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        servletUtils.removeCookie(request, response, "AccessToken");
+        servletUtils.removeCookie(request, response, "RefreshToken");
     }
 
     @Transactional(readOnly = true)
