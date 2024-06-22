@@ -12,12 +12,15 @@ import com.server.nodak.domain.user.service.UserService;
 import com.server.nodak.global.common.response.ApiResponse;
 import com.server.nodak.security.SecurityUtils;
 import com.server.nodak.security.aop.AuthorizationRequired;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.security.Principal;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,7 +36,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<CurrentUserInfoResponse>> getStatus() {
         return ok(success("로그인 정보가 있습니다.", userService.getCurrentUserInfo()));
     }
-    
+
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<UserInfoResponse>> getUserInfo(@PathVariable("userId") Long userId,
                                                                      Principal principal) {
@@ -50,6 +53,13 @@ public class UserController {
     @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
     public ResponseEntity<ApiResponse<Void>> getUserInfo(@RequestBody UserUpdateDTO userUpdateDTO) {
         userService.updateUserInfo(userUpdateDTO);
+        return ok(success());
+    }
+
+    @PostMapping("/logout")
+    @AuthorizationRequired({UserRole.GENERAL, UserRole.MANAGER})
+    public ResponseEntity<ApiResponse<Void>> logout(HttpServletRequest request, HttpServletResponse response) {
+        userService.logout(request, response);
         return ok(success());
     }
 
