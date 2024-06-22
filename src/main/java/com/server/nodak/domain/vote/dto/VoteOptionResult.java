@@ -12,13 +12,16 @@ public class VoteOptionResult {
     private Long voteOptionId;
     private Integer seq;
     private String voteOptionContent;
+    private String voteOptionImageUrl;
     private Integer count;
 
     @QueryProjection
-    public VoteOptionResult(Long voteOptionId, Integer seq, String voteOptionContent, Integer count) {
+    public VoteOptionResult(Long voteOptionId, Integer seq, String voteOptionContent, String voteOptionImageUrl,
+                            Integer count) {
         this.voteOptionId = voteOptionId;
         this.seq = seq;
         this.voteOptionContent = voteOptionContent;
+        this.voteOptionImageUrl = voteOptionImageUrl;
         this.count = count != null ? count : 0;
     }
 }
