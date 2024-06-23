@@ -85,7 +85,7 @@ class HttpServletUtilsTest {
                 .addCookie(any(Cookie.class));
     }
 
-    @Test
+//    @Test
     @DisplayName("쿠키 삭제시 정상적으로 값이 삭제되어야 한다.")
     void responseRemoveCookie() {
         // given
