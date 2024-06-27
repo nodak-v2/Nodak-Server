@@ -15,31 +15,31 @@ import java.util.Random;
 import java.util.UUID;
 
 public class Utils {
+
     static Random rnd = new Random();
 
     public static VoteOption createVoteOption(Vote vote, Integer seq, String content) {
         return VoteOption.builder()
-                .vote(vote)
-                .content(content)
-                .seq((seq == null) ? rnd.nextInt(1, 10) : seq)
-                .build();
+            .vote(vote)
+            .content(content)
+            .seq((seq == null) ? rnd.nextInt(1, 10) : seq)
+            .build();
     }
 
     public static Vote createVote(String title, Post post) {
         return Vote.builder()
-                .title(title)
-                .post(post)
-                .build();
+            .title(title)
+            .post(post)
+            .build();
     }
 
     public static Post createPost(User user, String title, String content, Category category) {
         return Post.builder()
-                .title(title)
-                .content(content)
-                .imageUrl("abc.abc")
-                .user(user)
-                .category(category)
-                .build();
+            .content(content)
+            .imageUrl("abc.abc")
+            .user(user)
+            .category(category)
+            .build();
     }
 
     public static User createUser() {
@@ -58,16 +58,16 @@ public class Utils {
         return new Category(title);
     }
 
-    public static PostRequest createPostRequest(String title, String channel, String postContent, String voteTitle,
-                                                String imageUrl, List<VoteOptionRequest> voteOption) {
+    public static PostRequest createPostRequest(String channel, String postContent,
+        String voteTitle,
+        String imageUrl, List<VoteOptionRequest> voteOption) {
         return PostRequest.builder()
-                .title(title)
-                .channel(channel)
-                .content(postContent)
-                .voteTitle(voteTitle)
-                .imageUrl(imageUrl)
-                .voteOptionContent(voteOption)
-                .build();
+            .channel(channel)
+            .content(postContent)
+            .voteTitle(voteTitle)
+            .imageUrl(imageUrl)
+            .voteOptionContent(voteOption)
+            .build();
     }
 
     public static String randomUUID() {
