@@ -153,7 +153,6 @@ public class PostService {
     private Vote createVote(Post post, PostRequest postRequest) {
         return Vote.builder()
             .title(postRequest.getVoteTitle())
-            .startDate(postRequest.getStartDate())
             .endDate(postRequest.getEndDate())
             .post(post)
             .build();

@@ -100,7 +100,6 @@ class PostControllerTest {
                 .option("option1")
                 .imageUrl("imageUrl1")
                 .build()))
-            .startDate(LocalDateTime.now())
             .endDate(LocalDateTime.now().plusDays(1))
             .build();
         given(principal.getName()).willReturn(userId);
@@ -130,7 +129,6 @@ class PostControllerTest {
                 .option("option1")
                 .imageUrl("imageUrl1")
                 .build()))
-            .startDate(LocalDateTime.now())
             .endDate(LocalDateTime.now().plusDays(1))
             .build();
         given(principal.getName()).willReturn(userId);
@@ -194,10 +192,10 @@ class PostControllerTest {
     public String postRequestByJson(PostRequest req) {
         return String.format(
             "{\"content\" : \"%s\", \"imageUrl\" : \"%s\","
-                + " \"channel\" : \"%s\", \"voteTitle\" : \"%s\", \"voteOptionContent\" : [ { \"option\" : \"%s\", \"imageUrl\" :\"%s\"} ] , \"startDate\" : \"%s\", \"endDate\" : \"%s\" }"
+                + " \"channel\" : \"%s\", \"voteTitle\" : \"%s\", \"voteOptionContent\" : [ { \"option\" : \"%s\", \"imageUrl\" :\"%s\"} ] , \"endDate\" : \"%s\" }"
             , req.getContent(), req.getImageUrl(), req.getVoteTitle(), req.getChannel(),
             req.getVoteOptionContent().get(0).getOption(),
-            req.getVoteOptionContent().get(0).getImageUrl(), req.getStartDate(), req.getEndDate()
+            req.getVoteOptionContent().get(0).getImageUrl(), req.getEndDate()
 
         );
     }

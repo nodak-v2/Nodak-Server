@@ -13,12 +13,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.ToString;
 import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
@@ -36,12 +38,8 @@ public class Vote extends BaseEntity {
     private Post post;
 
     @OneToMany(mappedBy = "vote", cascade = {CascadeType.PERSIST,
-            CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
+        CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<VoteOption> voteOptions = new ArrayList<>();
-
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
-    private LocalDateTime startDate;
 
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
@@ -51,11 +49,10 @@ public class Vote extends BaseEntity {
     private boolean isTerminated = false;
 
     @Builder
-    public Vote(String title, Post post, List<VoteOption> voteOptions, LocalDateTime startDate, LocalDateTime endDate) {
+    public Vote(String title, Post post, List<VoteOption> voteOptions, LocalDateTime endDate) {
         this.title = title;
         setPost(post);
         this.voteOptions = voteOptions != null ? voteOptions : new ArrayList<>();
-        this.startDate = startDate;
         this.endDate = endDate;
         this.isTerminated = false;
     }
