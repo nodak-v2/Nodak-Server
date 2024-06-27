@@ -19,22 +19,20 @@ public class PostResponse {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS")
     private LocalDateTime createdAt;
     private String content;
-    private String imageUrl;
     private Integer starCount;
     private Boolean checkStar;
 
     @QueryProjection
-    public PostResponse(String author, Boolean isAuthor, Integer commentSize, String profileImageUrl,
-                        LocalDateTime createdAt,
-                        String content,
-                        String imageUrl, Integer starCount, Boolean checkStar) {
+    public PostResponse(String author, Boolean isAuthor, Integer commentSize,
+        String profileImageUrl,
+        LocalDateTime createdAt,
+        String content, Integer starCount, Boolean checkStar) {
         this.author = author;
         this.isAuthor = isAuthor;
         this.commentSize = commentSize;
         this.profileImageUrl = profileImageUrl;
         this.createdAt = createdAt;
         this.content = content;
-        this.imageUrl = imageUrl;
         this.starCount = starCount;
         this.checkStar = checkStar;
     }

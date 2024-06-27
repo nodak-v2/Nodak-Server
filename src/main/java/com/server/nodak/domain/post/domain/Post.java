@@ -34,13 +34,14 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("is_deleted = false")
 public class Post extends BaseEntity {
 
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
+        CascadeType.REMOVE}, orphanRemoval = true)
     private final List<StarPost> starPosts = new ArrayList<>();
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST,
+        CascadeType.REMOVE}, orphanRemoval = true)
     private final List<Comment> comments = new ArrayList<>();
     @NotBlank
     private String content;
-    private String imageUrl;
     private int stars;
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
     @ColumnDefault("false")
@@ -52,13 +53,12 @@ public class Post extends BaseEntity {
     @JoinColumn(nullable = false, name = "category_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Category category;
     @OneToOne(mappedBy = "post", cascade = {CascadeType.PERSIST,
-            CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
+        CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private Vote vote;
 
     @Builder
-    public Post(String content, String imageUrl, User user, Category category, Vote vote) {
+    public Post(String content, User user, Category category, Vote vote) {
         this.content = content;
-        this.imageUrl = imageUrl;
         this.setUser(user);
         this.setCategory(category);
         this.setVote(vote);
@@ -89,9 +89,6 @@ public class Post extends BaseEntity {
         if (!request.getContent().equals(content)) {
             this.content = request.getContent();
         }
-        if (!request.getImageUrl().equals(imageUrl)) {
-            this.imageUrl = request.getImageUrl();
-        }
     }
 
     public void addVoteComment(Comment comment) {
@@ -110,15 +107,14 @@ public class Post extends BaseEntity {
         }
 
         return PostSearchResponse.builder()
-                .postId(this.getId())
-                .voteId(this.vote.getId())
-                .commentCount(this.comments.size())
-                .likeCount(this.starPosts.size())
-                .voterCount(voterCount)
-                .author(this.user.getNickname())
-                .profileImageUrl(this.user.getProfileImageUrl())
-                .postImageUrl(this.imageUrl)
-                .createdAt(this.getCreatedAt())
-                .build();
+            .postId(this.getId())
+            .voteId(this.vote.getId())
+            .commentCount(this.comments.size())
+            .likeCount(this.starPosts.size())
+            .voterCount(voterCount)
+            .author(this.user.getNickname())
+            .profileImageUrl(this.user.getProfileImageUrl())
+            .createdAt(this.getCreatedAt())
+            .build();
     }
 }

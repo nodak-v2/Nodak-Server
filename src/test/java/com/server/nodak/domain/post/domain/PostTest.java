@@ -42,11 +42,10 @@ class PostTest {
     void 게시글_저장_테스트() {
         // given
         Post post = Post.builder()
-                .content("게시글 내용 AA. 투표 부탁드립니다.")
-                .imageUrl("abc.abc")
-                .user(user)
-                .category(new Category("축구"))
-                .build();
+            .content("게시글 내용 AA. 투표 부탁드립니다.")
+            .user(user)
+            .category(new Category("축구"))
+            .build();
         createVote("title", post);
 
         em.persist(post);
@@ -60,17 +59,15 @@ class PostTest {
     void title_content_empty() {
         // given
         Post post1 = Post.builder()
-                .imageUrl("abc.abc")
-                .user(user)
-                .category(new Category())
-                .build();
+            .user(user)
+            .category(new Category())
+            .build();
 
         Post post2 = Post.builder()
-                .content("게시글 내용 AA")
-                .imageUrl("abc.abc")
-                .user(user)
-                .category(new Category())
-                .build();
+            .content("게시글 내용 AA")
+            .user(user)
+            .category(new Category())
+            .build();
 
         // When
         Throwable result1 = Assertions.catchThrowable(() -> {

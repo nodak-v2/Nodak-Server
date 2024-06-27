@@ -120,7 +120,6 @@ class PostServiceTest {
             .profileImageUrl("http://프로필이미지")
             .createdAt(LocalDateTime.now())
             .content("게시글 내용")
-            .imageUrl("http://게시글이미지")
             .starCount(3)
             .checkStar(true)
             .build());
@@ -134,7 +133,6 @@ class PostServiceTest {
         Assertions.assertThat(response.getAuthor()).isEqualTo(postResponse.getAuthor());
         Assertions.assertThat(response.getCreatedAt()).isEqualTo(postResponse.getCreatedAt());
         Assertions.assertThat(response.getContent()).isEqualTo(postResponse.getContent());
-        Assertions.assertThat(response.getImageUrl()).isEqualTo(postResponse.getImageUrl());
         Assertions.assertThat(response.getStarCount()).isEqualTo(postResponse.getStarCount());
         Assertions.assertThat(response.getCheckStar()).isEqualTo(postResponse.getCheckStar());
     }
@@ -214,7 +212,6 @@ class PostServiceTest {
     public List<PostSearchResponse> createPostSearchResponses(int size) {
         return LongStream.rangeClosed(1, size)
             .mapToObj(e -> PostSearchResponse.builder().postId(e)
-                .postImageUrl(String.format("http://postImage%d.com", e))
                 .author(String.format("작성자%d", e))
                 .profileImageUrl(String.format("http://profileImage%d.com", e)).voterCount(10L)
                 .build())

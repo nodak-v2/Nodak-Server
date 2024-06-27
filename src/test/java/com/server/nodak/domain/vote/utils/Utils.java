@@ -36,7 +36,6 @@ public class Utils {
     public static Post createPost(User user, String title, String content, Category category) {
         return Post.builder()
             .content(content)
-            .imageUrl("abc.abc")
             .user(user)
             .category(category)
             .build();
@@ -65,7 +64,6 @@ public class Utils {
             .channel(channel)
             .content(postContent)
             .voteTitle(voteTitle)
-            .imageUrl(imageUrl)
             .voteOptionContent(voteOption)
             .build();
     }

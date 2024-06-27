@@ -120,7 +120,6 @@ class PostRepositoryImplTest {
         Assertions.assertThat(response.getCommentSize())
             .isEqualTo(posts.get(selectId).getComments().size());
         Assertions.assertThat(response.getContent()).isEqualTo(posts.get(selectId).getContent());
-        Assertions.assertThat(response.getImageUrl()).isEqualTo(posts.get(selectId).getImageUrl());
         Assertions.assertThat(response.getStarCount())
             .isEqualTo(posts.get(selectId).getStarPosts().size());
         Assertions.assertThat(response.getCheckStar())
