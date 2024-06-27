@@ -58,8 +58,8 @@ public class PostService {
         AtomicInteger index = new AtomicInteger(1);
 
         request.getVoteOptionContent().stream()
-                .map(voteOption -> createVoteOption(index.getAndIncrement(), voteOption.getOption(),
-                        voteOption.getImageUrl(), vote)).toList();
+            .map(voteOption -> createVoteOption(index.getAndIncrement(), voteOption.getOption(),
+                voteOption.getImageUrl(), vote)).toList();
 
         postRepository.save(post);
 //
@@ -75,7 +75,8 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostResponse findPost(Long userId, Long postId) {
-        return postRepository.findOne(userId, postId).orElseThrow(() -> new DataNotFoundException());
+        return postRepository.findOne(userId, postId)
+            .orElseThrow(() -> new DataNotFoundException());
     }
 
     @Transactional
@@ -106,7 +107,7 @@ public class PostService {
     @Transactional
     public void cancleLike(Long userId, Long postId) {
         StarPost starPost = starPostRepository.findByUserIdAndPostId(userId, postId)
-                .orElseThrow(() -> new BadRequestException());
+            .orElseThrow(() -> new BadRequestException());
         starPost.delete(true);
         starPostRepository.save(starPost);
     }
@@ -133,29 +134,29 @@ public class PostService {
 
     private VoteOption createVoteOption(int seq, String content, String imageUrl, Vote vote) {
         return VoteOption.builder()
-                .seq(seq)
-                .content(content)
-                .imageUrl(imageUrl)
-                .vote(vote)
-                .build();
+            .seq(seq)
+            .content(content)
+            .imageUrl(imageUrl)
+            .vote(vote)
+            .build();
     }
 
     private Post createPost(User user, Category category, PostRequest req) {
         return Post.builder()
-                .user(user)
-                .content(req.getContent())
-                .category(category)
-                .imageUrl(req.getImageUrl())
-                .build();
+            .user(user)
+            .content(req.getContent())
+            .category(category)
+            .imageUrl(req.getImageUrl())
+            .build();
     }
 
     private Vote createVote(Post post, PostRequest postRequest) {
         return Vote.builder()
-                .title(postRequest.getTitle())
-                .startDate(postRequest.getStartDate())
-                .endDate(postRequest.getEndDate())
-                .post(post)
-                .build();
+            .title(postRequest.getVoteTitle())
+            .startDate(postRequest.getStartDate())
+            .endDate(postRequest.getEndDate())
+            .post(post)
+            .build();
     }
 
     private StarPost createStarPost(User user, Post post) {
@@ -167,15 +168,18 @@ public class PostService {
     }
 
     private Category findCategoryByTitle(String channel) {
-        return categoryRepository.findByTitle(channel).orElseThrow(() -> new BadRequestException("존재하지 않는 카테고리입니다."));
+        return categoryRepository.findByTitle(channel)
+            .orElseThrow(() -> new BadRequestException("존재하지 않는 카테고리입니다."));
     }
 
     private Post findPostById(Long postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new BadRequestException("존재하지 않는 게시글입니다."));
+        return postRepository.findById(postId)
+            .orElseThrow(() -> new BadRequestException("존재하지 않는 게시글입니다."));
     }
 
     private Post findPostByIdAndUserId(Long postId, Long userId) {
-        return postRepository.findByIdAndUserId(postId, userId).orElseThrow(() -> new AuthorizationException());
+        return postRepository.findByIdAndUserId(postId, userId)
+            .orElseThrow(() -> new AuthorizationException());
     }
 
     @Transactional
