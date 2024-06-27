@@ -25,6 +25,9 @@ import lombok.ToString;
 @ToString(of = {"content", "seq"})
 public class VoteOption extends BaseEntity {
 
+    @OneToMany(mappedBy = "voteOption", cascade = {CascadeType.PERSIST,
+            CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
+    private final List<VoteHistory> voteHistories = new ArrayList<>();
     @Column(nullable = false)
     @NotBlank
     private String content;
@@ -36,16 +39,13 @@ public class VoteOption extends BaseEntity {
     @ManyToOne(cascade = {CascadeType.PERSIST}, optional = false)
     @JoinColumn(nullable = false, foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Vote vote;
-
-    @OneToMany(mappedBy = "voteOption", cascade = {CascadeType.PERSIST,
-            CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<VoteHistory> voteHistories = new ArrayList<>();
-
+    private String imageUrl;
 
     @Builder
-    public VoteOption(String content, int seq, Vote vote) {
+    public VoteOption(String content, int seq, String imageUrl, Vote vote) {
         this.content = content;
         this.seq = seq;
+        this.imageUrl = imageUrl;
         setVote(vote);
     }
 

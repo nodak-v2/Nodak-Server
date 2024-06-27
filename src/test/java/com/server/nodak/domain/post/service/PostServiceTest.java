@@ -17,6 +17,7 @@ import com.server.nodak.domain.post.dto.PostRequest;
 import com.server.nodak.domain.post.dto.PostResponse;
 import com.server.nodak.domain.post.dto.PostSearchRequest;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
+import com.server.nodak.domain.post.dto.VoteOptionRequest;
 import com.server.nodak.domain.post.repository.CategoryRepository;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.post.repository.StarPostRepository;
@@ -24,7 +25,6 @@ import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.LongStream;
@@ -75,8 +75,8 @@ class PostServiceTest {
     @DisplayName("게시글 저장 테스트")
     void savePost() {
         // Given
-        PostRequest postRequest = createPostRequest(category.getTitle(), "Post_content", "Vote_title",
-                "http://image.com", createVoteOptionMap());
+        PostRequest postRequest = createPostRequest("Post_title", category.getTitle(), "Post_content", "Vote_title",
+                "http://image.com", createVoteOptionList());
         given(userRepository.findById(user.getId())).willReturn(Optional.ofNullable(user));
         given(categoryRepository.findByTitle(postRequest.getChannel())).willReturn(Optional.ofNullable(category));
 
@@ -112,6 +112,7 @@ class PostServiceTest {
         // Given
         Long postId = rnd.nextLong(1, 10);
         PostResponse postResponse = Mockito.spy(PostResponse.builder()
+                .title("게시글 제목")
                 .author("작성자")
                 .profileImageUrl("http://프로필이미지")
                 .createdAt(LocalDateTime.now())
@@ -126,6 +127,7 @@ class PostServiceTest {
         PostResponse response = postService.findPost(user.getId(), postId);
 
         // Then
+        Assertions.assertThat(response.getTitle()).isEqualTo(postResponse.getTitle());
         Assertions.assertThat(response.getAuthor()).isEqualTo(postResponse.getAuthor());
         Assertions.assertThat(response.getCreatedAt()).isEqualTo(postResponse.getCreatedAt());
         Assertions.assertThat(response.getContent()).isEqualTo(postResponse.getContent());
@@ -139,8 +141,8 @@ class PostServiceTest {
     public void updatePost() {
         // Given
         Post post = createPost(user, randomUUID(), randomUUID(), category);
-        PostRequest postRequest = createPostRequest(category.getTitle(), "Post_content", "Vote_title",
-                "http://image.com", createVoteOptionMap());
+        PostRequest postRequest = createPostRequest("Post_title", category.getTitle(), "Post_content", "Vote_title",
+                "http://image.com", createVoteOptionList());
         given(postRepository.findByIdAndUserId(post.getId(), user.getId())).willReturn(Optional.of(post));
 
         // When
@@ -212,11 +214,17 @@ class PostServiceTest {
                 .toList();
     }
 
-    public Map<Integer, String> createVoteOptionMap() {
-        return Map.of(
-                1, "voteOption1",
-                2, "voteOption2",
-                3, "voteOption3"
+    public List<VoteOptionRequest> createVoteOptionList() {
+        return List.of(
+                VoteOptionRequest.builder()
+                        .option("voteOption1")
+                        .imageUrl("image1").build(),
+                VoteOptionRequest.builder()
+                        .option("voteOption2")
+                        .imageUrl("image2").build(),
+                VoteOptionRequest.builder()
+                        .option("voteOption3")
+                        .imageUrl("image3").build()
         );
     }
 }

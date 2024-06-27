@@ -4,15 +4,19 @@ import com.server.nodak.domain.comment.domain.Comment;
 import com.server.nodak.domain.comment.dto.request.CreateCommentRequest;
 import com.server.nodak.domain.comment.dto.request.UpdateCommentRequest;
 import com.server.nodak.domain.comment.dto.response.CommentResponse;
+import com.server.nodak.domain.comment.repository.CommentJpaRepository;
 import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.repository.PostRepository;
+import com.server.nodak.domain.reply.dto.MyCommentHistory;
+import com.server.nodak.domain.reply.dto.MyReplyHistory;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserHistoryRepository;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.BadRequestException;
 import com.server.nodak.exception.common.DataNotFoundException;
-import com.server.nodak.security.aop.IncreaseUserHistory;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -24,12 +28,13 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentService {
 
     private final CommentRepository commentRepository;
+    private final CommentJpaRepository commentJpaRepository;
+
     private final PostRepository postRepository;
     private final UserRepository userRepository;
     private final UserHistoryRepository userHistoryRepository;
 
     @Transactional
-    @IncreaseUserHistory(incrementValue = 2)
     public void createComment(long postId, long userId, CreateCommentRequest commentRequest) {
         Post post = findPost(postId);
         User user = findUser(userId);
@@ -58,7 +63,7 @@ public class CommentService {
     @Transactional(readOnly = true)
     public List<CommentResponse> fetchCommentsForPost(long postId) {
         findPost(postId);
-        List<Comment> comments = commentRepository.getCommentsByPostId(postId);
+        List<Comment> comments = commentRepository.findByPostId(postId);
 
         return convertToCommentResponseList(comments);
     }
@@ -95,7 +100,7 @@ public class CommentService {
     }
 
     private Comment getComment(long commentId) {
-        return commentRepository.findById(commentId).orElseThrow(
+        return commentJpaRepository.findById(commentId).orElseThrow(
                 () -> new BadRequestException()
         );
     }
@@ -104,5 +109,19 @@ public class CommentService {
         if (comment.getPost().getId() != postId) {
             throw new BadRequestException();
         }
+    }
+
+    public List<MyCommentHistory> getAllCommentsByUser(long userId) {
+        findUser(userId);
+        List<Comment> comments = commentRepository.findByUserId(userId);
+
+        List<MyCommentHistory> result = new ArrayList<>();
+
+        for (Comment comment : comments) {
+            CommentResponse commentResponse = CommentResponse.of(comment);
+            result.add(new MyCommentHistory(commentResponse, comment));
+        }
+
+        return result;
     }
 }

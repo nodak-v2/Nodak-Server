@@ -22,6 +22,7 @@ import com.server.nodak.exception.common.BadRequestException;
 import com.server.nodak.exception.common.ConflictException;
 import com.server.nodak.exception.common.DataNotFoundException;
 import com.server.nodak.security.aop.IncreaseUserHistory;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,17 +53,19 @@ public class PostService {
         Category category = findCategoryByTitle(request.getChannel());
 
         Post post = createPost(user, category, request);
-        Vote vote = createVote(post, request.getVoteTitle());
+        Vote vote = createVote(post, request);
 
-        request.getVoteOptionContent().entrySet().stream()
-                .map(e -> createVoteOption(e.getKey(), e.getValue(), vote))
-                .toList();
+        AtomicInteger index = new AtomicInteger(1);
+
+        request.getVoteOptionContent().stream()
+                .map(voteOption -> createVoteOption(index.getAndIncrement(), voteOption.getOption(),
+                        voteOption.getImageUrl(), vote)).toList();
 
         postRepository.save(post);
-
-        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.",
-                user.getId());
-        notificationService.notifyFollowersBySse(user, post);
+//
+//        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.",
+//                user.getId());
+//        notificationService.notifyFollowersBySse(user, post);
     }
 
     @Transactional(readOnly = true)
@@ -108,10 +111,31 @@ public class PostService {
         starPostRepository.save(starPost);
     }
 
-    private VoteOption createVoteOption(int seq, String content, Vote vote) {
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable) {
+        return postRepository.findMyPosting(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable) {
+        return postRepository.findMyVoteHistory(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyComment(Long userId, Pageable pageable) {
+        return postRepository.findMyComment(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyLike(Long userId, Pageable pageable) {
+        return postRepository.findMyLike(userId, pageable);
+    }
+
+    private VoteOption createVoteOption(int seq, String content, String imageUrl, Vote vote) {
         return VoteOption.builder()
                 .seq(seq)
                 .content(content)
+                .imageUrl(imageUrl)
                 .vote(vote)
                 .build();
     }
@@ -125,10 +149,12 @@ public class PostService {
                 .build();
     }
 
-    private Vote createVote(Post post, String title) {
+    private Vote createVote(Post post, PostRequest postRequest) {
         return Vote.builder()
+                .title(postRequest.getTitle())
+                .startDate(postRequest.getStartDate())
+                .endDate(postRequest.getEndDate())
                 .post(post)
-                .title(title)
                 .build();
     }
 
@@ -150,5 +176,16 @@ public class PostService {
 
     private Post findPostByIdAndUserId(Long postId, Long userId) {
         return postRepository.findByIdAndUserId(postId, userId).orElseThrow(() -> new AuthorizationException());
+    }
+
+    @Transactional
+    public void terminateVote(long userId, Long postId) {
+        Post post = findPostByIdAndUserId(postId, userId);
+        Vote vote = post.getVote();
+
+        if (vote.isTerminated()) {
+            throw new BadRequestException("vote has already terminated.");
+        }
+        vote.setTerminated(true);
     }
 }

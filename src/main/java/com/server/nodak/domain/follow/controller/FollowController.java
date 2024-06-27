@@ -2,15 +2,18 @@ package com.server.nodak.domain.follow.controller;
 
 import com.server.nodak.domain.follow.service.FollowService;
 import com.server.nodak.domain.user.domain.UserRole;
-import com.server.nodak.domain.user.dto.UserInfoResponse;
+import com.server.nodak.domain.user.dto.UserInfoDTO;
 import com.server.nodak.global.common.response.ApiResponse;
 import com.server.nodak.security.aop.AuthorizationRequired;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import java.security.Principal;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,14 +36,14 @@ public class FollowController {
     }
 
     @GetMapping("/followers")
-    public ResponseEntity<ApiResponse<List<UserInfoResponse>>> getFollowers(Principal principal) {
-        List<UserInfoResponse> followers = followService.getFollowers(Long.parseLong(principal.getName()));
+    public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getFollowers(Principal principal) {
+        List<UserInfoDTO> followers = followService.getFollowers(Long.parseLong(principal.getName()));
         return ResponseEntity.ok(ApiResponse.success(followers));
     }
 
     @GetMapping("/followees")
-    public ResponseEntity<ApiResponse<List<UserInfoResponse>>> getFollowees(Principal principal) {
-        List<UserInfoResponse> followees = followService.getFollowees(Long.parseLong(principal.getName()));
+    public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getFollowees(Principal principal) {
+        List<UserInfoDTO> followees = followService.getFollowees(Long.parseLong(principal.getName()));
         return ResponseEntity.ok(ApiResponse.success(followees));
     }
 }

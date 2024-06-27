@@ -1,5 +1,7 @@
 package com.server.nodak.exception;
 
+import com.server.nodak.domain.user.dto.CurrentUserInfoResponse;
+import com.server.nodak.exception.common.AuthorizationException;
 import com.server.nodak.exception.common.BaseException;
 import com.server.nodak.global.common.response.ApiResponse;
 import jakarta.validation.ConstraintViolationException;
@@ -23,6 +25,13 @@ public class GlobalExceptionHandler {
         return ResponseEntity
                 .status(exception.getCode())
                 .body(ApiResponse.error(exception.getMessage()));
+    }
+
+    @ExceptionHandler(AuthorizationException.class)
+    public ResponseEntity<?> handleAuthorizationException(AuthorizationException exception) {
+        return ResponseEntity
+                .status(exception.getCode())
+                .body(ApiResponse.success(exception.getMessage(), CurrentUserInfoResponse.of(null)));
     }
 
     @ExceptionHandler({MethodArgumentNotValidException.class})

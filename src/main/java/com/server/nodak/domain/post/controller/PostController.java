@@ -44,6 +44,41 @@ public class PostController {
         return ResponseEntity.ok(ApiResponse.success(response));
     }
 
+    @GetMapping("/myPosting")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Page<PostSearchResponse>>> myPosting(Principal principal,
+                                                                           @PageableDefault Pageable pageable) {
+        Page<PostSearchResponse> response = postService.findMyPosting(Long.parseLong(principal.getName()), pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/myVoteHistory")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Page<PostSearchResponse>>> myVoteHistory(Principal principal,
+                                                                               @PageableDefault Pageable pageable) {
+        Page<PostSearchResponse> response = postService.findMyVoteHistory(Long.parseLong(principal.getName()),
+                pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/myComment")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Page<PostSearchResponse>>> myComment(Principal principal,
+                                                                           @PageableDefault Pageable pageable) {
+        Page<PostSearchResponse> response = postService.findMyComment(Long.parseLong(principal.getName()),
+                pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
+    @GetMapping("/myLike")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Page<PostSearchResponse>>> myLike(Principal principal,
+                                                                        @PageableDefault Pageable pageable) {
+        Page<PostSearchResponse> response = postService.findMyLike(Long.parseLong(principal.getName()),
+                pageable);
+        return ResponseEntity.ok(ApiResponse.success(response));
+    }
+
     @PostMapping
     @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> registerPost(@RequestBody PostRequest request, Principal principal) {
@@ -77,6 +112,13 @@ public class PostController {
     @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> deletePost(@PathVariable Long postId, Principal principal) {
         postService.removePost(Long.parseLong(principal.getName()), postId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{postId}/terminate")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Void>> terminateVote(@PathVariable Long postId, Principal principal) {
+        postService.terminateVote(Long.parseLong(principal.getName()), postId);
         return ResponseEntity.ok().build();
     }
 }

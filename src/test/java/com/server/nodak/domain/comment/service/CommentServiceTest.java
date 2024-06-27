@@ -13,6 +13,7 @@ import com.server.nodak.domain.comment.domain.Comment;
 import com.server.nodak.domain.comment.dto.request.CreateCommentRequest;
 import com.server.nodak.domain.comment.dto.request.UpdateCommentRequest;
 import com.server.nodak.domain.comment.dto.response.CommentResponse;
+import com.server.nodak.domain.comment.repository.CommentJpaRepository;
 import com.server.nodak.domain.comment.repository.CommentRepository;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
@@ -39,6 +40,9 @@ class CommentServiceTest {
 
     @Mock
     private CommentRepository commentRepository;
+
+    @Mock
+    private CommentJpaRepository commentJpaRepository;
 
     @Mock
     private UserRepository userRepository;
@@ -81,7 +85,7 @@ class CommentServiceTest {
         ReflectionTestUtils.setField(user, "id", 1L);
 
         lenient().when(postRepository.findById(any(Long.class))).thenReturn(Optional.of(post));
-        lenient().when(commentRepository.save(any(Comment.class))).thenAnswer(invocation -> invocation.getArgument(0));
+        lenient().when(commentJpaRepository.save(any(Comment.class))).thenAnswer(invocation -> invocation.getArgument(0));
         lenient().when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(user));
     }
 
@@ -102,7 +106,7 @@ class CommentServiceTest {
     @DisplayName("게시글 댓글 조회")
     void fetchCommentsForPost_test() {
         // given
-        when(commentRepository.getCommentsByPostId(postId)).thenReturn(Collections.emptyList());
+        when(commentRepository.findByPostId(postId)).thenReturn(Collections.emptyList());
 
         // when
         List<CommentResponse> result = commentService.fetchCommentsForPost(postId);
@@ -117,7 +121,7 @@ class CommentServiceTest {
     void updateComment_test() {
         // given
         UpdateCommentRequest commentRequest = new UpdateCommentRequest("수정된 댓글");
-        when(commentRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
+        when(commentJpaRepository.findById(any(Long.class))).thenReturn(Optional.of(comment));
 
         // when
         commentService.updateComment(postId, userId, commentId, commentRequest);
@@ -130,7 +134,7 @@ class CommentServiceTest {
     @DisplayName("댓글 삭제 테스트")
     void deleteComment_test() {
         // given
-        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(commentJpaRepository.findById(commentId)).thenReturn(Optional.of(comment));
 
         // when
         commentService.deleteComment(postId, userId, commentId);
