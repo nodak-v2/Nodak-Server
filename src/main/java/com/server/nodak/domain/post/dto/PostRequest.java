@@ -10,7 +10,6 @@ import lombok.Data;
 public class PostRequest {
 
     private String content;
-    private String imageUrl;
     private String channel;
     private String voteTitle;
     private List<VoteOptionRequest> voteOptionContent;

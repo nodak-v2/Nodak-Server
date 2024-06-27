@@ -93,7 +93,6 @@ class PostControllerTest {
         PostRequest postRequest = PostRequest.builder()
             .content("Post_content")
             .voteTitle("Vote_title")
-            .imageUrl("http://image.com")
             .channel("운동")
             .voteOptionContent(List.of(VoteOptionRequest
                 .builder()
@@ -122,7 +121,6 @@ class PostControllerTest {
         PostRequest postRequest = PostRequest.builder()
             .content("Post_content")
             .voteTitle("Vote_title")
-            .imageUrl("http://image.com")
             .channel("운동")
             .voteOptionContent(List.of(VoteOptionRequest
                 .builder()
@@ -191,12 +189,11 @@ class PostControllerTest {
 
     public String postRequestByJson(PostRequest req) {
         return String.format(
-            "{\"content\" : \"%s\", \"imageUrl\" : \"%s\","
+            "{\"content\" : \"%s\", "
                 + " \"channel\" : \"%s\", \"voteTitle\" : \"%s\", \"voteOptionContent\" : [ { \"option\" : \"%s\", \"imageUrl\" :\"%s\"} ] , \"endDate\" : \"%s\" }"
-            , req.getContent(), req.getImageUrl(), req.getVoteTitle(), req.getChannel(),
+            , req.getContent(), req.getVoteTitle(), req.getChannel(),
             req.getVoteOptionContent().get(0).getOption(),
             req.getVoteOptionContent().get(0).getImageUrl(), req.getEndDate()
-
         );
     }
 }

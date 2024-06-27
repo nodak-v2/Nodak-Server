@@ -146,7 +146,6 @@ public class PostService {
             .user(user)
             .content(req.getContent())
             .category(category)
-            .imageUrl(req.getImageUrl())
             .build();
     }
 
