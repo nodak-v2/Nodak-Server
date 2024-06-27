@@ -42,7 +42,6 @@ class PostTest {
     void 게시글_저장_테스트() {
         // given
         Post post = Post.builder()
-                .title("post1")
                 .content("게시글 내용 AA. 투표 부탁드립니다.")
                 .imageUrl("abc.abc")
                 .user(user)
@@ -57,11 +56,10 @@ class PostTest {
     }
 
     @Test
-    @DisplayName("title 또는 content 가 공백이면 예외 발생")
+    @DisplayName("content 가 공백이면 예외 발생")
     void title_content_empty() {
         // given
         Post post1 = Post.builder()
-                .title("post1")
                 .imageUrl("abc.abc")
                 .user(user)
                 .category(new Category())

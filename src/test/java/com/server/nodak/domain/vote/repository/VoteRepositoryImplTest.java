@@ -1,5 +1,12 @@
 package com.server.nodak.domain.vote.repository;
 
+import static com.server.nodak.domain.vote.utils.Utils.createCategory;
+import static com.server.nodak.domain.vote.utils.Utils.createPost;
+import static com.server.nodak.domain.vote.utils.Utils.createUser;
+import static com.server.nodak.domain.vote.utils.Utils.createVote;
+import static com.server.nodak.domain.vote.utils.Utils.createVoteHistory;
+import static com.server.nodak.domain.vote.utils.Utils.createVoteOption;
+
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
@@ -12,6 +19,13 @@ import com.server.nodak.domain.vote.repository.votehistory.VoteHistoryRepository
 import com.server.nodak.domain.vote.repository.voteoption.VoteOptionRepository;
 import com.server.nodak.global.config.QueryDslConfig;
 import jakarta.persistence.EntityManager;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import lombok.extern.slf4j.Slf4j;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,12 +36,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageRequest;
-
-import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
-import static com.server.nodak.domain.vote.utils.Utils.*;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -147,7 +155,7 @@ class VoteRepositoryImplTest {
             Post post = createPost(user, uuid, uuid, category1);
             posts.add(post);
             Vote vote = createVote(String.format("Vote_title_%s", uuid), post);
-            voteOptionMap.put(post.getTitle(), createVoteOptions(vote, voteOptionCount));
+            voteOptionMap.put(vote.getTitle(), createVoteOptions(vote, voteOptionCount));
         });
 
         voteOptionMap.values().stream().forEach(voteOptions -> {

@@ -1,30 +1,33 @@
 package com.server.nodak.domain.post.repository;
 
+import static com.server.nodak.domain.comment.domain.QComment.comment;
+import static com.server.nodak.domain.post.domain.QPost.post;
+import static com.server.nodak.domain.post.domain.QStarPost.starPost;
+import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
+import static com.server.nodak.domain.vote.domain.QVoteOption.voteOption;
+
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.nodak.domain.post.domain.QStarPost;
-import com.server.nodak.domain.post.dto.*;
+import com.server.nodak.domain.post.dto.PostResponse;
+import com.server.nodak.domain.post.dto.PostSearchRequest;
+import com.server.nodak.domain.post.dto.PostSearchResponse;
+import com.server.nodak.domain.post.dto.QPostResponse;
+import com.server.nodak.domain.post.dto.QPostSearchResponse;
 import com.server.nodak.domain.vote.domain.QVoteOption;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.server.nodak.domain.comment.domain.QComment.comment;
-import static com.server.nodak.domain.post.domain.QPost.post;
-import static com.server.nodak.domain.post.domain.QStarPost.starPost;
-import static com.server.nodak.domain.vote.domain.QVoteHistory.voteHistory;
-import static com.server.nodak.domain.vote.domain.QVoteOption.voteOption;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -43,7 +46,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         new QPostSearchResponse(
                                 post.id,
                                 post.vote.id,
-                                post.title,
                                 post.comments.size(),
                                 post.starPosts.size(),
                                 JPAExpressions
@@ -119,7 +121,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         new QPostSearchResponse(
                                 post.id,
                                 post.vote.id,
-                                post.title,
                                 post.comments.size(),
                                 post.starPosts.size(),
                                 JPAExpressions
@@ -195,7 +196,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         new QPostSearchResponse(
                                 post.id,
                                 post.vote.id,
-                                post.title,
                                 post.comments.size(),
                                 post.starPosts.size(),
                                 JPAExpressions
@@ -266,7 +266,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         new QPostSearchResponse(
                                 post.id,
                                 post.vote.id,
-                                post.title,
                                 post.comments.size(),
                                 post.starPosts.size(),
                                 JPAExpressions
@@ -331,7 +330,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QStarPost starPost = QStarPost.starPost;
         PostResponse postResponse = queryFactory.select(
                         new QPostResponse(
-                                post.title,
                                 post.user.nickname,
                                 userId != null ?
                                         post.user.id.eq(userId) : Expressions.FALSE,
@@ -363,7 +361,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         new QPostSearchResponse(
                                 post.id,
                                 post.vote.id,
-                                post.title,
                                 post.comments.size(),
                                 post.starPosts.size(),
                                 JPAExpressions
@@ -430,17 +427,12 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
 
     private BooleanBuilder searchCondition(PostSearchRequest request) {
         return new BooleanBuilder()
-                .and(titleContains(request.getKeyword()))
-                .or(contentContains(request.getKeyword()));
+                .and(contentContains(request.getKeyword()));
     }
 
     private BooleanBuilder searchCategory(PostSearchRequest request) {
         return new BooleanBuilder()
                 .and(catergoryIdEq(request.getCategoryId()));
-    }
-
-    private BooleanExpression titleContains(String title) {
-        return title != null ? post.title.contains(title) : null;
     }
 
     private BooleanExpression contentContains(String content) {

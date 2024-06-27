@@ -9,9 +9,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.server.nodak.domain.post.dto.PostRequest;
+import com.server.nodak.domain.post.dto.VoteOptionRequest;
 import com.server.nodak.domain.post.service.PostService;
 import com.server.nodak.domain.user.domain.User;
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Random;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,8 +54,8 @@ class PostControllerTest {
         user = createUser();
         MockitoAnnotations.openMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(postController)
-                .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
-                .build();
+            .setCustomArgumentResolvers(new PageableHandlerMethodArgumentResolver())
+            .build();
     }
 
     @Test
@@ -77,7 +80,7 @@ class PostControllerTest {
 
         // When
         ResultActions resultActions = mockMvc.perform(get(String.format("/posts/%d", postId))
-                .principal(principal));
+            .principal(principal));
 
         // Then
         resultActions.andExpect(status().isOk());
@@ -88,19 +91,25 @@ class PostControllerTest {
         // Given
         String userId = String.valueOf(rnd.nextLong(10));
         PostRequest postRequest = PostRequest.builder()
-                .title("Post_title")
-                .content("Post_content")
-                .voteTitle("Vote_title")
-                .imageUrl("http://image.com")
-                .channel("운동")
-                .build();
+            .content("Post_content")
+            .voteTitle("Vote_title")
+            .imageUrl("http://image.com")
+            .channel("운동")
+            .voteOptionContent(List.of(VoteOptionRequest
+                .builder()
+                .option("option1")
+                .imageUrl("imageUrl1")
+                .build()))
+            .startDate(LocalDateTime.now())
+            .endDate(LocalDateTime.now().plusDays(1))
+            .build();
         given(principal.getName()).willReturn(userId);
 
         // When
         ResultActions resultActions = mockMvc.perform(post("/posts")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postRequestByJson(postRequest))
-                .principal(principal));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(postRequestByJson(postRequest))
+            .principal(principal));
 
         // Then
         resultActions.andExpect(status().isOk());
@@ -112,19 +121,25 @@ class PostControllerTest {
         Long postId = rnd.nextLong(10);
         String userId = String.valueOf(rnd.nextLong(10));
         PostRequest postRequest = PostRequest.builder()
-                .title("Post_title")
-                .content("Post_content")
-                .voteTitle("Vote_title")
-                .imageUrl("http://image.com")
-                .channel("운동")
-                .build();
+            .content("Post_content")
+            .voteTitle("Vote_title")
+            .imageUrl("http://image.com")
+            .channel("운동")
+            .voteOptionContent(List.of(VoteOptionRequest
+                .builder()
+                .option("option1")
+                .imageUrl("imageUrl1")
+                .build()))
+            .startDate(LocalDateTime.now())
+            .endDate(LocalDateTime.now().plusDays(1))
+            .build();
         given(principal.getName()).willReturn(userId);
 
         // When
         ResultActions resultActions = mockMvc.perform(patch(String.format("/posts/%d", postId))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postRequestByJson(postRequest))
-                .principal(principal));
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(postRequestByJson(postRequest))
+            .principal(principal));
 
         // Then
         resultActions.andExpect(status().isOk());
@@ -139,7 +154,7 @@ class PostControllerTest {
 
         // When
         ResultActions resultActions = mockMvc.perform(post(String.format("/posts/%d/stars", postId))
-                .principal(principal));
+            .principal(principal));
 
         // Then
         resultActions.andExpect(status().isOk());
@@ -153,7 +168,8 @@ class PostControllerTest {
         given(principal.getName()).willReturn(userId);
 
         // When
-        ResultActions resultActions = mockMvc.perform(delete(String.format("/posts/%d/stars", postId))
+        ResultActions resultActions = mockMvc.perform(
+            delete(String.format("/posts/%d/stars", postId))
                 .principal(principal));
 
         // Then
@@ -169,7 +185,7 @@ class PostControllerTest {
 
         // When
         ResultActions resultActions = mockMvc.perform(delete(String.format("/posts/%d", postId))
-                .principal(principal));
+            .principal(principal));
 
         // Then
         resultActions.andExpect(status().isOk());
@@ -177,10 +193,12 @@ class PostControllerTest {
 
     public String postRequestByJson(PostRequest req) {
         return String.format(
-                "{\"title\" : \"%s\", \"content\" : \"%s\", \"imageUrl\" : \"%s\","
-                        + " \"channel\" : \"%s\", \"voteTitle\" : \"%s\", \"voteOptionContent\" : [ {\"%d\": \"%s\" } ] }"
-                , req.getTitle(), req.getContent(), req.getImageUrl(), req.getVoteTitle(), req.getChannel(),
-                0,
-                "투표 옵션");
+            "{\"content\" : \"%s\", \"imageUrl\" : \"%s\","
+                + " \"channel\" : \"%s\", \"voteTitle\" : \"%s\", \"voteOptionContent\" : [ { \"option\" : \"%s\", \"imageUrl\" :\"%s\"} ] , \"startDate\" : \"%s\", \"endDate\" : \"%s\" }"
+            , req.getContent(), req.getImageUrl(), req.getVoteTitle(), req.getChannel(),
+            req.getVoteOptionContent().get(0).getOption(),
+            req.getVoteOptionContent().get(0).getImageUrl(), req.getStartDate(), req.getEndDate()
+
+        );
     }
 }

@@ -34,41 +34,29 @@ import org.hibernate.annotations.SQLRestriction;
 @SQLRestriction("is_deleted = false")
 public class Post extends BaseEntity {
 
-    @NotBlank
-    private String title;
-
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private final List<StarPost> starPosts = new ArrayList<>();
+    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
+    private final List<Comment> comments = new ArrayList<>();
     @NotBlank
     private String content;
-
     private String imageUrl;
-
     private int stars;
-
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
     @ColumnDefault("false")
     private boolean isDeleted;
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User user;
-
     @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, optional = false)
     @JoinColumn(nullable = false, name = "category_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Category category;
-
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private final List<StarPost> starPosts = new ArrayList<>();
-
-    @OneToMany(mappedBy = "post", cascade = {CascadeType.PERSIST, CascadeType.REMOVE}, orphanRemoval = true)
-    private final List<Comment> comments = new ArrayList<>();
-
     @OneToOne(mappedBy = "post", cascade = {CascadeType.PERSIST,
             CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private Vote vote;
 
     @Builder
-    public Post(String title, String content, String imageUrl, User user, Category category, Vote vote) {
-        this.title = title;
+    public Post(String content, String imageUrl, User user, Category category, Vote vote) {
         this.content = content;
         this.imageUrl = imageUrl;
         this.setUser(user);
@@ -98,9 +86,6 @@ public class Post extends BaseEntity {
     }
 
     public void update(PostRequest request) {
-        if (!request.getTitle().equals(title)) {
-            this.title = request.getTitle();
-        }
         if (!request.getContent().equals(content)) {
             this.content = request.getContent();
         }
@@ -127,7 +112,6 @@ public class Post extends BaseEntity {
         return PostSearchResponse.builder()
                 .postId(this.getId())
                 .voteId(this.vote.getId())
-                .title(this.getTitle())
                 .commentCount(this.comments.size())
                 .likeCount(this.starPosts.size())
                 .voterCount(voterCount)
