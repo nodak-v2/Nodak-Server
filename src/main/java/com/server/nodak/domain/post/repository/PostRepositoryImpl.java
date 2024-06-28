@@ -349,7 +349,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                                 .where(starPost.user.id.eq(userId),
                                     starPost.post.id.eq(postId))
                         ) : Expressions.FALSE,
-                    post.category.id
+                    post.category.title
                 )
             )
             .from(post)
