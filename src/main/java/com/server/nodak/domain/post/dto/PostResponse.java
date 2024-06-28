@@ -21,12 +21,13 @@ public class PostResponse {
     private String content;
     private Integer starCount;
     private Boolean checkStar;
+    private Long categoryId;
 
     @QueryProjection
     public PostResponse(String author, Boolean isAuthor, Integer commentSize,
         String profileImageUrl,
         LocalDateTime createdAt,
-        String content, Integer starCount, Boolean checkStar) {
+        String content, Integer starCount, Boolean checkStar, Long categoryId) {
         this.author = author;
         this.isAuthor = isAuthor;
         this.commentSize = commentSize;
@@ -35,5 +36,6 @@ public class PostResponse {
         this.content = content;
         this.starCount = starCount;
         this.checkStar = checkStar;
+        this.categoryId = categoryId;
     }
 }

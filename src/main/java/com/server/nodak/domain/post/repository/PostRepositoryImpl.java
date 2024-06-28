@@ -348,7 +348,8 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                             JPAExpressions.selectFrom(starPost)
                                 .where(starPost.user.id.eq(userId),
                                     starPost.post.id.eq(postId))
-                        ) : Expressions.FALSE
+                        ) : Expressions.FALSE,
+                    post.category.id
                 )
             )
             .from(post)
