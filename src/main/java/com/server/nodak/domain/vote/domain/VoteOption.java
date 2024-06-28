@@ -1,6 +1,7 @@
 package com.server.nodak.domain.vote.domain;
 
 import com.server.nodak.domain.model.BaseEntity;
+import com.server.nodak.domain.vote.dto.VoteOptionListResult;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ConstraintMode;
@@ -26,7 +27,7 @@ import lombok.ToString;
 public class VoteOption extends BaseEntity {
 
     @OneToMany(mappedBy = "voteOption", cascade = {CascadeType.PERSIST,
-            CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
+        CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
     private final List<VoteHistory> voteHistories = new ArrayList<>();
     @Column(nullable = false)
     @NotBlank
@@ -63,5 +64,13 @@ public class VoteOption extends BaseEntity {
 
     public void addVoteHistory(VoteHistory voteHistory) {
         this.voteHistories.add(voteHistory);
+    }
+
+    public VoteOptionListResult toVoteOptionListResult() {
+        return VoteOptionListResult.builder()
+            .option(this.getContent())
+            .imageUrl(this.getImageUrl())
+            .build();
+
     }
 }

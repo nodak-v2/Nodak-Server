@@ -18,7 +18,8 @@ import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.post.dto.QPostResponse;
 import com.server.nodak.domain.post.dto.QPostSearchResponse;
 import com.server.nodak.domain.vote.domain.QVoteOption;
-import java.util.ArrayList;
+import com.server.nodak.domain.vote.domain.VoteOption;
+import com.server.nodak.domain.vote.dto.VoteOptionListResult;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,6 +47,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 new QPostSearchResponse(
                     post.id,
                     post.vote.id,
+                    post.vote.title,
                     post.comments.size(),
                     post.starPosts.size(),
                     JPAExpressions
@@ -56,8 +58,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                     post.user.profileImageUrl,
                     post.createdAt,
                     post.vote.endDate,
-                    post.vote.isTerminated,
-                    Expressions.constant(new ArrayList<>())
+                    post.vote.isTerminated
                 )
             )
             .from(post)
@@ -67,20 +68,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             .orderBy(post.createdAt.desc())
             .fetch();
 
-        // Fetch voteOptions separately
-        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+        // voteId에 종속된 voteOption 리스트 추출
+        Map<Long, List<VoteOption>> voteOptionsMap = fetch.stream()
             .collect(Collectors.toMap(
                 PostSearchResponse::getVoteId,
-                response -> queryFactory.select(voteOption.content)
+                response -> queryFactory.select(voteOption)
                     .from(voteOption)
                     .where(voteOption.vote.id.eq(response.getVoteId()))
                     .fetch()
             ));
 
-        // Set voteOptions for each PostSearchResponse
         fetch.forEach(response -> {
-            List<String> options = voteOptionsMap.get(response.getVoteId());
-            response.setVoteOptions(options);
+            // voteOption을 voteOptionListResult로 변환
+            List<VoteOptionListResult> voteOptionListResult = voteOptionsMap.get(
+                    response.getVoteId()).stream()
+                .map(e -> e.toVoteOptionListResult()).toList();
+
+            response.setVoteOptions(voteOptionListResult);
         });
 
         long count = findMyLikeForCount(userId);
@@ -119,6 +123,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 new QPostSearchResponse(
                     post.id,
                     post.vote.id,
+                    post.vote.title,
                     post.comments.size(),
                     post.starPosts.size(),
                     JPAExpressions
@@ -129,8 +134,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                     post.user.profileImageUrl,
                     post.createdAt,
                     post.vote.endDate,
-                    post.vote.isTerminated,
-                    Expressions.constant(new ArrayList<>())
+                    post.vote.isTerminated
                 )
             )
             .from(post)
@@ -140,20 +144,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             .orderBy(post.createdAt.desc())
             .fetch();
 
-        // Fetch voteOptions separately
-        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+        // voteId에 종속된 voteOption 리스트 추출
+        Map<Long, List<VoteOption>> voteOptionsMap = fetch.stream()
             .collect(Collectors.toMap(
                 PostSearchResponse::getVoteId,
-                response -> queryFactory.select(voteOption.content)
+                response -> queryFactory.select(voteOption)
                     .from(voteOption)
                     .where(voteOption.vote.id.eq(response.getVoteId()))
                     .fetch()
             ));
 
-        // Set voteOptions for each PostSearchResponse
         fetch.forEach(response -> {
-            List<String> options = voteOptionsMap.get(response.getVoteId());
-            response.setVoteOptions(options);
+            // voteOption을 voteOptionListResult로 변환
+            List<VoteOptionListResult> voteOptionListResult = voteOptionsMap.get(
+                    response.getVoteId()).stream()
+                .map(e -> e.toVoteOptionListResult()).toList();
+
+            response.setVoteOptions(voteOptionListResult);
         });
 
         long count = findMyCommentForCount(userId);
@@ -192,6 +199,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 new QPostSearchResponse(
                     post.id,
                     post.vote.id,
+                    post.vote.title,
                     post.comments.size(),
                     post.starPosts.size(),
                     JPAExpressions
@@ -202,8 +210,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                     post.user.profileImageUrl,
                     post.createdAt,
                     post.vote.endDate,
-                    post.vote.isTerminated,
-                    Expressions.constant(new ArrayList<>())
+                    post.vote.isTerminated
                 )
             )
             .from(post)
@@ -213,20 +220,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             .orderBy(post.createdAt.desc())
             .fetch();
 
-        // Fetch voteOptions separately
-        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+        // voteId에 종속된 voteOption 리스트 추출
+        Map<Long, List<VoteOption>> voteOptionsMap = fetch.stream()
             .collect(Collectors.toMap(
                 PostSearchResponse::getVoteId,
-                response -> queryFactory.select(voteOption.content)
+                response -> queryFactory.select(voteOption)
                     .from(voteOption)
                     .where(voteOption.vote.id.eq(response.getVoteId()))
                     .fetch()
             ));
 
-        // Set voteOptions for each PostSearchResponse
         fetch.forEach(response -> {
-            List<String> options = voteOptionsMap.get(response.getVoteId());
-            response.setVoteOptions(options);
+            // voteOption을 voteOptionListResult로 변환
+            List<VoteOptionListResult> voteOptionListResult = voteOptionsMap.get(
+                    response.getVoteId()).stream()
+                .map(e -> e.toVoteOptionListResult()).toList();
+
+            response.setVoteOptions(voteOptionListResult);
         });
 
         long count = findMyVoteHistoryForCount(userId);
@@ -260,6 +270,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 new QPostSearchResponse(
                     post.id,
                     post.vote.id,
+                    post.vote.title,
                     post.comments.size(),
                     post.starPosts.size(),
                     JPAExpressions
@@ -270,8 +281,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                     post.user.profileImageUrl,
                     post.createdAt,
                     post.vote.endDate,
-                    post.vote.isTerminated,
-                    Expressions.constant(new ArrayList<>())
+                    post.vote.isTerminated
                 )
             )
             .from(post)
@@ -281,20 +291,23 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             .orderBy(post.createdAt.desc())
             .fetch();
 
-        // Fetch voteOptions separately
-        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+        // voteId에 종속된 voteOption 리스트 추출
+        Map<Long, List<VoteOption>> voteOptionsMap = fetch.stream()
             .collect(Collectors.toMap(
                 PostSearchResponse::getVoteId,
-                response -> queryFactory.select(voteOption.content)
+                response -> queryFactory.select(voteOption)
                     .from(voteOption)
                     .where(voteOption.vote.id.eq(response.getVoteId()))
                     .fetch()
             ));
 
-        // Set voteOptions for each PostSearchResponse
         fetch.forEach(response -> {
-            List<String> options = voteOptionsMap.get(response.getVoteId());
-            response.setVoteOptions(options);
+            // voteOption을 voteOptionListResult로 변환
+            List<VoteOptionListResult> voteOptionListResult = voteOptionsMap.get(
+                    response.getVoteId()).stream()
+                .map(e -> e.toVoteOptionListResult()).toList();
+
+            response.setVoteOptions(voteOptionListResult);
         });
 
         long count = findMyPostingForCount(userId);
@@ -352,6 +365,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 new QPostSearchResponse(
                     post.id,
                     post.vote.id,
+                    post.vote.title,
                     post.comments.size(),
                     post.starPosts.size(),
                     JPAExpressions
@@ -362,8 +376,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                     post.user.profileImageUrl,
                     post.createdAt,
                     post.vote.endDate,
-                    post.vote.isTerminated,
-                    Expressions.constant(new ArrayList<>())
+                    post.vote.isTerminated
                 )
             )
             .from(post)
@@ -376,26 +389,30 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
             .orderBy(post.createdAt.desc())
             .fetch();
 
-        // Fetch voteOptions separately
-        Map<Long, List<String>> voteOptionsMap = fetch.stream()
+        // voteId에 종속된 voteOption 리스트 추출
+        Map<Long, List<VoteOption>> voteOptionsMap = fetch.stream()
             .collect(Collectors.toMap(
                 PostSearchResponse::getVoteId,
-                response -> queryFactory.select(voteOption.content)
+                response -> queryFactory.select(voteOption)
                     .from(voteOption)
                     .where(voteOption.vote.id.eq(response.getVoteId()))
                     .fetch()
             ));
 
-        // Set voteOptions for each PostSearchResponse
         fetch.forEach(response -> {
-            List<String> options = voteOptionsMap.get(response.getVoteId());
-            response.setVoteOptions(options);
+            // voteOption을 voteOptionListResult로 변환
+            List<VoteOptionListResult> voteOptionListResult = voteOptionsMap.get(
+                    response.getVoteId()).stream()
+                .map(e -> e.toVoteOptionListResult()).toList();
+
+            response.setVoteOptions(voteOptionListResult);
         });
 
         long count = searchForCount(request);
 
         return new PageImpl<>(fetch, pageable, count);
     }
+
 
     private long searchForCount(PostSearchRequest request) {
         Long count = queryFactory
