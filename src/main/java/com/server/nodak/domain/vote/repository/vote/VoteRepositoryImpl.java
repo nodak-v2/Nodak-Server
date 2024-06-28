@@ -131,6 +131,7 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
             .totalNumber(
                 voteOptionResults.stream().map(e -> e.getCount()).reduce((x, y) -> x + y).get())
             .voteOptions(voteOptionResults)
+            .isTerminated(voteResults.get(0).getIsTerminated())
             .build();
     }
 
@@ -144,6 +145,7 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
             .totalNumber(
                 voteOptionResults.stream().map(e -> e.getCount()).reduce((x, y) -> x + y).get())
             .voteOptions(voteOptionResults)
+            .isTerminated(voteResults.get(0).getIsTerminated())
             .build();
     }
 }
