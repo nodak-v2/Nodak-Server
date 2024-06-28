@@ -15,4 +15,6 @@ public interface UserRepository {
     Optional<User> findByNickname(String nickname);
 
     Optional<UserInfoDTO> getUserInfo(Long userId, Long myId);
+
+    long count();
 }

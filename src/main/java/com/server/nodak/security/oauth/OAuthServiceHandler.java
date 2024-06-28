@@ -1,5 +1,7 @@
 package com.server.nodak.security.oauth;
 
+import static com.server.nodak.domain.user.domain.User.createUser;
+
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.DataNotFoundException;
@@ -7,20 +9,18 @@ import com.server.nodak.security.NodakAuthentication;
 import com.server.nodak.security.oauth.user.OAuthUserInfo;
 import com.server.nodak.security.oauth.user.OAuthUserInfoFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
-import static com.server.nodak.domain.user.domain.User.*;
-
 @Service
 @RequiredArgsConstructor
 public class OAuthServiceHandler extends DefaultOAuth2UserService {
+
+    private final static String DEFAULT_NICKNAME = "피키";
+
     private final UserRepository userRepository;
 
     @Override
@@ -32,7 +32,7 @@ public class OAuthServiceHandler extends DefaultOAuth2UserService {
 
     private OAuth2User processOAuth2User(OAuth2UserRequest userRequest, OAuth2User oAuth2User) {
         OAuthUserInfo oAuthUserInfo = OAuthUserInfoFactory.getOAuthUserInfo(
-                userRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes()
+            userRequest.getClientRegistration().getRegistrationId(), oAuth2User.getAttributes()
         );
 
         if (oAuthUserInfo.getEmail().isEmpty()) {
@@ -57,11 +57,13 @@ public class OAuthServiceHandler extends DefaultOAuth2UserService {
     }
 
     private User registerUser(OAuthUserInfo oAuthUserInfo) {
+        long count = userRepository.count();
+        
         User user = createUser(
-                oAuthUserInfo.getEmail(),
-                "NO_PASS",
-                UUID.randomUUID().toString(),
-                oAuthUserInfo.getProvider()
+            oAuthUserInfo.getEmail(),
+            "NO_PASS",
+            String.format("%s %d", DEFAULT_NICKNAME, count),
+            oAuthUserInfo.getProvider()
         );
 
         return userRepository.save(user);
