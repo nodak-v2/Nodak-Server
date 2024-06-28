@@ -109,6 +109,7 @@ public class Post extends BaseEntity {
         return PostSearchResponse.builder()
             .postId(this.getId())
             .voteId(this.vote.getId())
+            .voteTitle(this.vote.getTitle())
             .commentCount(this.comments.size())
             .likeCount(this.starPosts.size())
             .voterCount(voterCount)
