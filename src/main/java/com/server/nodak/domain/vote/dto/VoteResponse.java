@@ -22,5 +22,7 @@ public class VoteResponse {
 
     private int totalNumber;
 
+    private boolean isTerminated;
+
     private List<VoteOptionDetailResult> voteOptions;
 }

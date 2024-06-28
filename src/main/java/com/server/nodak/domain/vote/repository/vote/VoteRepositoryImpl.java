@@ -37,7 +37,8 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
                         .where(voteHistory.voteOption.in(vote.voteOptions),
                             voteHistory.user.id.eq(userId))
                         .limit(1),
-                    voteOption.id
+                    voteOption.id,
+                    vote.isTerminated
                 )
             )
             .from(vote)
@@ -71,7 +72,7 @@ public class VoteRepositoryImpl implements VoteRepositoryCustom {
     public VoteResponse findVoteBefore(Long voteId) {
 
         List<VoteResult> voteResults = queryFactory.select(
-                new QVoteResult(vote.id, vote.title, voteOption.id)
+                new QVoteResult(vote.id, vote.title, voteOption.id, vote.isTerminated)
             )
             .from(vote)
             .innerJoin(voteOption)
