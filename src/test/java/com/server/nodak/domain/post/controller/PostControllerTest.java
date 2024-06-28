@@ -64,7 +64,10 @@ class PostControllerTest {
         // Given
 
         // When
-        ResultActions resultActions = mockMvc.perform(get("/posts/search"));
+        ResultActions resultActions = mockMvc.perform(get("/posts/search")
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{}")
+        );
 
         // Then
         resultActions.andExpect(status().isOk());
