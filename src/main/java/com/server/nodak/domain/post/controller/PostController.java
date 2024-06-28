@@ -33,8 +33,9 @@ public class PostController {
 
     @GetMapping("/search")
     public ResponseEntity<ApiResponse<Page<PostSearchResponse>>> postSearch(
-        @RequestBody PostSearchRequest request,
-        @PageableDefault Pageable pageable) {
+        String keyword, Long categoryId, @PageableDefault Pageable pageable) {
+        PostSearchRequest request = PostSearchRequest.builder().keyword(keyword)
+            .categoryId(categoryId).build();
         Page<PostSearchResponse> response = postService.findPostBySearch(request, pageable);
         return ResponseEntity.ok(ApiResponse.success(response));
     }
