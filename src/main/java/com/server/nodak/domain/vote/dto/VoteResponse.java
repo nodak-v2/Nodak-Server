@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VoteResponse {
+
     private Long voteId;
 
     private String voteTitle;
@@ -21,5 +22,5 @@ public class VoteResponse {
 
     private int totalNumber;
 
-    private List<VoteOptionResult> voteOptions;
+    private List<VoteOptionDetailResult> voteOptions;
 }

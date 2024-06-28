@@ -12,9 +12,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VoteResult {
+
     private Long voteId;
     private String voteTitle;
-    private List<VoteOptionResult> voteOptions;
+    private List<VoteOptionDetailResult> voteOptions;
     private Boolean hasVoted;
     private Long voteOptionId;
     private List<Long> voteOptionIds;
@@ -31,7 +32,7 @@ public class VoteResult {
 
     @QueryProjection
     public VoteResult(Long voteId, String voteTitle, Long choiceVoteOptionId,
-                      Long voteOptionId) {
+        Long voteOptionId) {
         this.voteId = voteId;
         this.voteTitle = voteTitle;
         this.hasVoted = true;
