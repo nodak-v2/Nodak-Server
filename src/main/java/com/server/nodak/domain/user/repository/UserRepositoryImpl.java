@@ -25,6 +25,11 @@ public class UserRepositoryImpl implements UserRepository {
     private final UserJpaRepository userJpaRepository;
 
     @Override
+    public long count() {
+        return userJpaRepository.count();
+    }
+
+    @Override
     public Optional<User> findById(Long userId) {
         return userJpaRepository.findById(userId);
     }
@@ -47,48 +52,48 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public Optional<UserInfoDTO> getUserInfo(Long userId, Long myId) {
         UserInfoDTO fetch = queryFactory.select(
-                        new QUserInfoDTO(
-                                user.id,
-                                user.email,
-                                user.nickname,
-                                user.profileImageUrl,
-                                user.posts.size().longValue(),
-                                JPAExpressions
-                                        .select(voteHistory.count())
-                                        .from(voteHistory)
-                                        .where(voteHistory.user.id.eq(userId)),
-                                JPAExpressions
-                                        .select(comment.count())
-                                        .from(comment)
-                                        .where(comment.user.id.in(userId))
-                                        .where(comment.isDeleted.eq(false)),
-                                JPAExpressions
-                                        .select(starPost.count())
-                                        .from(starPost)
-                                        .where(starPost.user.id.in(userId))
-                                        .where(starPost.isDeleted.eq(false)),
-                                JPAExpressions
-                                        .select(follow.count())
-                                        .from(follow)
-                                        .where(follow.follower.id.in(userId))
-                                        .where(follow.isDeleted.eq(false)),
-                                JPAExpressions
-                                        .select(follow.count())
-                                        .from(follow)
-                                        .where(follow.followee.id.in(userId))
-                                        .where(follow.isDeleted.eq(false)),
-                                myId != null ? (
-                                        JPAExpressions.selectOne()
-                                                .from(follow)
-                                                .where(follow.follower.id.eq(myId).and(follow.followee.id.eq(userId)))
-                                                .where(follow.isDeleted.eq(false))
-                                                .exists()
-                                ) : Expressions.FALSE
-                        )
+                new QUserInfoDTO(
+                    user.id,
+                    user.email,
+                    user.nickname,
+                    user.profileImageUrl,
+                    user.posts.size().longValue(),
+                    JPAExpressions
+                        .select(voteHistory.count())
+                        .from(voteHistory)
+                        .where(voteHistory.user.id.eq(userId)),
+                    JPAExpressions
+                        .select(comment.count())
+                        .from(comment)
+                        .where(comment.user.id.in(userId))
+                        .where(comment.isDeleted.eq(false)),
+                    JPAExpressions
+                        .select(starPost.count())
+                        .from(starPost)
+                        .where(starPost.user.id.in(userId))
+                        .where(starPost.isDeleted.eq(false)),
+                    JPAExpressions
+                        .select(follow.count())
+                        .from(follow)
+                        .where(follow.follower.id.in(userId))
+                        .where(follow.isDeleted.eq(false)),
+                    JPAExpressions
+                        .select(follow.count())
+                        .from(follow)
+                        .where(follow.followee.id.in(userId))
+                        .where(follow.isDeleted.eq(false)),
+                    myId != null ? (
+                        JPAExpressions.selectOne()
+                            .from(follow)
+                            .where(follow.follower.id.eq(myId).and(follow.followee.id.eq(userId)))
+                            .where(follow.isDeleted.eq(false))
+                            .exists()
+                    ) : Expressions.FALSE
                 )
-                .from(user)
-                .where(user.id.eq(userId))
-                .fetchOne();
+            )
+            .from(user)
+            .where(user.id.eq(userId))
+            .fetchOne();
         return Optional.ofNullable(fetch);
     }
 }
