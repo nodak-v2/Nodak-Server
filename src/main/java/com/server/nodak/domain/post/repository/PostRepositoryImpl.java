@@ -359,6 +359,54 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
     }
 
     @Override
+    public List<PostSearchResponse> findUserInfo(Long userId) {
+        List<PostSearchResponse> fetch = queryFactory.select(
+                new QPostSearchResponse(
+                    post.id,
+                    post.vote.id,
+                    post.vote.title,
+                    post.comments.size(),
+                    post.starPosts.size(),
+                    JPAExpressions
+                        .select(voteHistory.count())
+                        .from(voteHistory)
+                        .where(voteHistory.voteOption.in(post.vote.voteOptions)),
+                    post.user.nickname,
+                    post.user.profileImageUrl,
+                    post.createdAt,
+                    post.vote.endDate,
+                    post.vote.isTerminated
+                )
+            )
+            .from(post)
+            .where(
+                post.user.id.eq(userId)
+            )
+            .fetch();
+        
+        // voteId에 종속된 voteOption 리스트 추출
+        Map<Long, List<VoteOption>> voteOptionsMap = fetch.stream()
+            .collect(Collectors.toMap(
+                PostSearchResponse::getVoteId,
+                response -> queryFactory.select(voteOption)
+                    .from(voteOption)
+                    .where(voteOption.vote.id.eq(response.getVoteId()))
+                    .fetch()
+            ));
+
+        fetch.forEach(response -> {
+            // voteOption을 voteOptionListResult로 변환
+            List<VoteOptionListResult> voteOptionListResult = voteOptionsMap.get(
+                    response.getVoteId()).stream()
+                .map(e -> e.toVoteOptionListResult()).toList();
+
+            response.setVoteOptions(voteOptionListResult);
+        });
+
+        return fetch;
+    }
+
+    @Override
     public Page<PostSearchResponse> search(PostSearchRequest request, Pageable pageable) {
         QVoteOption voteOption = QVoteOption.voteOption;
 
