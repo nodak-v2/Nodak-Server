@@ -30,7 +30,7 @@ public class ReplyController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
-    @PatchMapping
+    @DeleteMapping
     @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<Void>> deleteReply(Principal principal,
                                                                   @RequestBody DeleteReplyRequest deleteRequest) {
