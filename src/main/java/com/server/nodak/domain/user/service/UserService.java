@@ -1,6 +1,5 @@
 package com.server.nodak.domain.user.service;
 
-import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.user.domain.User;
@@ -28,6 +27,7 @@ import org.springframework.util.StringUtils;
 @Service
 @RequiredArgsConstructor
 public class UserService {
+
     private final static int HISTORY_EXPIRATION_DAYS = 30;
     private final UserRepository userRepository;
     private final UserHistoryRepository userHistoryRepository;
@@ -47,13 +47,11 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserInfoResponse getUserInfo(Long userId, Long myId) {
         UserInfoDTO userInfoDTO = userRepository.getUserInfo(userId, myId)
-                .orElseThrow(() -> new DataNotFoundException());
+            .orElseThrow(() -> new DataNotFoundException());
 
-        List<Post> userPosts = postRepository.findByUserId(userId);
+        List<PostSearchResponse> userInfo = postRepository.findUserInfo(userId);
 
-        List<PostSearchResponse> postResponse = userPosts.stream().map(post -> post.toSearchResponse()).toList();
-
-        UserInfoResponse userInfoResponse = userInfoDTO.toUserInfoResponse(postResponse);
+        UserInfoResponse userInfoResponse = userInfoDTO.toUserInfoResponse(userInfo);
 
         return userInfoResponse;
     }
@@ -85,8 +83,8 @@ public class UserService {
         LocalDateTime startAt = endAt.minusDays(HISTORY_EXPIRATION_DAYS - 1);
 
         List<UserHistory> histories = userHistoryRepository.findByActionDateTimeBetweenAndUserIdOrderByActionDateTime(
-                startAt,
-                endAt, userId);
+            startAt,
+            endAt, userId);
 
         List<UserHistoryListResponse> result = new ArrayList<>();
 
@@ -99,22 +97,22 @@ public class UserService {
                 }
 
                 if (startAt.plusDays(i).toLocalDate()
-                        .equals(histories.get(historiesIdx).getActionDateTime().toLocalDate())) {
+                    .equals(histories.get(historiesIdx).getActionDateTime().toLocalDate())) {
                     result.add(histories.get(historiesIdx).toListResponse());
                     historiesIdx++;
                 } else {
                     result.add(UserHistoryListResponse.builder()
-                            .date(startAt.plusDays(i).toLocalDate())
-                            .level(1L)
-                            .build());
+                        .date(startAt.plusDays(i).toLocalDate())
+                        .level(1L)
+                        .build());
                 }
             }
         } else {
             for (long i = 0; i < HISTORY_EXPIRATION_DAYS; i++) {
                 result.add(UserHistoryListResponse.builder()
-                        .date(startAt.plusDays(i).toLocalDate())
-                        .level(1L)
-                        .build());
+                    .date(startAt.plusDays(i).toLocalDate())
+                    .level(1L)
+                    .build());
             }
         }
 
