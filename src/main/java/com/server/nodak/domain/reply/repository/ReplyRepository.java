@@ -9,7 +9,7 @@ import java.util.Optional;
 
 public interface ReplyRepository {
 
-    Optional<Reply> findByCommentId(Long commentId);
+    List<Reply> findByCommentId(Long commentId);
     List<Reply> getAllByUserId(Long userId);
     void save(Reply reply);
     void delete(Reply reply);

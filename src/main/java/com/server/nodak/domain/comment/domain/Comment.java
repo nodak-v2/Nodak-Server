@@ -22,8 +22,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Table(name = "comment")
-@SQLDelete(sql = "UPDATE comment SET is_deleted = true WHERE id = ?")
-@SQLRestriction("is_deleted = false")
 public class Comment extends BaseEntity {
 
     @NotBlank
@@ -38,6 +36,7 @@ public class Comment extends BaseEntity {
     @JoinColumn(name = "post_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private Post post;
 
+    @Setter
     @Column(name = "is_deleted", columnDefinition = "TINYINT(1)")
     @ColumnDefault("false")
     private boolean isDeleted;

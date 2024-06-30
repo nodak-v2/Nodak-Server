@@ -10,6 +10,8 @@ import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.reply.dto.MyCommentHistory;
 import com.server.nodak.domain.reply.dto.MyReplyHistory;
+import com.server.nodak.domain.reply.entity.Reply;
+import com.server.nodak.domain.reply.repository.ReplyRepository;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserHistoryRepository;
 import com.server.nodak.domain.user.repository.UserRepository;
@@ -29,10 +31,10 @@ public class CommentService {
 
     private final CommentRepository commentRepository;
     private final CommentJpaRepository commentJpaRepository;
+    private final ReplyRepository replyRepository;
 
     private final PostRepository postRepository;
     private final UserRepository userRepository;
-    private final UserHistoryRepository userHistoryRepository;
 
     @Transactional
     public void createComment(long postId, long userId, CreateCommentRequest commentRequest) {
@@ -79,7 +81,7 @@ public class CommentService {
         findUser(userId);
         Comment comment = getComment(commentId);
 
-        if (comment.getUser().getId() != userId) {
+        if (comment.getUser().getId() != userId || comment.isDeleted()) {
             throw new BadRequestException();
         }
 
@@ -96,7 +98,15 @@ public class CommentService {
         if (comment.getUser().getId() != userId) {
             throw new BadRequestException();
         }
-        commentRepository.delete(comment);
+
+        List<Reply> replyList = replyRepository.findByCommentId(commentId);
+
+        if (replyList.isEmpty()) {
+            commentRepository.delete(comment);
+        } else {
+            comment.setContent("삭제된 댓글입니다.");
+            comment.setDeleted(true);
+        }
     }
 
     private Comment getComment(long commentId) {

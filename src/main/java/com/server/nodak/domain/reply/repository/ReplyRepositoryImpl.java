@@ -15,7 +15,7 @@ public class ReplyRepositoryImpl implements ReplyRepository {
     private final ReplyJpaRepository replyJpaRepository;
 
     @Override
-    public Optional<Reply> findByCommentId(Long commentId) {
+    public List<Reply> findByCommentId(Long commentId) {
         return replyJpaRepository.findByCommentId(commentId);
     }
 
