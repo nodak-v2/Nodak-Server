@@ -11,11 +11,15 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
+
     @Override
     Page<PostSearchResponse> search(PostSearchRequest request, Pageable pageable);
 
     @Override
     Optional<PostResponse> findOne(Long userId, Long postId);
+
+    @Override
+    List<PostSearchResponse> findUserInfo(Long userId);
 
     Optional<Post> findByIdAndUserId(Long postId, Long userId);
 
