@@ -54,7 +54,7 @@ public class ReplyService {
             throw new BadRequestException("유저가 작성한 대댓글이 아닙니다.");
         }
 
-        reply.setDeleted(true);
+        replyRepository.delete(reply);
     }
 
     public List<ReplyResponse> getAllByCommentId(Long commentId) {
