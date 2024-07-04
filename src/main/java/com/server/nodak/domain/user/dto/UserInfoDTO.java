@@ -5,9 +5,7 @@ import com.querydsl.core.annotations.QueryProjection;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
 import com.server.nodak.domain.user.domain.User;
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +14,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UserInfoDTO {
+
     private Long userId;
     private String email;
     private String nickname;
@@ -33,8 +32,9 @@ public class UserInfoDTO {
     private Long followeeCount;
     private Boolean isFollowing;
 
-    protected UserInfoDTO(User user, Long postCount, Long voteCount, Long commentCount, Long likeCount,
-                          Long followerCount) {
+    protected UserInfoDTO(User user, Long postCount, Long voteCount, Long commentCount,
+        Long likeCount,
+        Long followerCount) {
         this.userId = user.getId();
         this.email = user.getEmail();
         this.nickname = user.getNickname();
@@ -58,8 +58,8 @@ public class UserInfoDTO {
 
     @QueryProjection
     public UserInfoDTO(Long userId, String email, String nickname, String profileImageUrl,
-                       Long postCount, Long voteCount, Long commentCount, Long likeCount,
-                       Long followerCount, Long followeeCount, Boolean isFollowing) {
+        Long postCount, Long voteCount, Long commentCount, Long likeCount,
+        Long followerCount, Long followeeCount, Boolean isFollowing) {
         this.userId = userId;
         this.email = email;
         this.nickname = nickname;
@@ -74,9 +74,10 @@ public class UserInfoDTO {
     }
 
     @QueryProjection
-    public UserInfoDTO(Long userId, String email, String nickname, String profileImageUrl, String introduction,
-                       LocalDateTime createdAt, LocalDateTime updatedAt, Long followerCount,
-                       Long followeeCount) {
+    public UserInfoDTO(Long userId, String email, String nickname, String profileImageUrl,
+        String introduction,
+        LocalDateTime createdAt, LocalDateTime updatedAt, Long followerCount,
+        Long followeeCount) {
         this.userId = userId;
         this.email = email;
         this.nickname = nickname;
@@ -89,8 +90,8 @@ public class UserInfoDTO {
     }
 
     public static UserInfoDTO of(User user, Long postCount, Long voteCount, Long commentCount,
-                                 Long likeCount,
-                                 Long followerCount) {
+        Long likeCount,
+        Long followerCount) {
         return new UserInfoDTO(user, postCount, voteCount, commentCount, likeCount, followerCount);
     }
 
@@ -99,24 +100,25 @@ public class UserInfoDTO {
     }
 
     public UserInfoResponse toUserInfoResponse(List<PostSearchResponse> userPosts) {
-        Map<String, Integer> badge = new HashMap<>();
-        badge.put("posting", 1);
-        badge.put("voting", 1);
-        badge.put("comment", 1);
-        badge.put("love", 1);
-        badge.put("follower", 1);
+        BadgeResponse badge = BadgeResponse.builder()
+            .posting(this.postCount)
+            .follow(this.followerCount)
+            .voting(this.voteCount)
+            .comment(this.commentCount)
+            .like(this.likeCount)
+            .build();
 
         return UserInfoResponse.builder()
-                .userId(this.userId)
-                .email(this.email)
-                .nickname(this.nickname)
-                .profileImageUrl(this.profileImageUrl)
-                .postCount(this.postCount)
-                .followerCount(this.followerCount)
-                .followeeCount(this.followeeCount)
-                .isFollowing(isFollowing)
-                .badge(badge)
-                .posts(userPosts)
-                .build();
+            .userId(this.userId)
+            .email(this.email)
+            .nickname(this.nickname)
+            .profileImageUrl(this.profileImageUrl)
+            .postCount(this.postCount)
+            .followerCount(this.followerCount)
+            .followeeCount(this.followeeCount)
+            .isFollowing(isFollowing)
+            .badge(badge)
+            .posts(userPosts)
+            .build();
     }
 }
