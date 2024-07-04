@@ -9,4 +9,8 @@ public class ConflictException extends BaseException {
     public ConflictException(String message) {
         super(409, message);
     }
+
+    public ConflictException(int code, String message) {
+        super(code, message);
+    }
 }
