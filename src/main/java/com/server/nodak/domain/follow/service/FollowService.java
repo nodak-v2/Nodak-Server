@@ -76,11 +76,11 @@ public class FollowService {
     public List<UserInfoDTO> getFollowers(Long userId) {
         List<User> followers = followRepository.getFollowersByUserId(userId);
 
-        long followerCount = followRepository.getUserFollowerCount(userId);
-        long followeeCount = followRepository.getUserFolloweeCount(userId);
-
         return followers.stream()
-                .map(user -> UserInfoDTO.of(user, followerCount, followeeCount))
+                .map(user -> UserInfoDTO.of(user,
+                                followRepository.getUserFollowerCount(user.getId()),
+                                followRepository.getUserFolloweeCount(user.getId()))
+                )
                 .collect(Collectors.toList());
     }
 
@@ -88,11 +88,11 @@ public class FollowService {
     public List<UserInfoDTO> getFollowees(Long userId) {
         List<User> followees = followRepository.getFolloweesByUserId(userId);
 
-        long followerCount = followRepository.getUserFollowerCount(userId);
-        long followeeCount = followRepository.getUserFolloweeCount(userId);
-
         return followees.stream()
-                .map(user -> UserInfoDTO.of(user, followerCount, followeeCount))
+                .map(user -> UserInfoDTO.of(user,
+                        followRepository.getUserFollowerCount(user.getId()),
+                        followRepository.getUserFolloweeCount(user.getId()))
+                )
                 .collect(Collectors.toList());
     }
 }
