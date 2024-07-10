@@ -75,12 +75,12 @@ public class UserRepositoryImpl implements UserRepository {
                     JPAExpressions
                         .select(follow.count())
                         .from(follow)
-                        .where(follow.follower.id.in(userId))
+                        .where(follow.followee.id.in(userId))
                         .where(follow.isDeleted.eq(false)),
                     JPAExpressions
                         .select(follow.count())
                         .from(follow)
-                        .where(follow.followee.id.in(userId))
+                        .where(follow.follower.id.in(userId))
                         .where(follow.isDeleted.eq(false)),
                     myId != null ? (
                         JPAExpressions.selectOne()
