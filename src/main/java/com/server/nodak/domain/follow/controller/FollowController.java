@@ -46,4 +46,16 @@ public class FollowController {
         List<UserInfoDTO> followees = followService.getFollowees(Long.parseLong(principal.getName()));
         return ResponseEntity.ok(ApiResponse.success(followees));
     }
+
+    @GetMapping("/followers/{userId}")
+    public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getUserFollowers(@PathVariable("userId") Long userId) {
+        List<UserInfoDTO> followers = followService.getFollowers(userId);
+        return ResponseEntity.ok(ApiResponse.success(followers));
+    }
+
+    @GetMapping("/followees/{userId}")
+    public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getUserFollowees(@PathVariable("userId") Long userId) {
+        List<UserInfoDTO> followees = followService.getFollowees(userId);
+        return ResponseEntity.ok(ApiResponse.success(followees));
+    }
 }
