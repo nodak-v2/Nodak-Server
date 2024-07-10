@@ -1,9 +1,7 @@
 package com.server.nodak.domain.user.dto;
 
 import com.server.nodak.domain.post.dto.PostSearchResponse;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -31,7 +29,7 @@ public class UserInfoResponse {
 
     private Boolean isFollowing;
 
-    private Map<String, Integer> badge = new HashMap<>();
+    private BadgeResponse badge;
 
     private List<PostSearchResponse> posts;
 

@@ -101,13 +101,13 @@ public class PostService {
             starPostRepository.save(starPost);
             return;
         }
-        throw new ConflictException();
+        throw new ConflictException(200, "좋아요는 1회만 가능합니다.");
     }
 
     @Transactional
     public void cancleLike(Long userId, Long postId) {
         StarPost starPost = starPostRepository.findByUserIdAndPostId(userId, postId)
-            .orElseThrow(() -> new BadRequestException());
+            .orElseThrow(() -> new ConflictException(200, "취소할 좋아요 기록이 존재하지 않습니다."));
         starPost.delete(true);
         starPostRepository.save(starPost);
     }
