@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PostResponse {
 
+    private Long authorId;
     private String author;
     private Boolean isAuthor;
     private Integer commentSize;
@@ -24,10 +25,11 @@ public class PostResponse {
     private String categoryName;
 
     @QueryProjection
-    public PostResponse(String author, Boolean isAuthor, Integer commentSize,
+    public PostResponse(Long authorId, String author, Boolean isAuthor, Integer commentSize,
         String profileImageUrl,
         LocalDateTime createdAt,
         String content, Integer starCount, Boolean checkStar, String categoryName) {
+        this.authorId = authorId;
         this.author = author;
         this.isAuthor = isAuthor;
         this.commentSize = commentSize;
