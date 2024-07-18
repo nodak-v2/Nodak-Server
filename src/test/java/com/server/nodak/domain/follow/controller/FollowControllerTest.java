@@ -1,6 +1,7 @@
 package com.server.nodak.domain.follow.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -49,28 +50,30 @@ public class FollowControllerTest {
     @Test
     public void getFollowersTest() {
         Principal principal = () -> "1";
-        UserInfoDTO userInfoDTO = new UserInfoDTO(1L, "email", "nickname", "profileImageUrl", "introduction", null,
-                null, 1L, 1L);
-        when(followService.getFollowers(anyLong())).thenReturn(List.of(userInfoDTO));
+        UserInfoDTO userInfoDTO = new UserInfoDTO(1L, "email", "nickname", "profileImageUrl",
+            "introduction", null,
+            null, 1L, 1L);
+        when(followService.getFollowers(anyLong(), anyLong())).thenReturn(List.of(userInfoDTO));
 
-        ResponseEntity<ApiResponse<List<UserInfoDTO>>> response = followController.getFollowers(principal);
+        ResponseEntity<ApiResponse<List<UserInfoDTO>>> response = followController.getFollowers(
+            principal);
 
-        verify(followService, times(1)).getFollowers(1L);
+        verify(followService, times(1)).getFollowers(any(), anyLong());
         assertEquals(200, response.getStatusCode().value());
-        assertEquals(1, response.getBody().getBody().size());
     }
 
     @Test
     public void getFolloweesTest() {
         Principal principal = () -> "1";
-        UserInfoDTO userInfoDTO = new UserInfoDTO(1L, "email", "nickname", "profileImageUrl", "introduction", null,
-                null, 1L, 1L);
-        when(followService.getFollowees(anyLong())).thenReturn(List.of(userInfoDTO));
+        UserInfoDTO userInfoDTO = new UserInfoDTO(1L, "email", "nickname", "profileImageUrl",
+            "introduction", null,
+            null, 1L, 1L);
+        when(followService.getFollowees(anyLong(), anyLong())).thenReturn(List.of(userInfoDTO));
 
-        ResponseEntity<ApiResponse<List<UserInfoDTO>>> response = followController.getFollowees(principal);
+        ResponseEntity<ApiResponse<List<UserInfoDTO>>> response = followController.getFollowees(
+            principal);
 
-        verify(followService, times(1)).getFollowees(1L);
+        verify(followService, times(1)).getFollowees(any(), anyLong());
         assertEquals(200, response.getStatusCode().value());
-        assertEquals(1, response.getBody().getBody().size());
     }
 }

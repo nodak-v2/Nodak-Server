@@ -89,6 +89,23 @@ public class UserInfoDTO {
         this.followeeCount = followeeCount;
     }
 
+    @QueryProjection
+    public UserInfoDTO(Long userId, String email, String nickname, String profileImageUrl,
+        String introduction,
+        LocalDateTime createdAt, LocalDateTime updatedAt, Long followerCount,
+        Long followeeCount, Boolean isFollowing) {
+        this.userId = userId;
+        this.email = email;
+        this.nickname = nickname;
+        this.profileImageUrl = profileImageUrl;
+        this.introduction = introduction;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.followerCount = followerCount;
+        this.followeeCount = followeeCount;
+        this.isFollowing = isFollowing;
+    }
+
     public static UserInfoDTO of(User user, Long postCount, Long voteCount, Long commentCount,
         Long likeCount,
         Long followerCount) {

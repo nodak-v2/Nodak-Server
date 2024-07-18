@@ -4,6 +4,7 @@ import com.server.nodak.domain.follow.service.FollowService;
 import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.domain.user.dto.UserInfoDTO;
 import com.server.nodak.global.common.response.ApiResponse;
+import com.server.nodak.security.SecurityUtils;
 import com.server.nodak.security.aop.AuthorizationRequired;
 import java.security.Principal;
 import java.util.List;
@@ -23,39 +24,52 @@ public class FollowController {
 
     @PostMapping("/follow/{followeeId}")
     @AuthorizationRequired(UserRole.GENERAL)
-    public ResponseEntity<ApiResponse<Void>> followUser(Principal principal, @PathVariable Long followeeId) {
+    public ResponseEntity<ApiResponse<Void>> followUser(Principal principal,
+        @PathVariable Long followeeId) {
         followService.followUser(Long.parseLong(principal.getName()), followeeId);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/unfollow/{followeeId}")
     @AuthorizationRequired(UserRole.GENERAL)
-    public ResponseEntity<ApiResponse<Void>> unfollowUser(Principal principal, @PathVariable Long followeeId) {
+    public ResponseEntity<ApiResponse<Void>> unfollowUser(Principal principal,
+        @PathVariable Long followeeId) {
         followService.unfollowUser(Long.parseLong(principal.getName()), followeeId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/followers")
     public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getFollowers(Principal principal) {
-        List<UserInfoDTO> followers = followService.getFollowers(Long.parseLong(principal.getName()));
+        List<UserInfoDTO> followers = followService.getFollowers(null,
+            Long.parseLong(principal.getName()));
         return ResponseEntity.ok(ApiResponse.success(followers));
     }
 
     @GetMapping("/followees")
     public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getFollowees(Principal principal) {
-        List<UserInfoDTO> followees = followService.getFollowees(Long.parseLong(principal.getName()));
+        List<UserInfoDTO> followees = followService.getFollowees(null,
+            Long.parseLong(principal.getName()));
         return ResponseEntity.ok(ApiResponse.success(followees));
     }
 
     @GetMapping("/followers/{userId}")
-    public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getUserFollowers(@PathVariable("userId") Long userId) {
-        List<UserInfoDTO> followers = followService.getFollowers(userId);
-        return ResponseEntity.ok(ApiResponse.success(followers));
+    public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getUserFollowers(
+        @PathVariable("userId") Long userId, Principal principal) {
+        if (SecurityUtils.isAuthenticated()) {
+            return ResponseEntity.ok(ApiResponse.success(
+                followService.getFollowers(Long.parseLong(principal.getName()), userId)));
+        }
+        return ResponseEntity.ok(ApiResponse.success(followService.getFollowers(null, userId)));
     }
 
     @GetMapping("/followees/{userId}")
-    public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getUserFollowees(@PathVariable("userId") Long userId) {
-        List<UserInfoDTO> followees = followService.getFollowees(userId);
-        return ResponseEntity.ok(ApiResponse.success(followees));
+    public ResponseEntity<ApiResponse<List<UserInfoDTO>>> getUserFollowees(
+        @PathVariable("userId") Long userId, Principal principal) {
+        if (SecurityUtils.isAuthenticated()) {
+            return ResponseEntity.ok(ApiResponse.success(
+                followService.getFollowees(Long.parseLong(principal.getName()), userId)));
+        }
+        return ResponseEntity.ok(ApiResponse.success(
+            followService.getFollowees(null, userId)));
     }
 }
