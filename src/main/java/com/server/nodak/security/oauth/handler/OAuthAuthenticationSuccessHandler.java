@@ -1,33 +1,33 @@
 package com.server.nodak.security.oauth.handler;
 
+import com.server.nodak.security.NodakAuthentication;
 import com.server.nodak.security.jwt.JwtProperties;
 import com.server.nodak.security.jwt.TokenProvider;
-import com.server.nodak.security.NodakAuthentication;
 import com.server.nodak.utils.HttpServletUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
-    private static final String REDIRECT_URI = "http://localhost:3000/redirect";
+
+    private static final String REDIRECT_URI = "https://picky-fe.vercel.app//redirect";
     private final TokenProvider tokenProvider;
     private final HttpServletUtils servletUtils;
     private final JwtProperties jwtProperties;
 
     @Override
-    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
+        Authentication authentication) throws IOException, ServletException {
         log.info("Success oauth authentication");
         if (response.isCommitted()) {
             return;
@@ -40,14 +40,17 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         String accessToken = tokenProvider.createAccessToken(userId);
         String refreshToken = tokenProvider.createAccessToken(userId);
 
-        servletUtils.addCookie(response, "AccessToken", accessToken, (int) jwtProperties.getAccessTokenExpiration());
-        servletUtils.addCookie(response, "RefreshToken", refreshToken, (int) jwtProperties.getRefreshTokenExpiration());
+        servletUtils.addCookie(response, "AccessToken", accessToken,
+            (int) jwtProperties.getAccessTokenExpiration());
+        servletUtils.addCookie(response, "RefreshToken", refreshToken,
+            (int) jwtProperties.getRefreshTokenExpiration());
 
         this.clearAuthenticationAttributes(request, response);
         this.getRedirectStrategy().sendRedirect(request, response, REDIRECT_URI);
     }
 
-    private void clearAuthenticationAttributes(HttpServletRequest request, HttpServletResponse response) {
+    private void clearAuthenticationAttributes(HttpServletRequest request,
+        HttpServletResponse response) {
         super.clearAuthenticationAttributes(request);
         servletUtils.removeCookie(request, response, "oauth2_auth_request");
     }
