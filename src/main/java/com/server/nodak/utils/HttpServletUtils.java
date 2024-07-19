@@ -26,7 +26,6 @@ public class HttpServletUtils {
         cookie.setHttpOnly(true);
         cookie.setMaxAge(seconds);
         cookie.setSecure(true);
-        cookie.setDomain("picky-fe.vercel.app");
         cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
@@ -39,7 +38,6 @@ public class HttpServletUtils {
             cookie.setHttpOnly(true);
             cookie.setMaxAge(0);
             cookie.setSecure(true);
-            cookie.setDomain("picky-fe.vercel.app");
             cookie.setAttribute("SameSite", "None");
             response.addCookie(cookie);
         }
