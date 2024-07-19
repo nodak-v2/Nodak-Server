@@ -1,17 +1,13 @@
 package com.server.nodak.utils;
 
+import static java.util.Optional.empty;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.springframework.http.ResponseCookie;
-import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 import java.util.Optional;
-
-import static java.util.Optional.empty;
+import org.springframework.stereotype.Component;
 
 @Component
 public class HttpServletUtils {
@@ -30,17 +26,20 @@ public class HttpServletUtils {
         cookie.setHttpOnly(true);
         cookie.setMaxAge(seconds);
         cookie.setSecure(true);
+        cookie.setDomain("https://picky-fe.vercel.app");
         cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
 
-    public void removeCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    public void removeCookie(HttpServletRequest request, HttpServletResponse response,
+        String name) {
         if (getCookie(request, name).isPresent()) {
             Cookie cookie = new Cookie(name, "");
             cookie.setPath("/");
             cookie.setHttpOnly(true);
             cookie.setMaxAge(0);
             cookie.setSecure(true);
+            cookie.setDomain("https://picky-fe.vercel.app");
             cookie.setAttribute("SameSite", "None");
             response.addCookie(cookie);
         }
@@ -55,10 +54,10 @@ public class HttpServletUtils {
     public Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
 
-        if(cookies != null && cookies.length > 0) {
+        if (cookies != null && cookies.length > 0) {
             return Arrays.stream(cookies)
-                    .filter(cookie -> cookie.getName().equals(name))
-                    .findAny();
+                .filter(cookie -> cookie.getName().equals(name))
+                .findAny();
         }
 
         return empty();
