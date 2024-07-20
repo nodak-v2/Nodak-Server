@@ -335,6 +335,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
         QStarPost starPost = QStarPost.starPost;
         PostResponse postResponse = queryFactory.select(
                 new QPostResponse(
+                    post.user.id,
                     post.user.nickname,
                     userId != null ?
                         post.user.id.eq(userId) : Expressions.FALSE,
@@ -383,7 +384,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 post.user.id.eq(userId)
             )
             .fetch();
-        
+
         // voteId에 종속된 voteOption 리스트 추출
         Map<Long, List<VoteOption>> voteOptionsMap = fetch.stream()
             .collect(Collectors.toMap(

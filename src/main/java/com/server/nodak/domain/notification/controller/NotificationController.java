@@ -57,22 +57,23 @@ public class NotificationController {
         }
     }
 
-    public void notifyFollowers(User user, Post post) {
-        followService.getFollowers(user.getId()).forEach(follower -> {
-            SseEmitter emitter = clients.get(follower.getUserId());
-
-            if (emitter != null) {
-                try {
-                    Map<String, Object> data = new HashMap<>();
-                    data.put("userId", user.getId());
-                    data.put("postId", post.getId());
-                    emitter.send(SseEmitter.event().name("newPost").data(data, MediaType.APPLICATION_JSON));
-                } catch (IOException e) {
-                    clients.remove(follower.getUserId());
-                }
-            }
-        });
-    }
+    // TODO: 추후 수정 필요
+//    public void notifyFollowers(User user, Post post) {
+//        followService.getFollowers(user.getId()).forEach(follower -> {
+//            SseEmitter emitter = clients.get(follower.getUserId());
+//
+//            if (emitter != null) {
+//                try {
+//                    Map<String, Object> data = new HashMap<>();
+//                    data.put("userId", user.getId());
+//                    data.put("postId", post.getId());
+//                    emitter.send(SseEmitter.event().name("newPost").data(data, MediaType.APPLICATION_JSON));
+//                } catch (IOException e) {
+//                    clients.remove(follower.getUserId());
+//                }
+//            }
+//        });
+//    }
 
     // TODO: 추가 구현 필요
     @GetMapping("/notifications")

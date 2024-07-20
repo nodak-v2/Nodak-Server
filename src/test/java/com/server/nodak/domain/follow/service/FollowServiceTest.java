@@ -42,8 +42,10 @@ class FollowServiceTest {
 
     @BeforeEach
     public void setUp() {
-        follower = Mockito.spy(User.createUser("follower@example.com", "password", "follower", UserProvider.KAKAO));
-        followee = Mockito.spy(User.createUser("followee@example.com", "password", "followee", UserProvider.KAKAO));
+        follower = Mockito.spy(
+            User.createUser("follower@example.com", "password", "follower", UserProvider.KAKAO));
+        followee = Mockito.spy(
+            User.createUser("followee@example.com", "password", "followee", UserProvider.KAKAO));
 
         given(follower.getId()).willReturn(1L);
         given(followee.getId()).willReturn(2L);
@@ -54,7 +56,8 @@ class FollowServiceTest {
     public void followUserTest() {
         given(userRepository.findById(1L)).willReturn(Optional.of(follower));
         given(userRepository.findById(2L)).willReturn(Optional.of(followee));
-        given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(Optional.empty());
+        given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(
+            Optional.empty());
 
         followService.followUser(1L, 2L);
 
@@ -66,7 +69,8 @@ class FollowServiceTest {
     public void followUserAlreadyFollowingTest() {
         given(userRepository.findById(1L)).willReturn(Optional.of(follower));
         given(userRepository.findById(2L)).willReturn(Optional.of(followee));
-        given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(Optional.of(new Follow()));
+        given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(
+            Optional.of(new Follow()));
 
         assertThrows(BadRequestException.class, () -> followService.followUser(1L, 2L));
     }
@@ -74,7 +78,8 @@ class FollowServiceTest {
     @Test
     @DisplayName("언팔로우 실패 - 존재하지 않는 관계")
     public void unfollowUserNotFoundTest() {
-        given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(Optional.empty());
+        given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(
+            Optional.empty());
 
         assertThrows(BadRequestException.class, () -> followService.unfollowUser(1L, 2L));
     }
@@ -82,12 +87,12 @@ class FollowServiceTest {
     @Test
     @DisplayName("팔로워 리스트 가져오기")
     public void getFollowersTest() {
-        List<User> followers = Collections.singletonList(follower);
-        given(followRepository.getFollowersByUserId(anyLong())).willReturn(followers);
+        List<UserInfoDTO> followers = Collections.singletonList(UserInfoDTO.of(follower, 3L, 3L));
+        given(followRepository.getFollowersByUserId(anyLong(), anyLong())).willReturn(followers);
         given(followRepository.getUserFollowerCount(anyLong())).willReturn(1L);
         given(followRepository.getUserFolloweeCount(anyLong())).willReturn(1L);
 
-        List<UserInfoDTO> result = followService.getFollowers(2L);
+        List<UserInfoDTO> result = followService.getFollowers(2L, 1L);
 
         assertEquals(1, result.size());
         assertEquals(follower.getId(), result.get(0).getUserId());
@@ -96,12 +101,12 @@ class FollowServiceTest {
     @Test
     @DisplayName("팔로우 리스트 가져오기")
     public void getFolloweesTest() {
-        List<User> followees = Collections.singletonList(followee);
-        given(followRepository.getFolloweesByUserId(anyLong())).willReturn(followees);
+        List<UserInfoDTO> followees = Collections.singletonList(UserInfoDTO.of(followee, 3L, 3L));
+        given(followRepository.getFolloweesByUserId(anyLong(), anyLong())).willReturn(followees);
         given(followRepository.getUserFollowerCount(anyLong())).willReturn(1L);
         given(followRepository.getUserFolloweeCount(anyLong())).willReturn(1L);
 
-        List<UserInfoDTO> result = followService.getFollowees(1L);
+        List<UserInfoDTO> result = followService.getFollowees(1L, 1L);
 
         assertEquals(1, result.size());
         assertEquals(followee.getId(), result.get(0).getUserId());
