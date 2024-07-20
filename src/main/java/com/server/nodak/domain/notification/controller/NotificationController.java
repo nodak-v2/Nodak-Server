@@ -5,10 +5,12 @@ import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.domain.UserRole;
 import com.server.nodak.exception.common.AuthorizationException;
+import com.server.nodak.global.common.response.ApiResponse;
 import com.server.nodak.security.aop.AuthorizationRequired;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -71,5 +73,13 @@ public class NotificationController {
                 }
             }
         });
+    }
+
+    // TODO: 추가 구현 필요
+    @GetMapping("/notifications")
+    @AuthorizationRequired(UserRole.GENERAL)
+    public ResponseEntity<ApiResponse<Void>> getNotifications(Principal principal) {
+        long userId = Long.parseLong(principal.getName());
+        return null;
     }
 }
