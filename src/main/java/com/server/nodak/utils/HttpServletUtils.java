@@ -26,7 +26,7 @@ public class HttpServletUtils {
         cookie.setHttpOnly(true);
         cookie.setMaxAge(seconds);
         cookie.setSecure(true);
-        cookie.setAttribute("SameSite", "Strict");
+        cookie.setAttribute("SameSite", "None");
         response.addCookie(cookie);
     }
 
@@ -38,7 +38,7 @@ public class HttpServletUtils {
             cookie.setHttpOnly(true);
             cookie.setMaxAge(0);
             cookie.setSecure(true);
-            cookie.setAttribute("SameSite", "Strict");
+            cookie.setAttribute("SameSite", "None");
             response.addCookie(cookie);
         }
 //        getCookie(request, name).ifPresent(cookie -> {
