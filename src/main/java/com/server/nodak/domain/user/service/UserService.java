@@ -19,6 +19,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -68,7 +69,12 @@ public class UserService {
             currentUser.updateDescription(userUpdateDTO.getDescription());
         }
 
-        if (StringUtils.hasText(userUpdateDTO.getProfileImageUrl())) {
+        if (Objects.nonNull(currentUser.getProfileImageUrl())) {            // DB의 이미지가 있는 경우
+            if (!currentUser.getProfileImageUrl()
+                .equals(userUpdateDTO.getProfileImageUrl())) {     // DB 이미지와 요청 이미지가 다른 경우
+                currentUser.updateImage(userUpdateDTO.getProfileImageUrl());
+            }
+        } else {
             currentUser.updateImage(userUpdateDTO.getProfileImageUrl());
         }
     }

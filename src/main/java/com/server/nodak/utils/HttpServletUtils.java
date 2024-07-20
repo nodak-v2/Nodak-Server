@@ -1,17 +1,13 @@
 package com.server.nodak.utils;
 
+import static java.util.Optional.empty;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
-import org.springframework.http.ResponseCookie;
-import org.springframework.stereotype.Component;
-
 import java.util.Arrays;
 import java.util.Optional;
-
-import static java.util.Optional.empty;
+import org.springframework.stereotype.Component;
 
 @Component
 public class HttpServletUtils {
@@ -34,7 +30,8 @@ public class HttpServletUtils {
         response.addCookie(cookie);
     }
 
-    public void removeCookie(HttpServletRequest request, HttpServletResponse response, String name) {
+    public void removeCookie(HttpServletRequest request, HttpServletResponse response,
+        String name) {
         if (getCookie(request, name).isPresent()) {
             Cookie cookie = new Cookie(name, "");
             cookie.setPath("/");
@@ -55,10 +52,10 @@ public class HttpServletUtils {
     public Optional<Cookie> getCookie(HttpServletRequest request, String name) {
         Cookie[] cookies = request.getCookies();
 
-        if(cookies != null && cookies.length > 0) {
+        if (cookies != null && cookies.length > 0) {
             return Arrays.stream(cookies)
-                    .filter(cookie -> cookie.getName().equals(name))
-                    .findAny();
+                .filter(cookie -> cookie.getName().equals(name))
+                .findAny();
         }
 
         return empty();

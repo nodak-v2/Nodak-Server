@@ -8,7 +8,6 @@ import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.exception.common.BadRequestException;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -40,7 +39,8 @@ public class FollowService {
         User follower = checkIfUserExists(userId);
         User followee = checkIfUserExists(followeeId);
 
-        Optional<Follow> followOptional = followRepository.checkIfDeletedFollowExists(userId, followeeId);
+        Optional<Follow> followOptional = followRepository.checkIfDeletedFollowExists(userId,
+            followeeId);
         if (followOptional.isPresent()) {
             followOptional.get().updateDelete(false);
             redisTemplate.opsForSet().add(String.valueOf(follower.getId()) + ":followee", followee.getId());
@@ -58,7 +58,7 @@ public class FollowService {
 
     private User checkIfUserExists(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new BadRequestException());
+            .orElseThrow(() -> new BadRequestException());
     }
 
     @Transactional
@@ -67,7 +67,7 @@ public class FollowService {
             throw new BadRequestException();
         }
         Follow follow = followRepository.getFollowByRelation(userId, followeeId)
-                .orElseThrow(() -> new BadRequestException("follow not found"));
+            .orElseThrow(() -> new BadRequestException("follow not found"));
 
         checkIfUserExists(userId);
         checkIfUserExists(followeeId);
@@ -77,26 +77,12 @@ public class FollowService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserInfoDTO> getFollowers(Long userId) {
-        List<User> followers = followRepository.getFollowersByUserId(userId);
-
-        return followers.stream()
-                .map(user -> UserInfoDTO.of(user,
-                                followRepository.getUserFollowerCount(user.getId()),
-                                followRepository.getUserFolloweeCount(user.getId()))
-                )
-                .collect(Collectors.toList());
+    public List<UserInfoDTO> getFollowers(Long myId, Long userId) {
+        return followRepository.getFollowersByUserId(myId, userId);
     }
 
     @Transactional(readOnly = true)
-    public List<UserInfoDTO> getFollowees(Long userId) {
-        List<User> followees = followRepository.getFolloweesByUserId(userId);
-
-        return followees.stream()
-                .map(user -> UserInfoDTO.of(user,
-                        followRepository.getUserFollowerCount(user.getId()),
-                        followRepository.getUserFolloweeCount(user.getId()))
-                )
-                .collect(Collectors.toList());
+    public List<UserInfoDTO> getFollowees(Long myId, Long userId) {
+        return followRepository.getFolloweesByUserId(myId, userId);
     }
 }
