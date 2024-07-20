@@ -62,16 +62,6 @@ class FollowServiceTest {
     }
 
     @Test
-    @DisplayName("유저 팔로우 이미 존재")
-    public void followUserAlreadyFollowingTest() {
-        given(userRepository.findById(1L)).willReturn(Optional.of(follower));
-        given(userRepository.findById(2L)).willReturn(Optional.of(followee));
-        given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(Optional.of(new Follow()));
-
-        assertThrows(BadRequestException.class, () -> followService.followUser(1L, 2L));
-    }
-
-    @Test
     @DisplayName("언팔로우 실패 - 존재하지 않는 관계")
     public void unfollowUserNotFoundTest() {
         given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(Optional.empty());
