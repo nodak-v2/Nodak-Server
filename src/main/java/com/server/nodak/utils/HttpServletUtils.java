@@ -35,12 +35,21 @@ public class HttpServletUtils {
     }
 
     public void removeCookie(HttpServletRequest request, HttpServletResponse response, String name) {
-        getCookie(request, name).ifPresent(cookie -> {
-            cookie.setValue("");
+        if (getCookie(request, name).isPresent()) {
+            Cookie cookie = new Cookie(name, "");
             cookie.setPath("/");
+            cookie.setHttpOnly(true);
             cookie.setMaxAge(0);
+            cookie.setSecure(true);
+            cookie.setAttribute("SameSite", "None");
             response.addCookie(cookie);
-        });
+        }
+//        getCookie(request, name).ifPresent(cookie -> {
+//            cookie.setValue("");
+//            cookie.setPath("/");
+//            cookie.setMaxAge(0);
+//            response.addCookie(cookie);
+//        });
     }
 
     public Optional<Cookie> getCookie(HttpServletRequest request, String name) {

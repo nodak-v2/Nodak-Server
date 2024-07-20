@@ -1,6 +1,7 @@
 package com.server.nodak.domain.post.service;
 
 import com.server.nodak.domain.notification.controller.NotificationController;
+import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.domain.StarPost;
@@ -12,6 +13,7 @@ import com.server.nodak.domain.post.repository.CategoryRepository;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.post.repository.StarPostRepository;
 import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.domain.user.repository.UserHistoryRepository;
 import com.server.nodak.domain.user.repository.UserRepository;
 import com.server.nodak.domain.vote.domain.Vote;
 import com.server.nodak.domain.vote.domain.VoteOption;
@@ -19,7 +21,8 @@ import com.server.nodak.exception.common.AuthorizationException;
 import com.server.nodak.exception.common.BadRequestException;
 import com.server.nodak.exception.common.ConflictException;
 import com.server.nodak.exception.common.DataNotFoundException;
-import java.util.List;
+import com.server.nodak.security.aop.IncreaseUserHistory;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,26 +42,30 @@ public class PostService {
     private final StarPostRepository starPostRepository;
 
     private final NotificationController notificationController;
+    private final NotificationService notificationService;
+
+    private final UserHistoryRepository userHistoryRepository;
 
     @Transactional
+    @IncreaseUserHistory(incrementValue = 2)
     public void savePost(Long userId, PostRequest request) {
         User user = findUserById(userId);
         Category category = findCategoryByTitle(request.getChannel());
 
         Post post = createPost(user, category, request);
-        Vote vote = createVote(post, request.getVoteTitle());
+        Vote vote = createVote(post, request);
 
-        List<VoteOption> list = request.getVoteOptionContent().entrySet().stream().map(e ->
-                createVoteOption(e.getKey(), e.getValue(), vote)
-        ).toList();
+        AtomicInteger index = new AtomicInteger(1);
+
+        request.getVoteOptionContent().stream()
+            .map(voteOption -> createVoteOption(index.getAndIncrement(), voteOption.getOption(),
+                voteOption.getImageUrl(), vote)).toList();
 
         postRepository.save(post);
-        notifyMessageToFollowers(user, post);
-    }
-
-    // 알림 전송
-    private void notifyMessageToFollowers(User user, Post post) {
-        notificationController.notifyFollowers(user, post);
+//
+//        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.",
+//                user.getId());
+//        notificationService.notifyFollowersBySse(user, post);
     }
 
     @Transactional(readOnly = true)
@@ -68,7 +75,8 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostResponse findPost(Long userId, Long postId) {
-        return postRepository.findOne(userId, postId).orElseThrow(() -> new DataNotFoundException());
+        return postRepository.findOne(userId, postId)
+            .orElseThrow(() -> new DataNotFoundException());
     }
 
     @Transactional
@@ -86,46 +94,67 @@ public class PostService {
     }
 
     @Transactional
+    @IncreaseUserHistory
     public void registerLike(Long userId, Long postId) {
         if (starPostRepository.findByUserIdAndPostId(userId, postId).isEmpty()) {
             StarPost starPost = createStarPost(findUserById(userId), findPostById(postId));
             starPostRepository.save(starPost);
             return;
         }
-        throw new ConflictException();
+        throw new ConflictException(200, "좋아요는 1회만 가능합니다.");
     }
 
     @Transactional
     public void cancleLike(Long userId, Long postId) {
         StarPost starPost = starPostRepository.findByUserIdAndPostId(userId, postId)
-                .orElseThrow(() -> new BadRequestException());
+            .orElseThrow(() -> new ConflictException(200, "취소할 좋아요 기록이 존재하지 않습니다."));
         starPost.delete(true);
         starPostRepository.save(starPost);
     }
 
-    private VoteOption createVoteOption(int seq, String content, Vote vote) {
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyPosting(Long userId, Pageable pageable) {
+        return postRepository.findMyPosting(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyVoteHistory(Long userId, Pageable pageable) {
+        return postRepository.findMyVoteHistory(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyComment(Long userId, Pageable pageable) {
+        return postRepository.findMyComment(userId, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<PostSearchResponse> findMyLike(Long userId, Pageable pageable) {
+        return postRepository.findMyLike(userId, pageable);
+    }
+
+    private VoteOption createVoteOption(int seq, String content, String imageUrl, Vote vote) {
         return VoteOption.builder()
-                .seq(seq)
-                .content(content)
-                .vote(vote)
-                .build();
+            .seq(seq)
+            .content(content)
+            .imageUrl(imageUrl)
+            .vote(vote)
+            .build();
     }
 
     private Post createPost(User user, Category category, PostRequest req) {
         return Post.builder()
-                .user(user)
-                .title(req.getTitle())
-                .content(req.getContent())
-                .category(category)
-                .imageUrl(req.getImageUrl())
-                .build();
+            .user(user)
+            .content(req.getContent())
+            .category(category)
+            .build();
     }
 
-    private Vote createVote(Post post, String title) {
+    private Vote createVote(Post post, PostRequest postRequest) {
         return Vote.builder()
-                .post(post)
-                .title(title)
-                .build();
+            .title(postRequest.getVoteTitle())
+            .endDate(postRequest.getEndDate())
+            .post(post)
+            .build();
     }
 
     private StarPost createStarPost(User user, Post post) {
@@ -137,14 +166,28 @@ public class PostService {
     }
 
     private Category findCategoryByTitle(String channel) {
-        return categoryRepository.findByTitle(channel).orElseThrow(() -> new BadRequestException("존재하지 않는 카테고리입니다."));
+        return categoryRepository.findByTitle(channel)
+            .orElseThrow(() -> new BadRequestException("존재하지 않는 카테고리입니다."));
     }
 
     private Post findPostById(Long postId) {
-        return postRepository.findById(postId).orElseThrow(() -> new BadRequestException("존재하지 않는 게시글입니다."));
+        return postRepository.findById(postId)
+            .orElseThrow(() -> new BadRequestException("존재하지 않는 게시글입니다."));
     }
 
     private Post findPostByIdAndUserId(Long postId, Long userId) {
-        return postRepository.findByIdAndUserId(postId, userId).orElseThrow(() -> new AuthorizationException());
+        return postRepository.findByIdAndUserId(postId, userId)
+            .orElseThrow(() -> new AuthorizationException());
+    }
+
+    @Transactional
+    public void terminateVote(long userId, Long postId) {
+        Post post = findPostByIdAndUserId(postId, userId);
+        Vote vote = post.getVote();
+
+        if (vote.isTerminated()) {
+            throw new BadRequestException("vote has already terminated.");
+        }
+        vote.setTerminated(true);
     }
 }

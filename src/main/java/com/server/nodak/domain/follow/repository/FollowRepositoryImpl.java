@@ -5,13 +5,12 @@ import com.server.nodak.domain.follow.domain.Follow;
 import com.server.nodak.domain.follow.domain.QFollow;
 import com.server.nodak.domain.user.domain.QUser;
 import com.server.nodak.domain.user.domain.User;
-import com.server.nodak.domain.user.dto.QUserInfoResponse;
-import com.server.nodak.domain.user.dto.UserInfoResponse;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
+import com.server.nodak.domain.user.dto.QUserInfoDTO;
+import com.server.nodak.domain.user.dto.UserInfoDTO;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,12 +19,12 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public int getUserFollowerCount(Long userId) {
+    public long getUserFollowerCount(Long userId) {
         return followJpaRepository.getFollowerCount(userId);
     }
 
     @Override
-    public int getUserFolloweeCount(Long userId) {
+    public long getUserFolloweeCount(Long userId) {
         return followJpaRepository.getFolloweeCount(userId);
     }
 
@@ -43,7 +42,7 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     public Follow save(Follow follow) {
         return followJpaRepository.save(follow);
     }
-    
+
     @Override
     public List<User> getFollowersByUserId(Long userId) {
         return followJpaRepository.findFollowersByUserId(userId);
@@ -55,12 +54,12 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     }
 
     @Override
-    public List<UserInfoResponse> findFollowersByUserId(Long userId) {
+    public List<UserInfoDTO> findFollowersByUserId(Long userId) {
         QFollow follow = QFollow.follow;
         QUser user = QUser.user;
 
         return queryFactory
-                .select(new QUserInfoResponse(
+                .select(new QUserInfoDTO(
                         user.id,
                         user.email,
                         user.nickname,
@@ -68,8 +67,8 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
                         user.description,
                         user.createdAt,
                         user.updatedAt,
-                        follow.countDistinct().intValue().as("followerCount"),
-                        follow.countDistinct().intValue().as("followeeCount")
+                        follow.countDistinct().longValue().as("followerCount"),
+                        follow.countDistinct().longValue().as("followeeCount")
                 ))
                 .from(follow)
                 .join(follow.follower, user)
@@ -79,12 +78,12 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     }
 
     @Override
-    public List<UserInfoResponse> findFolloweesByUserId(Long userId) {
+    public List<UserInfoDTO> findFolloweesByUserId(Long userId) {
         QFollow follow = QFollow.follow;
         QUser user = QUser.user;
 
         return queryFactory
-                .select(new QUserInfoResponse(
+                .select(new QUserInfoDTO(
                         user.id,
                         user.email,
                         user.nickname,
@@ -92,8 +91,8 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
                         user.description,
                         user.createdAt,
                         user.updatedAt,
-                        follow.countDistinct().intValue().as("followerCount"),
-                        follow.countDistinct().intValue().as("followeeCount")
+                        follow.countDistinct().longValue().as("followerCount"),
+                        follow.countDistinct().longValue().as("followeeCount")
                 ))
                 .from(follow)
                 .join(follow.followee, user)

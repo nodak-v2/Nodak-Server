@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,6 +63,8 @@ class AuthorizationInterceptorTest {
                 .thenReturn(exceptRole(currentRole));
         when(handlerMethod.getMethodAnnotation(AuthorizationRequired.class))
                 .thenReturn(annotation);
+        when(annotation.status())
+                .thenReturn(HttpStatus.UNAUTHORIZED);
 
         // then
         if (currentRole != MANAGER) {

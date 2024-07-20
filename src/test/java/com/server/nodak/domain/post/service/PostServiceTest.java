@@ -9,7 +9,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
-import com.server.nodak.domain.notification.controller.NotificationController;
+import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.domain.StarPost;
@@ -17,6 +17,7 @@ import com.server.nodak.domain.post.dto.PostRequest;
 import com.server.nodak.domain.post.dto.PostResponse;
 import com.server.nodak.domain.post.dto.PostSearchRequest;
 import com.server.nodak.domain.post.dto.PostSearchResponse;
+import com.server.nodak.domain.post.dto.VoteOptionRequest;
 import com.server.nodak.domain.post.repository.CategoryRepository;
 import com.server.nodak.domain.post.repository.PostRepository;
 import com.server.nodak.domain.post.repository.StarPostRepository;
@@ -24,7 +25,6 @@ import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.repository.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.stream.LongStream;
@@ -46,6 +46,7 @@ import org.springframework.data.domain.PageRequest;
 @DisplayName("PostService 테스트")
 @Slf4j
 class PostServiceTest {
+
     Random rnd = new Random();
 
     @InjectMocks
@@ -60,7 +61,7 @@ class PostServiceTest {
     StarPostRepository starPostRepository;
 
     @Mock
-    NotificationController notificationController;
+    NotificationService notificationService;
 
     User user;
     Category category;
@@ -75,10 +76,12 @@ class PostServiceTest {
     @DisplayName("게시글 저장 테스트")
     void savePost() {
         // Given
-        PostRequest postRequest = createPostRequest("Post_title", category.getTitle(), "Post_content", "Vote_title",
-                "http://image.com", createVoteOptionMap());
+        PostRequest postRequest = createPostRequest(category.getTitle(), "Post_content",
+            "Vote_title",
+            "http://image.com", createVoteOptionList());
         given(userRepository.findById(user.getId())).willReturn(Optional.ofNullable(user));
-        given(categoryRepository.findByTitle(postRequest.getChannel())).willReturn(Optional.ofNullable(category));
+        given(categoryRepository.findByTitle(postRequest.getChannel())).willReturn(
+            Optional.ofNullable(category));
 
         // When
         postService.savePost(user.getId(), postRequest);
@@ -94,10 +97,11 @@ class PostServiceTest {
         Long categoryId = rnd.nextLong(1, 10);
         Long count = rnd.nextLong(1, 10);
         PageRequest pageRequest = PageRequest.of(0, 10);
-        PostSearchRequest searchRequest = PostSearchRequest.builder().categoryId(categoryId).build();
+        PostSearchRequest searchRequest = PostSearchRequest.builder().categoryId(categoryId)
+            .build();
         List<PostSearchResponse> postSearchResponses = createPostSearchResponses(10);
         given(postRepository.search(searchRequest, pageRequest)).willReturn(
-                new PageImpl<>(postSearchResponses, pageRequest, count));
+            new PageImpl<>(postSearchResponses, pageRequest, count));
 
         // When
         Page<PostSearchResponse> result = postService.findPostBySearch(searchRequest, pageRequest);
@@ -112,26 +116,23 @@ class PostServiceTest {
         // Given
         Long postId = rnd.nextLong(1, 10);
         PostResponse postResponse = Mockito.spy(PostResponse.builder()
-                .title("게시글 제목")
-                .author("작성자")
-                .profileImageUrl("http://프로필이미지")
-                .createdAt(LocalDateTime.now())
-                .content("게시글 내용")
-                .imageUrl("http://게시글이미지")
-                .starCount(3)
-                .checkStar(true)
-                .build());
-        given(postRepository.findOne(user.getId(), postId)).willReturn(Optional.ofNullable(postResponse));
+            .author("작성자")
+            .profileImageUrl("http://프로필이미지")
+            .createdAt(LocalDateTime.now())
+            .content("게시글 내용")
+            .starCount(3)
+            .checkStar(true)
+            .build());
+        given(postRepository.findOne(user.getId(), postId)).willReturn(
+            Optional.ofNullable(postResponse));
 
         // When
         PostResponse response = postService.findPost(user.getId(), postId);
 
         // Then
-        Assertions.assertThat(response.getTitle()).isEqualTo(postResponse.getTitle());
         Assertions.assertThat(response.getAuthor()).isEqualTo(postResponse.getAuthor());
         Assertions.assertThat(response.getCreatedAt()).isEqualTo(postResponse.getCreatedAt());
         Assertions.assertThat(response.getContent()).isEqualTo(postResponse.getContent());
-        Assertions.assertThat(response.getImageUrl()).isEqualTo(postResponse.getImageUrl());
         Assertions.assertThat(response.getStarCount()).isEqualTo(postResponse.getStarCount());
         Assertions.assertThat(response.getCheckStar()).isEqualTo(postResponse.getCheckStar());
     }
@@ -141,9 +142,11 @@ class PostServiceTest {
     public void updatePost() {
         // Given
         Post post = createPost(user, randomUUID(), randomUUID(), category);
-        PostRequest postRequest = createPostRequest("Post_title", category.getTitle(), "Post_content", "Vote_title",
-                "http://image.com", createVoteOptionMap());
-        given(postRepository.findByIdAndUserId(post.getId(), user.getId())).willReturn(Optional.of(post));
+        PostRequest postRequest = createPostRequest(category.getTitle(), "Post_content",
+            "Vote_title",
+            "http://image.com", createVoteOptionList());
+        given(postRepository.findByIdAndUserId(post.getId(), user.getId())).willReturn(
+            Optional.of(post));
 
         // When
         postService.updatePost(user.getId(), post.getId(), postRequest);
@@ -158,7 +161,8 @@ class PostServiceTest {
     public void removePost() {
         // Given
         Post post = Mockito.spy(createPost(user, randomUUID(), randomUUID(), category));
-        given(postRepository.findByIdAndUserId(post.getId(), user.getId())).willReturn(Optional.of(post));
+        given(postRepository.findByIdAndUserId(post.getId(), user.getId())).willReturn(
+            Optional.of(post));
 
         // When
         postService.removePost(user.getId(), post.getId());
@@ -194,7 +198,7 @@ class PostServiceTest {
         StarPost starPost = Mockito.spy(StarPost.builder().user(user).post(post).build());
 
         given(starPostRepository.findByUserIdAndPostId(user.getId(), post.getId())).willReturn(
-                Optional.ofNullable(starPost));
+            Optional.ofNullable(starPost));
 
         // When
         postService.cancleLike(user.getId(), post.getId());
@@ -207,18 +211,24 @@ class PostServiceTest {
 
     public List<PostSearchResponse> createPostSearchResponses(int size) {
         return LongStream.rangeClosed(1, size)
-                .mapToObj(e -> PostSearchResponse.builder().postId(e)
-                        .postImageUrl(String.format("http://postImage%d.com", e))
-                        .author(String.format("작성자%d", e))
-                        .profileImageUrl(String.format("http://profileImage%d.com", e)).voterCount(10L).build())
-                .toList();
+            .mapToObj(e -> PostSearchResponse.builder().postId(e)
+                .author(String.format("작성자%d", e))
+                .profileImageUrl(String.format("http://profileImage%d.com", e)).voterCount(10L)
+                .build())
+            .toList();
     }
 
-    public Map<Integer, String> createVoteOptionMap() {
-        return Map.of(
-                1, "voteOption1",
-                2, "voteOption2",
-                3, "voteOption3"
+    public List<VoteOptionRequest> createVoteOptionList() {
+        return List.of(
+            VoteOptionRequest.builder()
+                .option("voteOption1")
+                .imageUrl("image1").build(),
+            VoteOptionRequest.builder()
+                .option("voteOption2")
+                .imageUrl("image2").build(),
+            VoteOptionRequest.builder()
+                .option("voteOption3")
+                .imageUrl("image3").build()
         );
     }
 }

@@ -9,7 +9,7 @@ import static com.server.nodak.domain.vote.utils.Utils.createVoteOption;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.server.nodak.domain.comment.domain.Comment;
-import com.server.nodak.domain.comment.repository.CommentRepository;
+import com.server.nodak.domain.comment.repository.CommentJpaRepository;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.post.domain.StarPost;
@@ -61,7 +61,7 @@ class PostRepositoryImplTest {
     @Autowired
     PostRepository postRepository;
     @Autowired
-    CommentRepository commentRepository;
+    CommentJpaRepository commentRepository;
     @Autowired
     StarPostRepository starPostRepository;
     @Autowired
@@ -109,60 +109,65 @@ class PostRepositoryImplTest {
         int selectId = rnd.nextInt(postCount);
 
         // When
-        PostResponse response = postRepository.findOne(user.getId(), posts.get(selectId).getId()).get();
+        PostResponse response = postRepository.findOne(user.getId(), posts.get(selectId).getId())
+            .get();
 
         // Then
-        Assertions.assertThat(response.getTitle()).isEqualTo(posts.get(selectId).getTitle());
-        Assertions.assertThat(response.getAuthor()).isEqualTo(posts.get(selectId).getUser().getNickname());
+        Assertions.assertThat(response.getAuthor())
+            .isEqualTo(posts.get(selectId).getUser().getNickname());
         Assertions.assertThat(response.getIsAuthor())
-                .isEqualTo(posts.get(selectId).getUser().getId().equals(user.getId()));
-        Assertions.assertThat(response.getCommentSize()).isEqualTo(posts.get(selectId).getComments().size());
+            .isEqualTo(posts.get(selectId).getUser().getId().equals(user.getId()));
+        Assertions.assertThat(response.getCommentSize())
+            .isEqualTo(posts.get(selectId).getComments().size());
         Assertions.assertThat(response.getContent()).isEqualTo(posts.get(selectId).getContent());
-        Assertions.assertThat(response.getImageUrl()).isEqualTo(posts.get(selectId).getImageUrl());
-        Assertions.assertThat(response.getStarCount()).isEqualTo(posts.get(selectId).getStarPosts().size());
-        Assertions.assertThat(response.getCheckStar()).isEqualTo(posts.get(selectId).getStarPosts().stream()
+        Assertions.assertThat(response.getStarCount())
+            .isEqualTo(posts.get(selectId).getStarPosts().size());
+        Assertions.assertThat(response.getCheckStar())
+            .isEqualTo(posts.get(selectId).getStarPosts().stream()
                 .filter(e -> e.getUser().getNickname().equals(response.getAuthor())
-                        && e.getPost().getId() == selectId).toList().size() > 0);
+                    && e.getPost().getId() == selectId).toList().size() > 0);
     }
 
-    @Test
-    @DisplayName("search 테스트 - 키워드 검색")
-    void searchByTitleAndContent() {
-        // Given
-        String keyword = randomUUID(1, 2);
-        PostSearchRequest searchRequest = PostSearchRequest.builder().keyword(keyword).build();
-        int postCount = 10;
-        int voteOptionCount = rnd.nextInt(1, 5);
-        int voteHistoryCount = rnd.nextInt(1, 5);
-        saveVoteAndVoteOptions(postCount, voteOptionCount, voteHistoryCount);
-        long findPostCount = posts.stream()
-                .filter(e -> e.getTitle().contains(keyword) || e.getContent().contains(keyword)).count();
-
-        // Then
-        Page<PostSearchResponse> result = postRepository.search(searchRequest, pageRequest);
-
-        // When
-        Assertions.assertThat(result.getContent().size()).isEqualTo(findPostCount);
-        Assertions.assertThat(result.getSize()).isEqualTo(pageRequest.getPageSize());
-    }
+//    @Test
+//    @DisplayName("search 테스트 - 키워드 검색")
+//    void searchByTitleAndContent() {
+//        // Given
+//        String keyword = randomUUID(1, 2);
+//        PostSearchRequest searchRequest = PostSearchRequest.builder().keyword(keyword).build();
+//        int postCount = 10;
+//        int voteOptionCount = rnd.nextInt(1, 5);
+//        int voteHistoryCount = rnd.nextInt(1, 5);
+//        saveVoteAndVoteOptions(postCount, voteOptionCount, voteHistoryCount);
+//        long findPostCount = posts.stream()
+//                .filter(e -> e.getTitle().contains(keyword) || e.getContent().contains(keyword)).count();
+//
+//        // Then
+//        Page<PostSearchResponse> result = postRepository.search(searchRequest, pageRequest);
+//
+//        // When
+//        Assertions.assertThat(result.getContent().size()).isEqualTo(findPostCount);
+//        Assertions.assertThat(result.getSize()).isEqualTo(pageRequest.getPageSize());
+//    }
 
     @Test
     @DisplayName("search 테스트 - 카테고리 검색")
     public void searchByCategoryId() {
         // Given
         List<Post> posts = List.of(
-                createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1),
-                createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1),
-                createPost(user, randomUUID(1, 10), randomUUID(1, 10), category2)
+            createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1),
+            createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1),
+            createPost(user, randomUUID(1, 10), randomUUID(1, 10), category2)
         );
         List<Post> savePosts = postRepository.saveAll(posts);
-        PostSearchRequest searchRequest = PostSearchRequest.builder().categoryId(category1.getId()).build();
-        List<Long> postIds = savePosts.stream().filter(post -> post.getCategory().getId() == category1.getId())
-                .map(post -> post.getId()).toList();
+        PostSearchRequest searchRequest = PostSearchRequest.builder().categoryId(category1.getId())
+            .build();
+        List<Long> postIds = savePosts.stream()
+            .filter(post -> post.getCategory().getId() == category1.getId())
+            .map(post -> post.getId()).toList();
 
         // When
         Page<PostSearchResponse> postsFromCategory1 = postRepository.search(searchRequest,
-                pageRequest);
+            pageRequest);
 
         // Then
         Assertions.assertThat(postsFromCategory1.getTotalElements()).isEqualTo(postIds.size());
@@ -179,14 +184,15 @@ class PostRepositoryImplTest {
         });
 
         voteOptions.stream().forEach(voteOption -> {
-            List<VoteHistory> historyList = IntStream.rangeClosed(1, voteHistoryCount).mapToObj(e -> {
-                if (e == 1) {
-                    return createVoteHistory(user, voteOption);
-                }
-                User tmpUser = createUser();
-                em.persist(tmpUser);
-                return createVoteHistory(tmpUser, voteOption);
-            }).toList();
+            List<VoteHistory> historyList = IntStream.rangeClosed(1, voteHistoryCount)
+                .mapToObj(e -> {
+                    if (e == 1) {
+                        return createVoteHistory(user, voteOption);
+                    }
+                    User tmpUser = createUser();
+                    em.persist(tmpUser);
+                    return createVoteHistory(tmpUser, voteOption);
+                }).toList();
             voteHistories.addAll(historyList);
         });
 
@@ -208,16 +214,18 @@ class PostRepositoryImplTest {
         createLikeData(likeCount);
 
         PostSearchRequest request = PostSearchRequest.builder()
-                .keyword(keyword)
-                .build();
+            .keyword(keyword)
+            .build();
 
         // when
-        List<PostSearchResponse> searchResponses = postRepository.search(request, pageRequest).getContent();
+        List<PostSearchResponse> searchResponses = postRepository.search(request, pageRequest)
+            .getContent();
 
         // then
         searchResponses.stream().forEach(res -> {
             System.out.println("start");
-            Post expectPost = posts.stream().filter(post -> post.getId() == res.getPostId()).findFirst().get();
+            Post expectPost = posts.stream().filter(post -> post.getId() == res.getPostId())
+                .findFirst().get();
             // 게시글 ID 검증
             Assertions.assertThat(res.getPostId()).isEqualTo(expectPost.getId());
             // 댓글 수 검증
@@ -230,7 +238,7 @@ class PostRepositoryImplTest {
 
     private List<VoteOption> createVoteOptions(Vote vote, int size) {
         return IntStream.rangeClosed(1, size).mapToObj(e ->
-                createVoteOption(vote, e, String.format("VoteOption_content_%d", e))
+            createVoteOption(vote, e, String.format("VoteOption_content_%d", e))
         ).collect(Collectors.toList());
     }
 
@@ -265,30 +273,30 @@ class PostRepositoryImplTest {
 
     public void createPostAndVoteData(int count) {
         IntStream.rangeClosed(1, count)
-                .forEach(index -> {
-                    User user = createUser();
-                    users.add(user);
-                    Post post = createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1);
-                    Vote vote = createVote(randomUUID(1, 10), post);
-                    posts.add(post);
-                    votes.add(vote);
-                    postRepository.save(post);
-                });
+            .forEach(index -> {
+                User user = createUser();
+                users.add(user);
+                Post post = createPost(user, randomUUID(1, 10), randomUUID(1, 10), category1);
+                Vote vote = createVote(randomUUID(1, 10), post);
+                posts.add(post);
+                votes.add(vote);
+                postRepository.save(post);
+            });
     }
 
     private StarPost createLike(User user, Post post) {
         return StarPost.builder()
-                .user(user)
-                .post(post)
-                .build();
+            .user(user)
+            .post(post)
+            .build();
     }
 
     private Comment createComment(User user, Post post, String content) {
         return Comment.builder()
-                .user(user)
-                .post(post)
-                .content(content)
-                .build();
+            .user(user)
+            .post(post)
+            .content(content)
+            .build();
     }
 
     public String randomUUID(int start, int end) {

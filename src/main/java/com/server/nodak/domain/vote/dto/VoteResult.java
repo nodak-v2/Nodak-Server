@@ -12,30 +12,34 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VoteResult {
+
     private Long voteId;
     private String voteTitle;
-    private List<VoteOptionResult> voteOptions;
+    private List<VoteOptionDetailResult> voteOptions;
     private Boolean hasVoted;
     private Long voteOptionId;
     private List<Long> voteOptionIds;
     private Long choiceVoteOptionId;
+    private Boolean isTerminated;
 
     @QueryProjection
-    public VoteResult(Long voteId, String voteTitle, Long voteOptionId) {
+    public VoteResult(Long voteId, String voteTitle, Long voteOptionId, Boolean isTerminated) {
         this.voteId = voteId;
         this.voteTitle = voteTitle;
         this.hasVoted = false;
         this.choiceVoteOptionId = 0L;
         this.voteOptionId = voteOptionId;
+        this.isTerminated = isTerminated;
     }
 
     @QueryProjection
     public VoteResult(Long voteId, String voteTitle, Long choiceVoteOptionId,
-                      Long voteOptionId) {
+        Long voteOptionId, Boolean isTerminated) {
         this.voteId = voteId;
         this.voteTitle = voteTitle;
         this.hasVoted = true;
         this.choiceVoteOptionId = choiceVoteOptionId;
         this.voteOptionId = voteOptionId;
+        this.isTerminated = isTerminated;
     }
 }

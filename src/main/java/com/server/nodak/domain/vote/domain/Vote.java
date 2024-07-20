@@ -1,5 +1,6 @@
 package com.server.nodak.domain.vote.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.server.nodak.domain.model.BaseEntity;
 import com.server.nodak.domain.post.domain.Post;
 import jakarta.persistence.CascadeType;
@@ -12,12 +13,15 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.ToString;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Getter
 @Entity
@@ -34,14 +38,23 @@ public class Vote extends BaseEntity {
     private Post post;
 
     @OneToMany(mappedBy = "vote", cascade = {CascadeType.PERSIST,
-            CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
-    private List<VoteOption> voteOptions;
+        CascadeType.REMOVE}, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<VoteOption> voteOptions = new ArrayList<>();
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
+    private LocalDateTime endDate;
+
+    @Setter
+    private boolean isTerminated = false;
 
     @Builder
-    public Vote(String title, Post post) {
+    public Vote(String title, Post post, List<VoteOption> voteOptions, LocalDateTime endDate) {
         this.title = title;
-        this.voteOptions = new ArrayList<>();
         setPost(post);
+        this.voteOptions = voteOptions != null ? voteOptions : new ArrayList<>();
+        this.endDate = endDate;
+        this.isTerminated = false;
     }
 
     public void setPost(Post post) {
