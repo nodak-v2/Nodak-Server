@@ -20,7 +20,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
-    private static final String REDIRECT_URI = "https://picky-fe.vercel.app/redirect";
+    private static final String REDIRECT_URI = "https://picky-pick.com/redirect";
     private final TokenProvider tokenProvider;
     private final HttpServletUtils servletUtils;
     private final JwtProperties jwtProperties;
