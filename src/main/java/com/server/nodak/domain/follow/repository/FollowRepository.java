@@ -20,4 +20,10 @@ public interface FollowRepository {
     List<User> getFollowersByUserId(Long userId);
 
     List<User> getFolloweesByUserId(Long userId);
+
+    List<Long> getFollowerIds(Long userId);
+
+    boolean isFollowing(Long followerId, Long followeeId);
+
+    void deleteFromRedis(Long followerId, Long followeeId);
 }

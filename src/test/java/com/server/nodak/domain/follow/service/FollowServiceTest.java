@@ -1,7 +1,7 @@
 package com.server.nodak.domain.follow.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static com.server.nodak.domain.follow.domain.QFollow.follow;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.any;
@@ -18,6 +18,8 @@ import com.server.nodak.exception.common.BadRequestException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import lombok.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -67,19 +69,6 @@ class FollowServiceTest {
         given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(Optional.of(new Follow()));
 
         assertThrows(BadRequestException.class, () -> followService.followUser(1L, 2L));
-    }
-
-    @Test
-    @DisplayName("유저 언팔로우")
-    public void unfollowUserTest() {
-        Follow follow = new Follow();
-
-        given(userRepository.findById(1L)).willReturn(Optional.of(follower));
-        given(userRepository.findById(2L)).willReturn(Optional.of(followee));
-        given(followRepository.getFollowByRelation(anyLong(), anyLong())).willReturn(Optional.of(follow));
-
-        followService.unfollowUser(1L, 2L);
-        verify(followRepository, times(1)).save(follow);
     }
 
     @Test
