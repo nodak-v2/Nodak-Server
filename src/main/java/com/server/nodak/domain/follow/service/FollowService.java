@@ -9,6 +9,7 @@ import com.server.nodak.exception.common.BadRequestException;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,7 @@ public class FollowService {
 
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     @Transactional(readOnly = true)
     public long getUserFollowerCount(Long userId) {
@@ -41,10 +43,12 @@ public class FollowService {
             followeeId);
         if (followOptional.isPresent()) {
             followOptional.get().updateDelete(false);
+            redisTemplate.opsForSet().add(String.valueOf(follower.getId()) + ":followee", followee.getId());
+            redisTemplate.opsForSet().add(String.valueOf(followee.getId()) + ":follower", follower.getId());
             return;
         }
 
-        if (followRepository.getFollowByRelation(userId, followeeId).isPresent()) {
+        if (followRepository.isFollowing(userId, followeeId)) {
             throw new BadRequestException("Already following this user.");
         }
 
@@ -69,7 +73,7 @@ public class FollowService {
         checkIfUserExists(followeeId);
 
         follow.updateDelete(true);
-        followRepository.save(follow);
+        followRepository.deleteFromRedis(follow.getFollower().getId(), followeeId);
     }
 
     @Transactional(readOnly = true)
