@@ -19,7 +19,7 @@ public interface FollowJpaRepository extends JpaRepository<Follow, Long> {
 
     Optional<Follow> getFollowByFollowerIdAndFolloweeId(Long followerId, Long followeeId);
 
-    @Query("select f from Follow f where f.follower.id = :followerId and f.followee.id = :followeeId and f.isDeleted = true")
+    @Query("select f from Follow f where f.follower.id = :followerId and f.followee.id = :followeeId and f.isDeleted is true")
     Optional<Follow> checkIfDeletedFollowExists(Long followerId, Long followeeId);
 
     @Query("select f.follower from Follow f where f.followee.id = :userId")

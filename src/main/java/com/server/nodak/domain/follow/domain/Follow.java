@@ -13,12 +13,13 @@ import org.hibernate.annotations.SQLRestriction;
 @Getter
 @Entity
 @NoArgsConstructor
-@SQLRestriction("is_deleted = false")
 public class Follow extends BaseEntity {
     @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, optional = false)
     private User follower;
     @ManyToOne(cascade = {CascadeType.PERSIST}, fetch = FetchType.LAZY, optional = false)
     private User followee;
+
+    @Getter
     private Boolean isDeleted;
 
     public static Follow create(User follower, User followee) {
