@@ -66,7 +66,6 @@ public class NotificationController {
                     Map<String, Object> data = new HashMap<>();
                     data.put("userId", user.getId());
                     data.put("postId", post.getId());
-                    data.put("title", post.getTitle());
                     emitter.send(SseEmitter.event().name("newPost").data(data, MediaType.APPLICATION_JSON));
                 } catch (IOException e) {
                     clients.remove(follower.getUserId());
