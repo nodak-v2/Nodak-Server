@@ -46,7 +46,18 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
             (int) jwtProperties.getRefreshTokenExpiration());
 
         this.clearAuthenticationAttributes(request, response);
-        this.getRedirectStrategy().sendRedirect(request, response, REDIRECT_URI);
+
+        // Determine redirect URL based on request domain
+        String serverName = request.getServerName();
+        String redirectUrl;
+        if ("picky-pick.com".equals(serverName)) {
+            redirectUrl = "https://picky-pick.com/redirect";
+        } else {
+            // Default redirect URL if the domain doesn't match
+            redirectUrl = "http://localhost:300/redirect";
+        }
+
+        this.getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 
     private void clearAuthenticationAttributes(HttpServletRequest request,
