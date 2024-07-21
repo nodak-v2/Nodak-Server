@@ -50,6 +50,7 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         // Determine redirect URL based on request domain
         String serverName = request.getServerName();
         String redirectUrl;
+        System.out.println(serverName);
         if ("picky-pick.com".equals(serverName)) {
             redirectUrl = "https://picky-pick.com/redirect";
         } else {
