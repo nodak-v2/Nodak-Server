@@ -1,25 +1,30 @@
 package com.server.nodak.domain.notification.entity;
 
-import com.server.nodak.domain.post.domain.Post;
-import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.domain.model.BaseEntity;
+import com.server.nodak.domain.notification.NotificationType;
 import lombok.*;
 
-import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class Notification implements Serializable {
+public class Notification extends BaseEntity {
 
-    private Long postId;
-    private String message;
-    private Long timestamp;
+    private NotificationType type;
+    private Long followerId;
+    private Long followeeId;
     private Long writerId;
+    private Long postId;
+    private Long timestamp;
 
-    public Notification(Long postId, String message, Long writerId) {
-        this.postId = postId;
-        this.message = message;
-        this.timestamp = System.currentTimeMillis();
+    @Builder
+    public Notification(NotificationType type, Long followerId, Long followeeId, Long writerId, Long postId, Long timestamp) {
+        this.type = type;
+        this.followerId = followerId;
+        this.followeeId = followeeId;
         this.writerId = writerId;
+        this.postId = postId;
+        this.timestamp = System.currentTimeMillis();
     }
 }
