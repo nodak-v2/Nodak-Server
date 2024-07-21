@@ -2,6 +2,7 @@ package com.server.nodak.domain.follow.service;
 
 import com.server.nodak.domain.follow.domain.Follow;
 import com.server.nodak.domain.follow.repository.FollowRepository;
+import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.dto.UserInfoDTO;
 import com.server.nodak.domain.user.repository.UserRepository;
@@ -20,6 +21,7 @@ public class FollowService {
     private final FollowRepository followRepository;
     private final UserRepository userRepository;
     private final RedisTemplate<String, Object> redisTemplate;
+    private final NotificationService notificationService;
 
     @Transactional(readOnly = true)
     public long getUserFollowerCount(Long userId) {
@@ -39,12 +41,13 @@ public class FollowService {
         User follower = checkIfUserExists(userId);
         User followee = checkIfUserExists(followeeId);
 
-        Optional<Follow> followOptional = followRepository.checkIfDeletedFollowExists(userId,
-            followeeId);
+        Optional<Follow> followOptional = followRepository.checkIfDeletedFollowExists(userId, followeeId);
+
         if (followOptional.isPresent()) {
             followOptional.get().updateDelete(false);
             redisTemplate.opsForSet().add(String.valueOf(follower.getId()) + ":followee", followee.getId());
             redisTemplate.opsForSet().add(String.valueOf(followee.getId()) + ":follower", follower.getId());
+            notificationService.saveFollowNotification(follower, followee);
             return;
         }
 
@@ -54,6 +57,7 @@ public class FollowService {
 
         Follow follow = Follow.create(follower, followee);
         followRepository.save(follow);
+        notificationService.saveFollowNotification(follower, followee);
     }
 
     private User checkIfUserExists(Long userId) {
