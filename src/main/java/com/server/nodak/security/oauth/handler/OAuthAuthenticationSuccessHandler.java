@@ -51,7 +51,7 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
         String serverName = request.getServerName();
         String redirectUrl;
         System.out.println(serverName);
-        if ("picky-pick.com".equals(serverName)) {
+        if ("api.picky-pick.com".equals(serverName)) {
             redirectUrl = "https://picky-pick.com/redirect";
         } else {
             // Default redirect URL if the domain doesn't match
