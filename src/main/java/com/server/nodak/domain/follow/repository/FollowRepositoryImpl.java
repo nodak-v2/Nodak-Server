@@ -57,7 +57,7 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     }
 
     @Override
-    public List<UserInfoDTO> getFollowersByUserId(Long myId, Long userId) {
+    public List<UserInfoDTO> getFolloweesByUserId(Long myId, Long userId) {
         QFollow mainFollow = new QFollow("main");
         QFollow subFollow = new QFollow("sub");
 
@@ -96,7 +96,7 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     }
 
     @Override
-    public List<UserInfoDTO> getFolloweesByUserId(Long myId, Long userId) {
+    public List<UserInfoDTO> getFollowersByUserId(Long myId, Long userId) {
         QFollow mainFollow = new QFollow("main");
         QFollow subFollow = new QFollow("sub");
 
