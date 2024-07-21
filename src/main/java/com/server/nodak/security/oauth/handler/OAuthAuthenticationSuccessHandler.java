@@ -54,7 +54,7 @@ public class OAuthAuthenticationSuccessHandler extends SimpleUrlAuthenticationSu
             redirectUrl = "https://picky-pick.com/redirect";
         } else {
             // Default redirect URL if the domain doesn't match
-            redirectUrl = "http://localhost:300/redirect";
+            redirectUrl = "http://localhost:3000/redirect";
         }
 
         this.getRedirectStrategy().sendRedirect(request, response, redirectUrl);
