@@ -19,11 +19,11 @@ public class Notification extends BaseEntity {
     private Long userId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "follower_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = true, name = "follower_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User follower;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(nullable = false, name = "writer_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(nullable = true, name = "writer_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private User writer;
 
     private Long postId;

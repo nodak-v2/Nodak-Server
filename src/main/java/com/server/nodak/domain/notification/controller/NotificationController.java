@@ -80,14 +80,18 @@ public class NotificationController {
 //        });
 //    }
 
-    // TODO: 추가 구현 필요
     @GetMapping("/notifications")
     @AuthorizationRequired(UserRole.GENERAL)
     public ResponseEntity<ApiResponse<List<NotificationInfo>>> getNotifications(Principal principal) {
         long userId = Long.parseLong(principal.getName());
+        System.out.println("userId = " + userId);
+
         List<NotificationInfo> result = notificationService.getNotifications(userId);
 
-        return ResponseEntity.ok(ApiResponse.success(result));
+        for (NotificationInfo notificationInfo : result) {
+            System.out.println("notificationInfo = " + notificationInfo);
+        }
 
+        return ResponseEntity.ok(ApiResponse.success(result));
     }
 }

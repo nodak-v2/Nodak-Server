@@ -1,6 +1,8 @@
 package com.server.nodak.domain.post.service;
 
+import com.server.nodak.domain.notification.NotificationType;
 import com.server.nodak.domain.notification.controller.NotificationController;
+import com.server.nodak.domain.notification.entity.Notification;
 import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Category;
 import com.server.nodak.domain.post.domain.Post;
@@ -41,10 +43,7 @@ public class PostService {
 
     private final StarPostRepository starPostRepository;
 
-    private final NotificationController notificationController;
     private final NotificationService notificationService;
-
-    private final UserHistoryRepository userHistoryRepository;
 
     @Transactional
     @IncreaseUserHistory(incrementValue = 2)
@@ -62,10 +61,7 @@ public class PostService {
                 voteOption.getImageUrl(), vote)).toList();
 
         postRepository.save(post);
-//
-//        notificationService.saveNotificationToRedis(post.getId(), user.getNickname() + "님이 새 게시글을 작성했습니다.",
-//                user.getId());
-//        notificationService.notifyFollowersBySse(user, post);
+        notificationService.savePostNotification(user, post.getId());
     }
 
     @Transactional(readOnly = true)

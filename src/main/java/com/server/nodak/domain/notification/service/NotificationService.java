@@ -1,13 +1,20 @@
 package com.server.nodak.domain.notification.service;
 
+import com.server.nodak.domain.follow.repository.FollowRepository;
 import com.server.nodak.domain.follow.service.FollowService;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.server.nodak.domain.notification.NotificationType;
 import com.server.nodak.domain.notification.dto.NotificationInfo;
+import com.server.nodak.domain.notification.entity.Notification;
 import com.server.nodak.domain.notification.repository.NotificationRepository;
+import com.server.nodak.domain.user.domain.User;
+import com.server.nodak.domain.user.dto.UserInfoDTO;
+import com.server.nodak.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -19,9 +26,8 @@ public class NotificationService {
 
     private final Map<Long, SseEmitter> clients = new ConcurrentHashMap<>();
     private final RedisTemplate<String, Object> redisTemplate;
-    private final FollowService followService;
-
     private final NotificationRepository notificationRepository;
+    private final FollowRepository followRepository;
 
     /**
      * SSE 연결 시, 동작
@@ -69,7 +75,35 @@ public class NotificationService {
         return notificationRepository.findAllByUserId(userId);
     }
 
-    // TODO: SCAN 을 통한 성능 개선
+    public void savePostNotification(User writer, Long postId) {
+        List<Long> followerIds = followRepository.getFollowerIds(writer.getId());
+
+        // 모든 알림을 저장할 리스트
+        List<Notification> notifications = new ArrayList<>();
+
+        for (Long userId : followerIds) {
+            Notification notification = Notification.builder()
+                    .type(NotificationType.POST)
+                    .userId(userId)
+                    .writer(writer)
+                    .postId(postId)
+                    .build();
+            notifications.add(notification);
+        }
+
+        notificationRepository.saveAll(notifications);
+    }
+
+    public void saveFollowNotification(User follower, User followee) {
+        Notification notification = Notification.builder()
+                .type(NotificationType.FOLLOW)
+                .userId(followee.getId())
+                .follower(follower)
+                .build();
+
+        notificationRepository.save(notification);
+    }
+
 //    public List<Notification> getUndeliveredNotifications(Long userId) {
 //        List<Long> followingIds = followService.getFollowees(userId).stream()
 //                .map(UserInfoDTO::getUserId)
