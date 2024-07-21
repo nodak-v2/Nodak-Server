@@ -12,11 +12,11 @@ public class WebConfig implements WebMvcConfigurer {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                    .allowedOriginPatterns("*") // 안에 해당 주소를 넣어도 됨
+                    .allowedOrigins("https://picky-pick.com")
                     .allowedHeaders("*")
                     .allowedMethods("*")
-                    .exposedHeaders("*");
-                //.allowCredentials(true);
+                    .exposedHeaders("*")
+                    .allowCredentials(true);
             }
         };
     }
