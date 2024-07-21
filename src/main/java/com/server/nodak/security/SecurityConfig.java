@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final OAuthAuthenticationSuccessHandler oAuthSuccessHandler;
     private final OAuthAuthenticationFailureHandler oAuthFailureHandler;
     private final OAuthServiceHandler oAuthServiceHandler;
@@ -26,26 +27,29 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                .formLogin(AbstractHttpConfigurer::disable)
-                .csrf(AbstractHttpConfigurer::disable)
-                .cors(AbstractHttpConfigurer::disable)
-                .anonymous(AbstractHttpConfigurer::disable)
-                .oauth2Login(configurer ->
-                        configurer.authorizationEndpoint(endpoint ->
-                                        endpoint.baseUri("/oauth2/authorization")
-                                )
-                                .userInfoEndpoint(customizer ->
-                                        customizer.userService(oAuthServiceHandler)
-                                )
-                                .successHandler(oAuthSuccessHandler)
-                                .failureHandler(oAuthFailureHandler)
-                )
-                .authorizeHttpRequests(request ->
-                        request.requestMatchers("/**").permitAll()
-                                .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
-                .build();
+            .formLogin(AbstractHttpConfigurer::disable)
+            .csrf(AbstractHttpConfigurer::disable)
+            .cors(AbstractHttpConfigurer::disable)
+            .anonymous(AbstractHttpConfigurer::disable)
+            .sessionManagement(sessionManagement ->
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .oauth2Login(configurer ->
+                configurer.authorizationEndpoint(endpoint ->
+                        endpoint.baseUri("/oauth2/authorization")
+                    )
+                    .userInfoEndpoint(customizer ->
+                        customizer.userService(oAuthServiceHandler)
+                    )
+                    .successHandler(oAuthSuccessHandler)
+                    .failureHandler(oAuthFailureHandler)
+            )
+            .authorizeHttpRequests(request ->
+                request.requestMatchers("/**").permitAll()
+                    .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
+            .build();
     }
 
 }
