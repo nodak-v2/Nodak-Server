@@ -1,8 +1,13 @@
 package com.server.nodak.domain.notification.service;
 
 import com.server.nodak.domain.follow.service.FollowService;
+
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+import com.server.nodak.domain.notification.dto.NotificationInfo;
+import com.server.nodak.domain.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -15,6 +20,8 @@ public class NotificationService {
     private final Map<Long, SseEmitter> clients = new ConcurrentHashMap<>();
     private final RedisTemplate<String, Object> redisTemplate;
     private final FollowService followService;
+
+    private final NotificationRepository notificationRepository;
 
     /**
      * SSE 연결 시, 동작
@@ -56,6 +63,10 @@ public class NotificationService {
 //            e.printStackTrace();
 //        }
         return null;
+    }
+
+    public List<NotificationInfo> getNotifications(long userId) {
+        return notificationRepository.findAllByUserId(userId);
     }
 
     // TODO: SCAN 을 통한 성능 개선

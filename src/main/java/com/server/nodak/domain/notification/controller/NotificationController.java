@@ -1,6 +1,8 @@
 package com.server.nodak.domain.notification.controller;
 
 import com.server.nodak.domain.follow.service.FollowService;
+import com.server.nodak.domain.notification.dto.NotificationInfo;
+import com.server.nodak.domain.notification.service.NotificationService;
 import com.server.nodak.domain.post.domain.Post;
 import com.server.nodak.domain.user.domain.User;
 import com.server.nodak.domain.user.domain.UserRole;
@@ -8,6 +10,7 @@ import com.server.nodak.exception.common.AuthorizationException;
 import com.server.nodak.global.common.response.ApiResponse;
 import com.server.nodak.security.aop.AuthorizationRequired;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -18,17 +21,19 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
+@RequiredArgsConstructor
 public class NotificationController {
 
     private final Map<Long, SseEmitter> clients = new ConcurrentHashMap<>();
 
-    @Autowired
-    private FollowService followService;
+    private final FollowService followService;
+
+    private final NotificationService notificationService;
 
     @GetMapping("/subscribe/{userId}")
     @AuthorizationRequired(UserRole.GENERAL)
@@ -78,8 +83,11 @@ public class NotificationController {
     // TODO: 추가 구현 필요
     @GetMapping("/notifications")
     @AuthorizationRequired(UserRole.GENERAL)
-    public ResponseEntity<ApiResponse<Void>> getNotifications(Principal principal) {
+    public ResponseEntity<ApiResponse<List<NotificationInfo>>> getNotifications(Principal principal) {
         long userId = Long.parseLong(principal.getName());
-        return null;
+        List<NotificationInfo> result = notificationService.getNotifications(userId);
+
+        return ResponseEntity.ok(ApiResponse.success(result));
+
     }
 }
