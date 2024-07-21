@@ -87,8 +87,7 @@ public class PostController {
 
     @PostMapping
     @AuthorizationRequired(UserRole.GENERAL)
-    public ResponseEntity<ApiResponse<Void>> registerPost(@RequestBody PostRequest request,
-        Principal principal) {
+    public ResponseEntity<ApiResponse<Void>> registerPost(@RequestBody PostRequest request,Principal principal) {
         postService.savePost(Long.parseLong(principal.getName()), request);
         return ResponseEntity.ok().build();
     }

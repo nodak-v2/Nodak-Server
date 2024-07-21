@@ -1,25 +1,41 @@
 package com.server.nodak.domain.notification.entity;
 
-import com.server.nodak.domain.post.domain.Post;
+import com.server.nodak.domain.model.BaseEntity;
+import com.server.nodak.domain.notification.NotificationType;
 import com.server.nodak.domain.user.domain.User;
+import jakarta.persistence.*;
 import lombok.*;
 
-import java.io.Serializable;
-
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
-public class Notification implements Serializable {
+public class Notification extends BaseEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private NotificationType type;
+    private Long userId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true, name = "follower_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User follower;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(nullable = true, name = "writer_id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    private User writer;
 
     private Long postId;
-    private String message;
     private Long timestamp;
-    private Long writerId;
 
-    public Notification(Long postId, String message, Long writerId) {
+    @Builder
+    public Notification(NotificationType type, Long userId, User follower, User writer, Long postId) {
+        this.type = type;
+        this.userId = userId;
+        this.follower= follower;
+        this.writer = writer;
         this.postId = postId;
-        this.message = message;
         this.timestamp = System.currentTimeMillis();
-        this.writerId = writerId;
     }
 }
