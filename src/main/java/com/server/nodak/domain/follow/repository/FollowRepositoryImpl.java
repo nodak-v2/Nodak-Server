@@ -8,13 +8,11 @@ import com.server.nodak.domain.follow.domain.QFollow;
 import com.server.nodak.domain.user.domain.QUser;
 import com.server.nodak.domain.user.dto.QUserInfoDTO;
 import com.server.nodak.domain.user.dto.UserInfoDTO;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
@@ -51,52 +49,13 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     public Follow save(Follow follow) {
         Long followeeId = follow.getFollowee().getId();
         Long followerId = follow.getFollower().getId();
-        redisTemplate.opsForSet().add(String.valueOf(followerId) + ":followee", followeeId);
-        redisTemplate.opsForSet().add(String.valueOf(followeeId) + ":follower", followerId);
+        redisTemplate.opsForSet().add(followerId + ":followee", followeeId);
+        redisTemplate.opsForSet().add(followeeId + ":follower", followerId);
         return followJpaRepository.save(follow);
     }
 
     @Override
     public List<UserInfoDTO> getFolloweesByUserId(Long myId, Long userId) {
-        QFollow mainFollow = new QFollow("main");
-        QFollow subFollow = new QFollow("sub");
-
-        return queryFactory
-            .select(
-                new QUserInfoDTO(
-                    mainFollow.followee.id,
-                    mainFollow.followee.email,
-                    mainFollow.followee.nickname,
-                    mainFollow.followee.profileImageUrl,
-                    mainFollow.followee.description,
-                    mainFollow.followee.createdAt,
-                    mainFollow.followee.updatedAt,
-                    JPAExpressions
-                        .select(subFollow.count())
-                        .from(subFollow)
-                        .where(subFollow.follower.id.eq(mainFollow.followee.id)),
-                    JPAExpressions
-                        .select(subFollow.count())
-                        .from(subFollow)
-                        .where(subFollow.followee.id.eq(mainFollow.followee.id)),
-                    myId != null ? (
-                        JPAExpressions.selectOne()
-                            .from(subFollow)
-                            .where(subFollow.follower.id.eq(myId)
-                                .and(subFollow.followee.id.eq(mainFollow.followee.id)))
-                            .where(subFollow.isDeleted.eq(false))
-                            .exists()
-                    ) : Expressions.FALSE
-                )
-            )
-            .from(mainFollow)
-            .where(mainFollow.follower.id.eq(userId))
-            .groupBy(mainFollow.followee.id)
-            .fetch();
-    }
-
-    @Override
-    public List<UserInfoDTO> getFollowersByUserId(Long myId, Long userId) {
         QFollow mainFollow = new QFollow("main");
         QFollow subFollow = new QFollow("sub");
 
@@ -135,6 +94,45 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
     }
 
     @Override
+    public List<UserInfoDTO> getFollowersByUserId(Long myId, Long userId) {
+        QFollow mainFollow = new QFollow("main");
+        QFollow subFollow = new QFollow("sub");
+
+        return queryFactory
+            .select(
+                new QUserInfoDTO(
+                    mainFollow.followee.id,
+                    mainFollow.followee.email,
+                    mainFollow.followee.nickname,
+                    mainFollow.followee.profileImageUrl,
+                    mainFollow.followee.description,
+                    mainFollow.followee.createdAt,
+                    mainFollow.followee.updatedAt,
+                    JPAExpressions
+                        .select(subFollow.count())
+                        .from(subFollow)
+                        .where(subFollow.follower.id.eq(mainFollow.followee.id)),
+                    JPAExpressions
+                        .select(subFollow.count())
+                        .from(subFollow)
+                        .where(subFollow.followee.id.eq(mainFollow.followee.id)),
+                    myId != null ? (
+                        JPAExpressions.selectOne()
+                            .from(subFollow)
+                            .where(subFollow.follower.id.eq(myId)
+                                .and(subFollow.followee.id.eq(mainFollow.followee.id)))
+                            .where(subFollow.isDeleted.eq(false))
+                            .exists()
+                    ) : Expressions.FALSE
+                )
+            )
+            .from(mainFollow)
+            .where(mainFollow.follower.id.eq(userId))
+            .groupBy(mainFollow.followee.id)
+            .fetch();
+    }
+
+    @Override
     public List<Long> getFollowerIds(Long userId) {
         Set<Object> followers = redisTemplate.opsForSet().members(userId + ":follower");
 
@@ -142,21 +140,22 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
             return Collections.emptyList();
         }
         return followers.stream()
-                .map(Object::toString)
-                .map(Long::valueOf)
-                .collect(Collectors.toList());
+            .map(Object::toString)
+            .map(Long::valueOf)
+            .collect(Collectors.toList());
     }
 
     @Override
     public boolean isFollowing(Long followerId, Long followeeId) {
-        Boolean isFollow = redisTemplate.opsForSet().isMember(String.valueOf(followeeId) + ":follower", followerId);
+        Boolean isFollow = redisTemplate.opsForSet()
+            .isMember(followeeId + ":follower", followerId);
         return isFollow != null && isFollow;
     }
 
     @Override
     public void deleteFromRedis(Long followerId, Long followeeId) {
-        redisTemplate.opsForSet().remove(String.valueOf(followerId) + ":followee", followeeId);
-        redisTemplate.opsForSet().remove(String.valueOf(followeeId) + ":follower", followerId);
+        redisTemplate.opsForSet().remove(followerId + ":followee", followeeId);
+        redisTemplate.opsForSet().remove(followeeId + ":follower", followerId);
     }
 
     @Override
