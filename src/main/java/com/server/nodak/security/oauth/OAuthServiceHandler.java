@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OAuthServiceHandler extends DefaultOAuth2UserService {
 
-    private final static String DEFAULT_NICKNAME = "피키";
+    private final static String DEFAULT_NICKNAME = "피커";
 
     private final UserRepository userRepository;
 
@@ -58,7 +58,7 @@ public class OAuthServiceHandler extends DefaultOAuth2UserService {
 
     private User registerUser(OAuthUserInfo oAuthUserInfo) {
         long count = userRepository.count();
-        
+
         User user = createUser(
             oAuthUserInfo.getEmail(),
             "NO_PASS",
