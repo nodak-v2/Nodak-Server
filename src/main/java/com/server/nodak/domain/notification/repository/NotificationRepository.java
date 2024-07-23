@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    @Query("SELECT new com.server.nodak.domain.notification.dto.NotificationInfo(n.type, f, w, n.postId) " +
+    @Query("SELECT new com.server.nodak.domain.notification.dto.NotificationInfo(n.type, f, w, n.postId, n.timestamp) " +
             "FROM Notification n " +
             "LEFT JOIN n.follower f " +
             "LEFT JOIN n.writer w " +

@@ -21,13 +21,13 @@ public class NotificationInfo {
     private Long timestamp;
 
     @Builder
-    public NotificationInfo(NotificationType type, User follower, User writer, Long postId) {
+    public NotificationInfo(NotificationType type, User follower, User writer, Long postId, Long timestamp) {
         this.type = type;
         this.followerId = (follower != null) ? follower.getId() : null;
         this.followerName = (follower != null) ? follower.getNickname() : null;
         this.writerId = (writer != null) ? writer.getId() : null;
         this.writerName = (writer != null) ? writer.getNickname() : null;
         this.postId = postId;
-        this.timestamp = System.currentTimeMillis();
+        this.timestamp = timestamp;
     }
 }
