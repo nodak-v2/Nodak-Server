@@ -89,6 +89,7 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
             )
             .from(mainFollow)
             .where(mainFollow.follower.id.eq(userId))
+            .where(mainFollow.isDeleted.eq(false))
             .groupBy(mainFollow.followee.id)
             .fetch();
     }
@@ -128,6 +129,7 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
             )
             .from(mainFollow)
             .where(mainFollow.followee.id.eq(userId))
+            .where(mainFollow.isDeleted.eq(false))
             .groupBy(mainFollow.follower.id)
             .fetch();
     }
