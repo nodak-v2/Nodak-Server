@@ -62,45 +62,6 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
         return queryFactory
             .select(
                 new QUserInfoDTO(
-                    mainFollow.follower.id,
-                    mainFollow.follower.email,
-                    mainFollow.follower.nickname,
-                    mainFollow.follower.profileImageUrl,
-                    mainFollow.follower.description,
-                    mainFollow.follower.createdAt,
-                    mainFollow.follower.updatedAt,
-                    JPAExpressions
-                        .select(subFollow.count())
-                        .from(subFollow)
-                        .where(subFollow.follower.id.eq(mainFollow.follower.id)),
-                    JPAExpressions
-                        .select(subFollow.count())
-                        .from(subFollow)
-                        .where(subFollow.followee.id.eq(mainFollow.follower.id)),
-                    myId != null ? (
-                        JPAExpressions.selectOne()
-                            .from(subFollow)
-                            .where(subFollow.follower.id.eq(myId)
-                                .and(subFollow.followee.id.eq(mainFollow.follower.id)))
-                            .where(subFollow.isDeleted.eq(false))
-                            .exists()
-                    ) : Expressions.FALSE
-                )
-            )
-            .from(mainFollow)
-            .where(mainFollow.followee.id.eq(userId))
-            .groupBy(mainFollow.follower.id)
-            .fetch();
-    }
-
-    @Override
-    public List<UserInfoDTO> getFollowersByUserId(Long myId, Long userId) {
-        QFollow mainFollow = new QFollow("main");
-        QFollow subFollow = new QFollow("sub");
-
-        return queryFactory
-            .select(
-                new QUserInfoDTO(
                     mainFollow.followee.id,
                     mainFollow.followee.email,
                     mainFollow.followee.nickname,
@@ -129,6 +90,45 @@ public class FollowRepositoryImpl implements FollowRepository, FollowRepositoryC
             .from(mainFollow)
             .where(mainFollow.follower.id.eq(userId))
             .groupBy(mainFollow.followee.id)
+            .fetch();
+    }
+
+    @Override
+    public List<UserInfoDTO> getFollowersByUserId(Long myId, Long userId) {
+        QFollow mainFollow = new QFollow("main");
+        QFollow subFollow = new QFollow("sub");
+
+        return queryFactory
+            .select(
+                new QUserInfoDTO(
+                    mainFollow.follower.id,
+                    mainFollow.follower.email,
+                    mainFollow.follower.nickname,
+                    mainFollow.follower.profileImageUrl,
+                    mainFollow.follower.description,
+                    mainFollow.follower.createdAt,
+                    mainFollow.follower.updatedAt,
+                    JPAExpressions
+                        .select(subFollow.count())
+                        .from(subFollow)
+                        .where(subFollow.follower.id.eq(mainFollow.follower.id)),
+                    JPAExpressions
+                        .select(subFollow.count())
+                        .from(subFollow)
+                        .where(subFollow.followee.id.eq(mainFollow.follower.id)),
+                    myId != null ? (
+                        JPAExpressions.selectOne()
+                            .from(subFollow)
+                            .where(subFollow.follower.id.eq(myId)
+                                .and(subFollow.followee.id.eq(mainFollow.follower.id)))
+                            .where(subFollow.isDeleted.eq(false))
+                            .exists()
+                    ) : Expressions.FALSE
+                )
+            )
+            .from(mainFollow)
+            .where(mainFollow.followee.id.eq(userId))
+            .groupBy(mainFollow.follower.id)
             .fetch();
     }
 
